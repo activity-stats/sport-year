@@ -26,6 +26,8 @@ export const useAuth = () => {
 
   const login = () => {
     const authUrl = stravaClient.getAuthUrl();
+    console.log('Initiating login with auth URL:', authUrl);
+    console.log('Expected callback URL:', `${window.location.origin}/callback`);
     window.location.href = authUrl;
   };
 

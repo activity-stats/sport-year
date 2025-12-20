@@ -2,6 +2,8 @@ import { useAuth } from '../hooks/useAuth.ts';
 
 export const Login = () => {
   const { login } = useAuth();
+  const expectedCallback = `${window.location.origin}/callback`;
+  const domain = window.location.host;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-600">
@@ -34,6 +36,16 @@ export const Login = () => {
           <p className="text-xs text-gray-500 text-center">
             We only request read access to your activities
           </p>
+
+          <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded text-xs">
+            <p className="font-semibold text-blue-900 mb-1">Strava App Configuration:</p>
+            <p className="text-blue-800">
+              <strong>Authorization Callback Domain:</strong> {domain}
+            </p>
+            <p className="text-blue-700 mt-1 text-[10px]">
+              Expected callback: {expectedCallback}
+            </p>
+          </div>
         </div>
       </div>
     </div>

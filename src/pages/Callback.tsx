@@ -11,19 +11,24 @@ export const Callback = () => {
     const code = searchParams.get('code');
     const error = searchParams.get('error');
 
+    console.log('Callback page - Current URL:', window.location.href);
+    console.log('Callback page - Code:', code);
+    console.log('Callback page - Error:', error);
+
     if (error) {
       console.error('OAuth error:', error);
-      navigate('/login');
+      navigate('/login', { replace: true });
       return;
     }
 
     if (code) {
       handleCallback(code).catch((err) => {
         console.error('Failed to handle callback:', err);
-        navigate('/login');
+        navigate('/login', { replace: true });
       });
     } else {
-      navigate('/login');
+      console.warn('No code or error in callback URL');
+      navigate('/login', { replace: true });
     }
   }, [searchParams, handleCallback, navigate]);
 
