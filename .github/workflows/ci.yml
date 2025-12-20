@@ -26,7 +26,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20.x']
+        node-version: ['22.x']
 
     steps:
       - name: Checkout code
@@ -62,7 +62,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20.x']
+        node-version: ['22.x']
 
     steps:
       - name: Checkout code
@@ -100,7 +100,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20.x']
+        node-version: ['22.x']
 
     steps:
       - name: Checkout code
@@ -142,7 +142,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20.x']
+        node-version: ['22.x']
 
     steps:
       - name: Checkout code
@@ -176,3 +176,4 @@ jobs:
           path: dist
           retention-days: 7
           if-no-files-found: error
+
