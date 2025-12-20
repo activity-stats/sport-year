@@ -1,4 +1,5 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import type { ActivityType } from '../../types/strava.ts';
 import type { TypeStats } from '../../types/activity.ts';
 
@@ -15,15 +16,24 @@ const COLORS: Record<string, string> = {
   Hike: '#f59e0b',
 };
 
+type MetricType = 'distance' | 'time' | 'count';
+
 export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
-  const chartData = Object.entries(data)
-    .filter(([_, stats]) => stats.count > 0)
-    .map(([type, stats]) => ({
-      name: type,
-      value: Math.round(stats.distanceKm),
-      count: stats.count,
-    }))
-    .sort((a, b) => b.value - a.value);
+  const [selectedMetric, setSelectedMetric] = useState<MetricType>('distance');
+
+  const getChartData = () => {
+    return Object.entries(data)
+      .filter(([_, stats]) => stats.count > 0)
+      .map(([type, stats]) => ({
+        name: type,
+        distance: Math.round(stats.distanceKm),
+        time: Math.round(stats.timeHours * 10) / 10,
+        count: stats.count,
+      }))
+      .sort((a, b) => b[selectedMetric] - a[selectedMetric]);
+  };
+
+  const chartData = getChartData();
 
   if (chartData.length === 0) {
     return (
@@ -34,9 +44,34 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
     );
   }
 
+  const metrics = {
+    distance: { label: 'Distance', unit: 'km' },
+    time: { label: 'Time', unit: 'hours' },
+    count: { label: 'Count', unit: 'activities' },
+  };
+
+  const currentMetric = metrics[selectedMetric];
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Activity Types</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-2xl font-bold text-gray-900">By Activity Type</h3>
+        <div className="flex gap-2">
+          {(Object.keys(metrics) as MetricType[]).map((metric) => (
+            <button
+              key={metric}
+              onClick={() => setSelectedMetric(metric)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                selectedMetric === metric
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {metrics[metric].label}
+            </button>
+          ))}
+        </div>
+      </div>
       <ResponsiveContainer width="100%" height={320}>
         <PieChart>
           <Pie
@@ -47,7 +82,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
             outerRadius={100}
             fill="#8884d8"
-            dataKey="value"
+            dataKey={selectedMetric}
             strokeWidth={2}
             stroke="#fff"
           >
@@ -56,10 +91,10 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value, name, props: any) => [
-              `${value ?? 0} km (${props.payload.count} activities)`,
-              name ?? '',
-            ]}
+            formatter={(value: number | undefined, name: string | undefined) => {
+              if (value === undefined) return ['', ''];
+              return [`${value} ${currentMetric.unit}`, name ?? ''];
+            }}
             contentStyle={{
               backgroundColor: '#fff',
               border: '1px solid #e5e7eb',
@@ -67,6 +102,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           />
+          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
