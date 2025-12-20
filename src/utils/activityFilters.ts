@@ -1,7 +1,7 @@
 import type { Activity } from '../types';
-import type { useSettingsStore } from '../stores/settingsStore';
+import { useSettingsStore } from '../stores/settingsStore';
 
-type Settings = ReturnType<typeof useSettingsStore>['yearInReview'];
+type Settings = ReturnType<typeof useSettingsStore.getState>['yearInReview'];
 
 export function filterActivities(
   activities: Activity[],

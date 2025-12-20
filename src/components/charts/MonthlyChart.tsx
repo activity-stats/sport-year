@@ -31,7 +31,8 @@ export const MonthlyChart = ({ data }: MonthlyChartProps) => {
           <XAxis dataKey="name" stroke="#6b7280" style={{ fontSize: '14px', fontWeight: 500 }} />
           <YAxis stroke="#6b7280" style={{ fontSize: '14px', fontWeight: 500 }} />
           <Tooltip
-            formatter={(value: number, name: string) => {
+            formatter={(value: number | undefined, name: string) => {
+              if (value === undefined) return ['', name];
               if (name === 'distance') return [`${value} km`, 'Distance'];
               if (name === 'elevation') return [`${value} m`, 'Elevation'];
               return [value, name];
