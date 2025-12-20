@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useYearStats } from '../hooks/useYearStats.ts';
 import { StatsOverview } from '../components/ui/StatsOverview.tsx';
@@ -10,9 +10,12 @@ import { YearInReview } from '../components/ui/YearInReview.tsx';
 import { YearInReviewSettings } from '../components/ui/YearInReviewSettings.tsx';
 import { StravaSettings } from '../components/settings/StravaSettings.tsx';
 import { ActivityMap } from '../components/maps/ActivityMap.tsx';
+import { OnboardingGuide } from '../components/ui/OnboardingGuide.tsx';
 import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 import type { ActivityType } from '../types';
+
+const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
 
 export const Dashboard = () => {
   const { athlete, logout } = useAuth();
@@ -21,6 +24,7 @@ export const Dashboard = () => {
   const [viewMode, setViewMode] = useState<'presentation' | 'detailed' | 'map'>('presentation');
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaSettings, setShowStravaSettings] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { stats, isLoading, error } = useYearStats(selectedYear);
   const { data: activities } = useActivities(selectedYear);
@@ -35,6 +39,26 @@ export const Dashboard = () => {
   }, [activities]);
 
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  // Show onboarding guide on first visit
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem(ONBOARDING_SEEN_KEY);
+    if (!hasSeenOnboarding && activities && activities.length > 0) {
+      // Use setTimeout to avoid synchronous setState in effect
+      const timer = setTimeout(() => setShowOnboarding(true), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [activities]);
+
+  const handleCloseOnboarding = () => {
+    setShowOnboarding(false);
+    localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
+  };
+
+  const handleOpenSettingsFromOnboarding = () => {
+    setShowSettings(true);
+    handleCloseOnboarding();
+  };
 
   if (error) {
     return (
@@ -63,6 +87,15 @@ export const Dashboard = () => {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* Help Button */}
+              <button
+                onClick={() => setShowOnboarding(true)}
+                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition backdrop-blur-sm flex items-center gap-2"
+                title="Show Guide"
+              >
+                ❓ Guide
+              </button>
+
               {/* Settings Button (only for presentation mode) */}
               {viewMode === 'presentation' && (
                 <button
@@ -223,6 +256,14 @@ export const Dashboard = () => {
           </div>
         )}
       </main>
+
+      {/* Onboarding Guide */}
+      {showOnboarding && (
+        <OnboardingGuide
+          onClose={handleCloseOnboarding}
+          onOpenSettings={handleOpenSettingsFromOnboarding}
+        />
+      )}
     </div>
   );
 };
