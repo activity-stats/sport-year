@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript-typescript', 'actions']
+        language: ['javascript-typescript']
 
     steps:
       - name: Checkout code
@@ -48,7 +48,6 @@ jobs:
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@662472033e021d55d94146f66f6058822b0b39fd # v3.27.0
-        if: matrix.language == 'javascript-typescript'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@662472033e021d55d94146f66f6058822b0b39fd # v3.27.0
