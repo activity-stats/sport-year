@@ -42,9 +42,7 @@ export const Login = () => {
             <p className="text-blue-800">
               <strong>Authorization Callback Domain:</strong> {domain}
             </p>
-            <p className="text-blue-700 mt-1 text-[10px]">
-              Expected callback: {expectedCallback}
-            </p>
+            <p className="text-blue-700 mt-1 text-[10px]">Expected callback: {expectedCallback}</p>
           </div>
         </div>
       </div>

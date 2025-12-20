@@ -72,15 +72,20 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
 
       <div className="space-y-3 max-h-[600px] overflow-y-auto">
         {filteredActivities.map((activity) => (
-          <div
+          <a
             key={activity.id}
-            className="p-5 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-200"
+            href={`https://www.strava.com/activities/${activity.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block p-5 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-200 hover:border-orange-400"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl">{ACTIVITY_ICONS[activity.type] || '🏃'}</span>
-                  <h4 className="font-semibold text-gray-900 text-lg">{activity.name}</h4>
+                  <h4 className="font-semibold text-gray-900 text-lg hover:text-orange-600 transition-colors">
+                    {activity.name}
+                  </h4>
                   <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                     {activity.type}
                   </span>
@@ -124,7 +129,7 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
                 {formatDate(activity.date)}
               </div>
             </div>
-          </div>
+          </a>
         ))}
 
         {filteredActivities.length === 0 && (

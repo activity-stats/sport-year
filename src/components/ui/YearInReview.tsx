@@ -199,8 +199,20 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
     day: 'numeric',
   });
 
+  // For triathlons, link to the first activity (swim usually), otherwise use the highlight ID
+  const activityId =
+    highlight.activities && highlight.activities.length > 0
+      ? highlight.activities[0].id
+      : highlight.id;
+  const stravaUrl = `https://www.strava.com/activities/${activityId}`;
+
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
+    <a
+      href={stravaUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 block"
+    >
       {/* Colorful top accent bar */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
 
@@ -272,7 +284,7 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
           </div>
         )}
       </div>
-    </div>
+    </a>
   );
 }
 

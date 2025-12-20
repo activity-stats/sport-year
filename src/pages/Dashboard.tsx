@@ -9,6 +9,7 @@ import { SportDetail } from '../components/ui/SportDetail.tsx';
 import { YearInReview } from '../components/ui/YearInReview.tsx';
 import { YearInReviewSettings } from '../components/ui/YearInReviewSettings.tsx';
 import { StravaSettings } from '../components/settings/StravaSettings.tsx';
+import { ActivityMap } from '../components/maps/ActivityMap.tsx';
 import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 import type { ActivityType } from '../types';
@@ -17,7 +18,7 @@ export const Dashboard = () => {
   const { athlete, logout } = useAuth();
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [viewMode, setViewMode] = useState<'presentation' | 'detailed'>('presentation');
+  const [viewMode, setViewMode] = useState<'presentation' | 'detailed' | 'map'>('presentation');
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaSettings, setShowStravaSettings] = useState(false);
 
@@ -104,6 +105,16 @@ export const Dashboard = () => {
                 >
                   📈 Detailed Stats
                 </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`px-4 py-2 rounded-md font-semibold transition ${
+                    viewMode === 'map'
+                      ? 'bg-white text-purple-600 shadow-lg'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                >
+                  🗺️ Map
+                </button>
               </div>
 
               <select
@@ -156,6 +167,22 @@ export const Dashboard = () => {
                   <StravaSettings onClose={() => setShowStravaSettings(false)} />
                 )}
               </>
+            ) : viewMode === 'map' ? (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Activity Map</h2>
+                    <p className="text-gray-600">
+                      All your activities for {selectedYear} visualized on a map. Click any route to
+                      see details.
+                    </p>
+                  </div>
+                  <ActivityMap activities={activities} height="calc(100vh - 300px)" />
+                </div>
+                {showStravaSettings && (
+                  <StravaSettings onClose={() => setShowStravaSettings(false)} />
+                )}
+              </div>
             ) : (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="space-y-8">

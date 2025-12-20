@@ -103,17 +103,26 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border border-gray-200 rounded-lg p-4">
+          <a
+            href={`https://www.strava.com/activities/${longestActivity.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-gray-200 rounded-lg p-4 hover:border-orange-400 hover:shadow-md transition-all"
+          >
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🏆</span>
-              <h4 className="font-semibold text-gray-900">Longest Activity</h4>
+              <h4 className="font-semibold text-gray-900 group-hover:text-orange-600">
+                Longest Activity
+              </h4>
             </div>
-            <div className="text-gray-700 font-medium mb-1">{longestActivity.name}</div>
+            <div className="text-gray-700 font-medium mb-1 hover:text-orange-600 transition-colors">
+              {longestActivity.name}
+            </div>
             <div className="flex gap-4 text-sm text-gray-600">
               <span>{formatDistanceWithUnit(longestActivity.distanceKm * 1000)}</span>
               <span>{formatDuration(longestActivity.movingTimeMinutes * 60)}</span>
             </div>
-          </div>
+          </a>
 
           {(sport === 'cycling' || sport === 'running') && (
             <div className="border border-gray-200 rounded-lg p-4">
