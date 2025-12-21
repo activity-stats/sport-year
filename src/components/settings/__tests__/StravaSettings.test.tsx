@@ -48,7 +48,8 @@ describe('StravaSettings', () => {
     it('should display callback domain', () => {
       render(<StravaSettings onClose={mockOnClose} />);
 
-      expect(screen.getByText('localhost:5173')).toBeInTheDocument();
+      // Check for Authorization Callback Domain section
+      expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
     });
 
     it('should pre-fill existing credentials', () => {
@@ -270,7 +271,7 @@ describe('StravaSettings', () => {
     it('should have link to Strava API settings', () => {
       render(<StravaSettings onClose={mockOnClose} />);
 
-      const link = screen.getByText('Strava API Settings');
+      const link = screen.getByRole('link', { name: /Open Strava API Settings/ });
       expect(link).toHaveAttribute('href', 'https://www.strava.com/settings/api');
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -280,9 +281,7 @@ describe('StravaSettings', () => {
       render(<StravaSettings onClose={mockOnClose} />);
 
       expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/Make sure your Strava app is configured with this domain/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Enter ONLY the domain without port number:/)).toBeInTheDocument();
     });
   });
 

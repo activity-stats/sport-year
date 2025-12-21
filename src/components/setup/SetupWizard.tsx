@@ -7,7 +7,9 @@ export function SetupWizard() {
   const [clientSecret, setClientSecret] = useState('');
   const [step, setStep] = useState<'instructions' | 'credentials'>('instructions');
 
-  const domain = window.location.host; // e.g., "localhost:5173" or "example.com"
+  // Extract domain without port for Strava callback
+  const hostname = window.location.hostname; // e.g., "localhost" or "example.com"
+  const callbackDomain = hostname === 'localhost' ? 'localhost' : hostname;
 
   const handleSave = () => {
     if (clientId.trim() && clientSecret.trim()) {
@@ -52,13 +54,18 @@ export function SetupWizard() {
                       <p className="text-gray-900 font-semibold mb-2">
                         Go to Strava's API settings
                       </p>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Click the link below. It will open in a new tab so you can easily switch
+                        back here.
+                      </p>
                       <a
                         href="https://www.strava.com/settings/api"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
+                        className="inline-flex items-center gap-2 bg-orange-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm"
                       >
-                        Open Strava API Settings →
+                        <span>Open Strava API Settings</span>
+                        <span className="text-lg">→</span>
                       </a>
                     </div>
                   </div>
@@ -96,10 +103,11 @@ export function SetupWizard() {
                           <div>
                             <strong className="text-red-600">Authorization Callback Domain:</strong>
                             <div className="mt-1 bg-gray-900 text-white px-3 py-2 rounded font-mono text-xs break-all">
-                              {domain}
+                              {callbackDomain}
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              ⚠️ Enter only the domain (not the full URL with /callback)
+                              ⚠️ Enter only the domain (not the full URL with /callback or port
+                              number)
                             </p>
                           </div>
                         </li>

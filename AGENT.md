@@ -7,6 +7,7 @@ This document provides context and guidelines for AI assistants working on the S
 **Sport Year** is a React + TypeScript web application for visualizing Strava athletic activities and creating year-in-review summaries.
 
 **Key Features:**
+
 - Strava OAuth authentication
 - Activity data fetching and visualization
 - Year-in-review generator with customization
@@ -16,6 +17,7 @@ This document provides context and guidelines for AI assistants working on the S
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 19 + TypeScript
 - **Build**: Vite
 - **Styling**: Tailwind CSS 4
@@ -26,6 +28,7 @@ This document provides context and guidelines for AI assistants working on the S
 - **Testing**: Vitest + React Testing Library
 
 ### Project Structure
+
 ```
 src/
 ├── api/strava/          # Strava API client
@@ -52,6 +55,7 @@ Key files:
 ## 🎯 Design Principles
 
 ### SOLID Architecture
+
 The codebase follows SOLID principles, particularly in the config system:
 
 - **Single Responsibility**: Each class has one purpose
@@ -61,12 +65,14 @@ The codebase follows SOLID principles, particularly in the config system:
 - **Dependency Inversion**: Depend on abstractions
 
 Example: `stravaConfigProvider.ts` implements a provider pattern with:
+
 - `IConfigProvider` interface
 - `EnvConfigProvider`, `StorageConfigProvider` implementations
 - `CompositeConfigProvider` for fallback chains
 - `ConfigProviderFactory` for creation
 
 ### Code Quality Standards
+
 - **TypeScript**: Strict mode, minimal `any` usage
 - **Testing**: 100% coverage on critical paths (73 tests total)
 - **Formatting**: Prettier with single quotes, 100 char width
@@ -76,6 +82,7 @@ Example: `stravaConfigProvider.ts` implements a provider pattern with:
 ## 🔑 Key Concepts
 
 ### Authentication Flow
+
 1. User creates Strava API app (OAuth client)
 2. User enters Client ID + Secret in setup wizard
 3. App stores credentials in localStorage
@@ -84,6 +91,7 @@ Example: `stravaConfigProvider.ts` implements a provider pattern with:
 6. Auto-refresh on expiry
 
 ### Configuration System
+
 ```typescript
 // Provider pattern for flexibility
 IConfigProvider
@@ -96,6 +104,7 @@ stravaConfigStore.ts uses ConfigProviderFactory
 ```
 
 ### State Management
+
 - **authStore**: Access tokens, athlete data
 - **stravaConfigStore**: Client ID/Secret
 - **settingsStore**: UI preferences
@@ -103,6 +112,7 @@ stravaConfigStore.ts uses ConfigProviderFactory
 ## 🧪 Testing Guidelines
 
 ### Test Structure
+
 ```typescript
 describe('ComponentName', () => {
   beforeEach(() => {
@@ -118,6 +128,7 @@ describe('ComponentName', () => {
 ```
 
 ### Testing Patterns
+
 - Use React Testing Library (`render`, `screen`, `userEvent`)
 - Mock stores with `vi.mock()`
 - Test user interactions, not implementation
@@ -125,6 +136,7 @@ describe('ComponentName', () => {
 - Use `waitFor` for async operations
 
 ### Coverage Requirements
+
 - Critical paths: 100%
 - Overall: 80%+ statements
 - Run: `npm run test:coverage`
@@ -132,6 +144,7 @@ describe('ComponentName', () => {
 ## 🚀 Common Tasks
 
 ### Adding a New Component
+
 1. Create in appropriate directory (e.g., `components/ui/`)
 2. Add TypeScript interface for props
 3. Write component with proper types
@@ -139,18 +152,21 @@ describe('ComponentName', () => {
 5. Export from `index.ts`
 
 ### Adding a New API Endpoint
+
 1. Add method to `api/strava/client.ts`
 2. Add types to `types/strava.ts`
 3. Create custom hook in `hooks/` if needed
 4. Add tests
 
 ### Adding a New Store
+
 1. Create in `stores/` directory
 2. Use Zustand with TypeScript
 3. Add persist middleware if needed
 4. Add tests in `__tests__/`
 
 ### Updating Styles
+
 - Use Tailwind utility classes
 - Follow existing color scheme (orange primary)
 - Responsive design (mobile-first)
@@ -159,12 +175,14 @@ describe('ComponentName', () => {
 ## 🔒 Security Considerations
 
 ### Never Commit
+
 - API keys or secrets
 - `.env` files
 - Tokens or credentials
 - User data
 
 ### Always
+
 - Validate user input
 - Sanitize data before display
 - Use TypeScript for type safety
@@ -172,6 +190,7 @@ describe('ComponentName', () => {
 - Run `npm audit`
 
 ### Strava API
+
 - OAuth 2.0 only
 - Tokens in localStorage (not cookies)
 - HTTPS for all requests
@@ -207,6 +226,7 @@ npm run ci:local        # Simulate CI
 ## 📝 Code Patterns
 
 ### Component Pattern
+
 ```typescript
 interface MyComponentProps {
   data: string;
@@ -215,7 +235,7 @@ interface MyComponentProps {
 
 export function MyComponent({ data, onAction }: MyComponentProps) {
   const [state, setState] = useState('');
-  
+
   return (
     <div className="flex flex-col gap-4">
       {/* Content */}
@@ -225,6 +245,7 @@ export function MyComponent({ data, onAction }: MyComponentProps) {
 ```
 
 ### Custom Hook Pattern
+
 ```typescript
 export const useMyHook = (param: string) => {
   const { data, isLoading, error } = useQuery({
@@ -237,6 +258,7 @@ export const useMyHook = (param: string) => {
 ```
 
 ### Store Pattern
+
 ```typescript
 interface MyStore {
   value: string;
@@ -257,16 +279,19 @@ export const useMyStore = create<MyStore>()(
 ## 🐛 Common Issues
 
 ### Build Failures
+
 - Check TypeScript errors: `npm run type-check`
 - Check for unused imports
 - Verify all dependencies installed
 
 ### Test Failures
+
 - Mock window.location properly
 - Use `waitFor` for async operations
 - Clear mocks in `beforeEach`
 
 ### Linting Issues
+
 - Auto-fix: `npm run lint:fix`
 - Format: `npm run format`
 - Check `.eslintrc` for rules
@@ -274,6 +299,7 @@ export const useMyStore = create<MyStore>()(
 ## 📚 Important Files to Know
 
 ### Configuration
+
 - `vite.config.ts` - Vite build config
 - `vitest.config.ts` - Test config
 - `eslint.config.js` - Linting rules
@@ -281,11 +307,13 @@ export const useMyStore = create<MyStore>()(
 - `tsconfig.json` - TypeScript config
 
 ### CI/CD
+
 - `.github/workflows/ci.yml` - Main CI pipeline
 - `.github/workflows/codeql.yml` - Security scanning
 - `.github/workflows/dependency-review.yml` - Dependency checks
 
 ### Git
+
 - `.husky/pre-commit` - Pre-commit hooks (runs lint-staged)
 - `.gitignore` - Ignored files
 
@@ -301,6 +329,7 @@ export const useMyStore = create<MyStore>()(
 ## 💡 Best Practices for AI Agents
 
 ### When Making Changes
+
 1. **Read existing code first** - Understand patterns
 2. **Maintain consistency** - Follow established patterns
 3. **Run tests** - Always verify changes work
@@ -309,6 +338,7 @@ export const useMyStore = create<MyStore>()(
 6. **Format code** - Run Prettier before committing
 
 ### When Suggesting Solutions
+
 1. **Consider existing architecture** - SOLID, provider pattern
 2. **Type safety first** - Avoid `any`, use proper types
 3. **Test coverage** - Include test examples
@@ -316,6 +346,7 @@ export const useMyStore = create<MyStore>()(
 5. **Performance** - Consider bundle size, lazy loading
 
 ### When Debugging
+
 1. **Check CI logs** - GitHub Actions output
 2. **Run locally** - `npm run validate`
 3. **Review test output** - Error messages are helpful
@@ -325,6 +356,7 @@ export const useMyStore = create<MyStore>()(
 ## ✅ Quality Checklist
 
 Before marking work complete:
+
 - [ ] TypeScript compiles (`npm run type-check`)
 - [ ] Tests pass (`npm test -- --run`)
 - [ ] Linting passes (`npm run lint`)
@@ -337,6 +369,7 @@ Before marking work complete:
 ## 🤝 Collaboration
 
 When working with humans:
+
 - Ask clarifying questions when uncertain
 - Explain architectural decisions
 - Provide context for suggestions
@@ -347,6 +380,7 @@ When working with humans:
 ---
 
 For questions or clarifications, refer to:
+
 - README.md - Project overview
 - CONTRIBUTING.md - Contribution guidelines
 - SECURITY.md - Security policies

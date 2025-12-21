@@ -25,6 +25,7 @@ export const Dashboard = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaSettings, setShowStravaSettings] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   const { stats, isLoading, error } = useYearStats(selectedYear);
   const { data: activities } = useActivities(selectedYear);
@@ -44,7 +45,6 @@ export const Dashboard = () => {
   useEffect(() => {
     const hasSeenOnboarding = localStorage.getItem(ONBOARDING_SEEN_KEY);
     if (!hasSeenOnboarding && activities && activities.length > 0) {
-      // Use setTimeout to avoid synchronous setState in effect
       const timer = setTimeout(() => setShowOnboarding(true), 0);
       return () => clearTimeout(timer);
     }
@@ -73,87 +73,129 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Sport Year</h1>
-              {athlete && (
-                <p className="text-white/90 text-sm mt-1">
-                  {athlete.firstname} {athlete.lastname}
-                </p>
-              )}
-            </div>
+      {/* Left Sidebar Navigation */}
+      <aside
+        className={`fixed left-0 top-0 h-full bg-gradient-to-b from-blue-600 via-purple-600 to-pink-600 shadow-2xl transition-all duration-300 z-40 ${
+          sidebarExpanded ? 'w-56' : 'w-16'
+        }`}
+        onMouseEnter={() => setSidebarExpanded(true)}
+        onMouseLeave={() => setSidebarExpanded(false)}
+      >
+        <div className="flex flex-col h-full py-6 px-3">
+          {/* Logo/Brand */}
+          <div className="mb-8 flex items-center justify-center">
+            <div className="text-2xl">🏃</div>
+          </div>
 
-            <div className="flex items-center gap-4">
-              {/* Help Button */}
+          {/* Navigation Items */}
+          <nav className="flex-1 space-y-2">
+            {/* Guide */}
+            <button
+              onClick={() => setShowOnboarding(true)}
+              className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
+              title="Show Guide"
+            >
+              <span className="text-xl">❓</span>
+              {sidebarExpanded && <span className="text-sm font-semibold">Guide</span>}
+            </button>
+
+            {/* View Mode Buttons */}
+            <button
+              onClick={() => setViewMode('presentation')}
+              className={`w-full px-3 py-3 rounded-lg transition flex items-center gap-3 ${
+                viewMode === 'presentation'
+                  ? 'bg-white text-purple-600 shadow-lg'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title="Year in Review"
+            >
+              <span className="text-xl">📊</span>
+              {sidebarExpanded && <span className="text-sm font-semibold">Year Review</span>}
+            </button>
+
+            <button
+              onClick={() => setViewMode('detailed')}
+              className={`w-full px-3 py-3 rounded-lg transition flex items-center gap-3 ${
+                viewMode === 'detailed'
+                  ? 'bg-white text-purple-600 shadow-lg'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title="Detailed Statistics"
+            >
+              <span className="text-xl">📈</span>
+              {sidebarExpanded && <span className="text-sm font-semibold">Stats</span>}
+            </button>
+
+            <button
+              onClick={() => setViewMode('map')}
+              className={`w-full px-3 py-3 rounded-lg transition flex items-center gap-3 ${
+                viewMode === 'map'
+                  ? 'bg-white text-purple-600 shadow-lg'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title="Activity Map"
+            >
+              <span className="text-xl">🗺️</span>
+              {sidebarExpanded && <span className="text-sm font-semibold">Map</span>}
+            </button>
+
+            <div className="my-4 border-t border-white/20"></div>
+
+            {/* Customize (only for presentation mode) */}
+            {viewMode === 'presentation' && (
               <button
-                onClick={() => setShowOnboarding(true)}
-                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition backdrop-blur-sm flex items-center gap-2"
-                title="Show Guide"
+                onClick={() => setShowSettings(true)}
+                className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
+                title="Customize Year in Review"
               >
-                ❓ Guide
+                <span className="text-xl">🎨</span>
+                {sidebarExpanded && <span className="text-sm font-semibold">Customize</span>}
               </button>
+            )}
 
-              {/* Settings Button (only for presentation mode) */}
-              {viewMode === 'presentation' && (
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition backdrop-blur-sm flex items-center gap-2"
-                  title="Year in Review Settings"
-                >
-                  ⚙️ Settings
-                </button>
-              )}
+            {/* Strava Settings */}
+            <button
+              onClick={() => setShowStravaSettings(true)}
+              className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
+              title="Strava Settings"
+            >
+              <span className="text-xl">🔑</span>
+              {sidebarExpanded && <span className="text-sm font-semibold">Strava</span>}
+            </button>
+          </nav>
 
-              {/* Strava Settings Button */}
-              <button
-                onClick={() => setShowStravaSettings(true)}
-                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition backdrop-blur-sm flex items-center gap-2"
-                title="Strava API Settings"
-              >
-                🔑 Strava
-              </button>
+          {/* Logout at bottom */}
+          <button
+            onClick={logout}
+            className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3 mt-auto"
+            title="Logout"
+          >
+            <span className="text-xl">🚪</span>
+            {sidebarExpanded && <span className="text-sm font-semibold">Logout</span>}
+          </button>
+        </div>
+      </aside>
 
-              {/* View Toggle */}
-              <div className="flex bg-white/10 backdrop-blur-sm rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('presentation')}
-                  className={`px-4 py-2 rounded-md font-semibold transition ${
-                    viewMode === 'presentation'
-                      ? 'bg-white text-purple-600 shadow-lg'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  📊 Year in Review
-                </button>
-                <button
-                  onClick={() => setViewMode('detailed')}
-                  className={`px-4 py-2 rounded-md font-semibold transition ${
-                    viewMode === 'detailed'
-                      ? 'bg-white text-purple-600 shadow-lg'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  📈 Detailed Stats
-                </button>
-                <button
-                  onClick={() => setViewMode('map')}
-                  className={`px-4 py-2 rounded-md font-semibold transition ${
-                    viewMode === 'map'
-                      ? 'bg-white text-purple-600 shadow-lg'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  🗺️ Map
-                </button>
+      {/* Main Content with margin for sidebar */}
+      <div className="ml-16">
+        {/* Header */}
+        <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-xl sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-white">Sport Year</h1>
+                {athlete && (
+                  <p className="text-white/90 text-sm mt-1">
+                    {athlete.firstname} {athlete.lastname}
+                  </p>
+                )}
               </div>
 
+              {/* Year Selector */}
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none"
+                className="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none relative z-10"
               >
                 {years.map((year) => (
                   <option key={year} value={year}>
@@ -161,101 +203,94 @@ export const Dashboard = () => {
                   </option>
                 ))}
               </select>
-
-              <button
-                onClick={logout}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition backdrop-blur-sm"
-              >
-                Logout
-              </button>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main>
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          </div>
-        ) : stats && activities ? (
-          <>
-            {viewMode === 'presentation' ? (
-              <>
-                <YearInReview
-                  year={selectedYear}
-                  stats={stats}
-                  activities={activities}
-                  athlete={athlete}
-                  highlightFilters={yearInReview}
-                  backgroundImageUrl={yearInReview.backgroundImageUrl}
-                />
-                <YearInReviewSettings
-                  isOpen={showSettings}
-                  onClose={() => setShowSettings(false)}
-                  availableActivityTypes={availableActivityTypes}
-                />
-                {showStravaSettings && (
-                  <StravaSettings onClose={() => setShowStravaSettings(false)} />
-                )}
-              </>
-            ) : viewMode === 'map' ? (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Activity Map</h2>
-                    <p className="text-gray-600">
-                      All your activities for {selectedYear} visualized on a map. Click any route to
-                      see details.
-                    </p>
-                  </div>
-                  <ActivityMap activities={activities} height="calc(100vh - 300px)" />
-                </div>
-                {showStravaSettings && (
-                  <StravaSettings onClose={() => setShowStravaSettings(false)} />
-                )}
-              </div>
-            ) : (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="space-y-8">
-                  {/* Stats Overview */}
-                  <StatsOverview stats={stats} />
-
-                  {/* Sport Details Section */}
+        {/* Main Content */}
+        <main>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+            </div>
+          ) : stats && activities ? (
+            <>
+              {viewMode === 'presentation' ? (
+                <>
+                  <YearInReview
+                    year={selectedYear}
+                    stats={stats}
+                    activities={activities}
+                    athlete={athlete}
+                    highlightFilters={yearInReview}
+                    backgroundImageUrl={yearInReview.backgroundImageUrl}
+                  />
+                  <YearInReviewSettings
+                    isOpen={showSettings}
+                    onClose={() => setShowSettings(false)}
+                    availableActivityTypes={availableActivityTypes}
+                  />
+                  {showStravaSettings && (
+                    <StravaSettings onClose={() => setShowStravaSettings(false)} />
+                  )}
+                </>
+              ) : viewMode === 'map' ? (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <div className="space-y-6">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Sport Breakdown</h2>
-                    <div className="grid grid-cols-1 gap-6">
-                      <SportDetail sport="cycling" activities={activities} />
-                      <SportDetail sport="running" activities={activities} />
-                      <SportDetail sport="swimming" activities={activities} />
+                    <div>
+                      <h2 className="text-3xl font-bold text-gray-900 mb-2">Activity Map</h2>
+                      <p className="text-gray-600">
+                        All your activities for {selectedYear} visualized on a map. Click any route
+                        to see details.
+                      </p>
                     </div>
+                    <ActivityMap activities={activities} height="calc(100vh - 300px)" />
                   </div>
-
-                  {/* Charts */}
-                  <div className="space-y-6">
-                    <h2 className="text-3xl font-bold text-gray-900">Activity Trends</h2>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <MonthlyChart data={stats.byMonth} />
-                      <ActivityTypeChart data={stats.byType} />
-                    </div>
-                  </div>
-
-                  {/* Activity List */}
-                  <ActivityList activities={activities} />
+                  {showStravaSettings && (
+                    <StravaSettings onClose={() => setShowStravaSettings(false)} />
+                  )}
                 </div>
-                {showStravaSettings && (
-                  <StravaSettings onClose={() => setShowStravaSettings(false)} />
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No data available for {selectedYear}</p>
-          </div>
-        )}
-      </main>
+              ) : (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                  <div className="space-y-8">
+                    {/* Stats Overview */}
+                    <StatsOverview stats={stats} />
+
+                    {/* Sport Details Section */}
+                    <div className="space-y-6">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-6">Sport Breakdown</h2>
+                      <div className="grid grid-cols-1 gap-6">
+                        <SportDetail sport="cycling" activities={activities} />
+                        <SportDetail sport="running" activities={activities} />
+                        <SportDetail sport="swimming" activities={activities} />
+                      </div>
+                    </div>
+
+                    {/* Charts */}
+                    <div className="space-y-6">
+                      <h2 className="text-3xl font-bold text-gray-900">Activity Trends</h2>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <MonthlyChart data={stats.byMonth} />
+                        <ActivityTypeChart data={stats.byType} />
+                      </div>
+                    </div>
+
+                    {/* Activity List */}
+                    <ActivityList activities={activities} />
+                  </div>
+                  {showStravaSettings && (
+                    <StravaSettings onClose={() => setShowStravaSettings(false)} />
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No data available for {selectedYear}</p>
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* Onboarding Guide */}
       {showOnboarding && (

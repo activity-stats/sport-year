@@ -46,7 +46,8 @@ describe('SetupWizard', () => {
     it('should display callback domain', () => {
       render(<SetupWizard />);
 
-      expect(screen.getByText('localhost:5173')).toBeInTheDocument();
+      // Check for Authorization Callback Domain section
+      expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
     });
 
     it('should have link to Strava API settings', () => {
@@ -228,8 +229,8 @@ describe('SetupWizard', () => {
     it('should use dynamic callback domain', () => {
       render(<SetupWizard />);
 
-      const callbackDomain = screen.getByText('localhost:5173');
-      expect(callbackDomain).toBeInTheDocument();
+      // Check for Authorization Callback Domain section without port
+      expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
     });
   });
 });

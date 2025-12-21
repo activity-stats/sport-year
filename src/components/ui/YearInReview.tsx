@@ -396,17 +396,15 @@ export function YearInReview({
         ref={containerRef}
         className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
       >
-        {/* Action Buttons - Fixed position */}
-        <div className="fixed top-4 right-4 z-50 flex gap-3 print:hidden">
-          <button
-            onClick={handleCreateSocialCard}
-            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 px-6 rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg flex items-center gap-2"
-            title="Create Social Card"
-          >
-            <span className="text-xl">📱</span>
-            <span>Social Card</span>
-          </button>
-        </div>
+        {/* Social Card Button - Fixed bottom right */}
+        <button
+          onClick={handleCreateSocialCard}
+          className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 print:hidden"
+          title="Create Social Card"
+        >
+          <span className="text-2xl">📱</span>
+          <span className="text-lg">Share</span>
+        </button>
 
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white">

@@ -136,4 +136,3 @@ MIT License - see LICENSE file for details
 
 - Issues: https://github.com/activity-stats/sport-year/issues
 - Discussions: https://github.com/activity-stats/sport-year/discussions
-

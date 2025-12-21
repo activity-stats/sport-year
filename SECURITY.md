@@ -30,17 +30,20 @@ We take security seriously. If you discover a security vulnerability, please rep
 ### Application Security
 
 **Data Storage**
+
 - All credentials stored locally in browser (localStorage)
 - No data sent to external servers except Strava API
 - No server-side storage or processing
 
 **Authentication**
+
 - OAuth 2.0 flow with Strava
 - Tokens stored securely in browser
 - No password storage
 - Automatic token refresh
 
 **API Communication**
+
 - HTTPS only for Strava API calls
 - No proxies or intermediaries
 - Direct client-to-Strava communication
@@ -48,18 +51,21 @@ We take security seriously. If you discover a security vulnerability, please rep
 ### Development Security
 
 **Dependencies**
+
 - Regular `npm audit` checks
 - Automated security scanning (CodeQL)
 - Dependency review on PRs
 - Dependabot alerts enabled
 
 **CI/CD Security**
+
 - Actions locked to commit SHA
 - Minimal permissions (principle of least privilege)
 - No credential persistence
 - Script execution blocked (`npm ci --ignore-scripts`)
 
 **Code Quality**
+
 - TypeScript strict mode
 - ESLint security rules
 - Pre-commit hooks
@@ -171,6 +177,7 @@ If self-hosting:
 5. **Monitor logs** - Watch for suspicious activity
 
 Example security headers:
+
 ```
 Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
 Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -189,6 +196,7 @@ X-XSS-Protection: 1; mode=block
 ## 🆘 Support
 
 For security questions (non-vulnerabilities):
+
 - Open a GitHub Discussion
 - Check existing security documentation
 - Review Strava API docs

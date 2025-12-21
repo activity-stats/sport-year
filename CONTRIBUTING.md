@@ -65,6 +65,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` - Maintenance tasks
 
 Examples:
+
 ```
 feat: add activity export feature
 fix: correct distance calculation for cycling
@@ -126,6 +127,7 @@ src/
 ## 🐛 Bug Reports
 
 Include:
+
 - Clear description of the issue
 - Steps to reproduce
 - Expected vs actual behavior
@@ -135,6 +137,7 @@ Include:
 ## 💡 Feature Requests
 
 Include:
+
 - Clear description of the feature
 - Use case and benefits
 - Possible implementation approach
@@ -152,6 +155,7 @@ Include:
 ### PR Title Format
 
 Follow conventional commits format:
+
 ```
 feat: add activity filtering by sport type
 fix: correct date range selector bug
