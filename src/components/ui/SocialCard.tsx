@@ -3,6 +3,7 @@ import { domToPng } from 'modern-screenshot';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import type { RaceHighlight } from '../../utils/raceDetection';
+import type { StatOption } from './StatsSelector';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
 
 interface SocialCardProps {
@@ -12,6 +13,7 @@ interface SocialCardProps {
   daysActive: number;
   selectedActivities: Activity[];
   selectedHighlights: RaceHighlight[];
+  selectedStats: StatOption[];
   backgroundImageUrl: string | null;
   onClose: () => void;
 }
@@ -23,6 +25,7 @@ export function SocialCard({
   daysActive,
   selectedActivities,
   selectedHighlights,
+  selectedStats,
   backgroundImageUrl,
   onClose,
 }: SocialCardProps) {
@@ -254,30 +257,36 @@ export function SocialCard({
                   </div>
                 )}
 
-                {/* Stats - Clean design without boxes */}
-                <div className="flex justify-around items-center">
-                  <div className="text-center">
-                    <div className="text-6xl font-black mb-2 drop-shadow-2xl">{daysActive}</div>
-                    <div className="text-xl font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
-                      Days Active
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-6xl font-black mb-2 drop-shadow-2xl">
-                      {Math.round(totalDistance).toLocaleString('de-DE')}
-                    </div>
-                    <div className="text-xl font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
-                      Distance (km)
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-6xl font-black mb-2 drop-shadow-2xl">
-                      {totalHours.toLocaleString('de-DE')}
-                    </div>
-                    <div className="text-xl font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
-                      Hours
-                    </div>
-                  </div>
+                {/* Stats - Dynamic based on selection */}
+                <div
+                  className={`grid gap-6 ${
+                    selectedStats.length === 1
+                      ? 'grid-cols-1'
+                      : selectedStats.length === 2
+                        ? 'grid-cols-2'
+                        : selectedStats.length === 3
+                          ? 'grid-cols-3'
+                          : 'grid-cols-4'
+                  }`}
+                >
+                  {selectedStats.map((stat) => {
+                    const value = stat.getValue(stats, daysActive);
+                    // Extract numeric value and unit
+                    const parts = value.match(/^([\d,\.]+)\s*(.*)$/);
+                    const numericValue = parts ? parts[1] : value;
+                    const unit = parts ? parts[2] : '';
+
+                    return (
+                      <div key={stat.id} className="text-center">
+                        <div className="text-5xl font-black mb-2 drop-shadow-2xl">
+                          {numericValue}
+                        </div>
+                        <div className="text-lg font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
+                          {unit || stat.label}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -287,9 +296,10 @@ export function SocialCard({
         {/* Actions */}
         <div className="p-6 border-t border-gray-200 flex justify-between items-center">
           <div className="text-sm text-gray-600">
+            {selectedStats.length} stat{selectedStats.length !== 1 ? 's' : ''} •{' '}
             {allSelectedItems.length === 0
-              ? 'No highlights selected'
-              : `${allSelectedItems.length} highlight${allSelectedItems.length !== 1 ? 's' : ''} selected`}
+              ? 'No highlights'
+              : `${allSelectedItems.length} highlight${allSelectedItems.length !== 1 ? 's' : ''}`}
           </div>
           <div className="flex gap-3">
             <button

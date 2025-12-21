@@ -9,6 +9,7 @@ import type { ActivityType } from '../../types';
 import type { TitlePattern, StatType } from '../../stores/settingsStore';
 import { ActivitySelector } from './ActivitySelector';
 import { SocialCard } from './SocialCard';
+import { StatsSelector, type StatOption } from './StatsSelector';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
@@ -298,10 +299,12 @@ export function YearInReview({
   backgroundImageUrl,
 }: YearInReviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showStatsSelector, setShowStatsSelector] = useState(false);
   const [showActivitySelector, setShowActivitySelector] = useState(false);
   const [showSocialCard, setShowSocialCard] = useState(false);
   const [selectedActivities, setSelectedActivities] = useState<Activity[]>([]);
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
+  const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
 
   // Filter activities only for highlights
   const filteredActivities = useMemo(
@@ -328,6 +331,12 @@ export function YearInReview({
   }, [highlights]);
 
   const handleCreateSocialCard = () => {
+    setShowStatsSelector(true);
+  };
+
+  const handleStatsSelected = (stats: StatOption[]) => {
+    setSelectedStats(stats);
+    setShowStatsSelector(false);
     setShowActivitySelector(true);
   };
 
@@ -734,6 +743,16 @@ export function YearInReview({
         </div>
       </div>
 
+      {/* Stats Selector Modal */}
+      {showStatsSelector && (
+        <StatsSelector
+          stats={stats}
+          daysActive={daysActive}
+          onConfirm={handleStatsSelected}
+          onClose={() => setShowStatsSelector(false)}
+        />
+      )}
+
       {/* Activity Selector Modal */}
       {showActivitySelector && (
         <ActivitySelector
@@ -754,6 +773,7 @@ export function YearInReview({
           daysActive={daysActive}
           selectedActivities={selectedActivities}
           selectedHighlights={selectedHighlights}
+          selectedStats={selectedStats}
           backgroundImageUrl={backgroundImageUrl || null}
           onClose={() => {
             setShowSocialCard(false);

@@ -22,13 +22,14 @@ export const useActivities = (year: number) => {
         setLoadingStage('fetching');
         const lastTimestamp = getLastActivityTimestamp(year);
         
-        // If we have a lastTimestamp, we do incremental fetch and merge
+        // Get existing cached activities (will be empty on first load)
+        const existingActivities = queryClient.getQueryData<any[]>(['activities', year]) || [];
+        
+        // Only do incremental fetch if we have BOTH lastTimestamp AND existing cached data
+        // This ensures first load always gets all activities
         let transformed;
-        if (lastTimestamp) {
-          // Get existing cached activities
-          const existingActivities = queryClient.getQueryData<any[]>(['activities', year]) || [];
-          
-          // Fetch only new activities
+        if (lastTimestamp && existingActivities.length > 0) {
+          // Incremental update - fetch only new activities and merge
           const newStravaActivities = await stravaClient.getActivitiesIncremental(year, lastTimestamp);
           
           // Stage 3: Transforming activities
@@ -41,7 +42,7 @@ export const useActivities = (year: number) => {
           
           transformed = [...existingActivities, ...uniqueNewActivities];
         } else {
-          // First time fetch - get all activities for the year
+          // First time fetch OR no cache - get all activities for the year
           const stravaActivities = await stravaClient.getActivitiesForYear(year);
           
           // Stage 3: Transforming activities
