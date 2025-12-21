@@ -6,7 +6,7 @@ import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
 import type { ActivityType } from '../../types';
-import type { TitlePattern } from '../../stores/settingsStore';
+import type { TitlePattern, StatType } from '../../stores/settingsStore';
 import { ActivitySelector } from './ActivitySelector';
 import { SocialCard } from './SocialCard';
 
@@ -19,6 +19,7 @@ interface HighlightFilters {
     swimming: { highlights: boolean; stats: boolean };
   };
   titleIgnorePatterns: TitlePattern[];
+  highlightStats: StatType[];
 }
 
 interface YearInReviewProps {
@@ -346,6 +347,129 @@ export function YearInReview({
     return uniqueDays.size;
   }, [activities]);
 
+  // Calculate additional stats
+  const additionalStats = useMemo(() => {
+    const activitiesWithHR = activities.filter((a) => a.averageHeartRate);
+    const avgHeartRate =
+      activitiesWithHR.length > 0
+        ? Math.round(
+            activitiesWithHR.reduce((sum, a) => sum + (a.averageHeartRate || 0), 0) /
+              activitiesWithHR.length
+          )
+        : 0;
+
+    const maxSpeed = Math.round(Math.max(...activities.map((a) => a.maxSpeedKmh), 0));
+    const avgSpeed = stats.totalTimeHours > 0 ? (stats.totalDistanceKm / stats.totalTimeHours) : 0;
+
+    return {
+      avgHeartRate,
+      maxSpeed,
+      avgSpeed,
+    };
+  }, [activities, stats]);
+
+  // Generate stat cards based on user selection
+  const statCards = useMemo(() => {
+    const cards: Array<{
+      value: string;
+      label: string;
+      colorClass: string;
+    }> = [];
+
+    // Use default stats if highlightStats is undefined (for backward compatibility)
+    const selectedStats = highlightFilters.highlightStats || [
+      'hours',
+      'daysActive',
+      'distance',
+      'elevation',
+    ];
+
+    selectedStats.forEach((statType) => {
+      switch (statType) {
+        case 'daysActive':
+          cards.push({
+            value: daysActive.toString(),
+            label: 'Days Active',
+            colorClass: 'hover:shadow-purple-500/50',
+          });
+          break;
+        case 'hours':
+          cards.push({
+            value: Math.round(stats.totalTimeHours).toLocaleString('de-DE'),
+            label: 'Active Hours',
+            colorClass: 'hover:shadow-blue-500/50',
+          });
+          break;
+        case 'distance':
+          cards.push({
+            value: Math.round(stats.totalDistanceKm).toLocaleString('de-DE'),
+            label: 'Distance (km)',
+            colorClass: 'hover:shadow-pink-500/50',
+          });
+          break;
+        case 'elevation':
+          cards.push({
+            value: Math.round(stats.totalElevationMeters).toLocaleString('de-DE'),
+            label: 'Climbing (m)',
+            colorClass: 'hover:shadow-green-500/50',
+          });
+          break;
+        case 'activities':
+          cards.push({
+            value: stats.activityCount.toLocaleString('de-DE'),
+            label: 'Activities',
+            colorClass: 'hover:shadow-orange-500/50',
+          });
+          break;
+        case 'avgSpeed':
+          cards.push({
+            value: Math.round(additionalStats.avgSpeed).toLocaleString('de-DE'),
+            label: 'Avg Speed (km/h)',
+            colorClass: 'hover:shadow-cyan-500/50',
+          });
+          break;
+        case 'longestActivity':
+          if (stats.longestActivity) {
+            cards.push({
+              value: Math.round(stats.longestActivity.distanceKm).toLocaleString('de-DE'),
+              label: 'Longest (km)',
+              colorClass: 'hover:shadow-indigo-500/50',
+            });
+          }
+          break;
+        case 'biggestClimb':
+          if (stats.highestElevation) {
+            cards.push({
+              value: Math.round(stats.highestElevation.elevationGainMeters).toLocaleString('de-DE'),
+              label: 'Biggest Climb (m)',
+              colorClass: 'hover:shadow-emerald-500/50',
+            });
+          }
+          break;
+        case 'avgHeartRate':
+          if (additionalStats.avgHeartRate > 0) {
+            cards.push({
+              value: additionalStats.avgHeartRate.toString(),
+              label: 'Avg Heart Rate',
+              colorClass: 'hover:shadow-red-500/50',
+            });
+          }
+          break;
+        case 'maxSpeed':
+          if (additionalStats.maxSpeed > 0) {
+            cards.push({
+              value: additionalStats.maxSpeed.toLocaleString('de-DE'),
+              label: 'Max Speed (km/h)',
+              colorClass: 'hover:shadow-yellow-500/50',
+            });
+          }
+          break;
+      }
+    });
+
+    return cards;
+  }, [stats, daysActive, additionalStats, highlightFilters.highlightStats]);
+
   // Generate monthly duration data for background chart
   const monthlyDurations = useMemo(() => {
     const months = Array(12).fill(0);
@@ -458,38 +582,19 @@ export function YearInReview({
 
               {/* Key Stats - Beautiful glassmorphism cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto mt-16">
-                <div className="group bg-white/20 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/30 shadow-2xl hover:bg-white/30 hover:scale-105 transition-all duration-300 hover:shadow-blue-500/50">
-                  <div className="text-4xl md:text-5xl font-black mb-2 text-white drop-shadow-lg">
-                    {Math.round(stats.totalTimeHours).toLocaleString('de-DE')}
+                {statCards.map((card, index) => (
+                  <div
+                    key={index}
+                    className={`group bg-white/20 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/30 shadow-2xl hover:bg-white/30 hover:scale-105 transition-all duration-300 ${card.colorClass}`}
+                  >
+                    <div className="text-4xl md:text-5xl font-black mb-2 text-white drop-shadow-lg">
+                      {card.value}
+                    </div>
+                    <div className="text-xs md:text-sm text-white/90 font-bold tracking-widest uppercase">
+                      {card.label}
+                    </div>
                   </div>
-                  <div className="text-xs md:text-sm text-white/90 font-bold tracking-widest uppercase">
-                    Active Hours
-                  </div>
-                </div>
-                <div className="group bg-white/20 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/30 shadow-2xl hover:bg-white/30 hover:scale-105 transition-all duration-300 hover:shadow-purple-500/50">
-                  <div className="text-4xl md:text-5xl font-black mb-2 text-white drop-shadow-lg">
-                    {daysActive}
-                  </div>
-                  <div className="text-xs md:text-sm text-white/90 font-bold tracking-widest uppercase">
-                    Days Active
-                  </div>
-                </div>
-                <div className="group bg-white/20 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/30 shadow-2xl hover:bg-white/30 hover:scale-105 transition-all duration-300 hover:shadow-pink-500/50">
-                  <div className="text-4xl md:text-5xl font-black mb-2 text-white drop-shadow-lg">
-                    {Math.round(stats.totalDistanceKm).toLocaleString('de-DE')}
-                  </div>
-                  <div className="text-xs md:text-sm text-white/90 font-bold tracking-widest uppercase">
-                    Distance (km)
-                  </div>
-                </div>
-                <div className="group bg-white/20 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/30 shadow-2xl hover:bg-white/30 hover:scale-105 transition-all duration-300 hover:shadow-green-500/50">
-                  <div className="text-4xl md:text-5xl font-black mb-2 text-white drop-shadow-lg">
-                    {Math.round(stats.totalElevationMeters).toLocaleString('de-DE')}
-                  </div>
-                  <div className="text-xs md:text-sm text-white/90 font-bold tracking-widest uppercase">
-                    Climbing (m)
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

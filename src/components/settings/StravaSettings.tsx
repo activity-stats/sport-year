@@ -38,11 +38,11 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
       onClick={onClose}
     >
       <div
-        className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white flex justify-between items-center">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white flex justify-between items-center flex-shrink-0">
           <div>
             <h2 className="text-2xl font-black">Strava Settings</h2>
             <p className="text-orange-100 text-sm mt-1">Manage your Strava app credentials</p>
@@ -56,7 +56,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Technical Notice */}
           <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
             <div className="flex gap-2">

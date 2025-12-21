@@ -19,9 +19,9 @@ export function SetupWizard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
-      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-white">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-white flex-shrink-0">
           <div className="flex items-center gap-4 mb-4">
             <div className="text-6xl">🏃</div>
             <div>
@@ -32,7 +32,7 @@ export function SetupWizard() {
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="p-8 overflow-y-auto flex-1">
           {step === 'instructions' ? (
             <>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Step 1: Create a Strava App</h2>

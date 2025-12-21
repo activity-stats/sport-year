@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useSettingsStore } from '../../stores/settingsStore';
+import { useSettingsStore, AVAILABLE_STATS, type StatType } from '../../stores/settingsStore';
 import type { ActivityType } from '../../types';
 
 interface YearInReviewSettingsProps {
@@ -13,7 +13,9 @@ export function YearInReviewSettings({
   onClose,
   availableActivityTypes,
 }: YearInReviewSettingsProps) {
-  const [activeTab, setActiveTab] = useState<'background' | 'types' | 'filters'>('background');
+  const [activeTab, setActiveTab] = useState<'background' | 'types' | 'filters' | 'stats'>(
+    'background'
+  );
   const [imageUrl, setImageUrl] = useState('');
   const [newPattern, setNewPattern] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +31,7 @@ export function YearInReviewSettings({
     addIgnorePattern,
     updateIgnorePattern,
     removeIgnorePattern,
+    toggleHighlightStat,
     resetYearInReview,
   } = useSettingsStore();
 
@@ -127,6 +130,16 @@ export function YearInReviewSettings({
               🖼️ Background
             </button>
             <button
+              onClick={() => setActiveTab('stats')}
+              className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
+                activeTab === 'stats'
+                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              📊 Stats
+            </button>
+            <button
               onClick={() => setActiveTab('types')}
               className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
                 activeTab === 'types'
@@ -134,7 +147,7 @@ export function YearInReviewSettings({
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              🎯 Activity Types
+              🎯 Activities
             </button>
             <button
               onClick={() => setActiveTab('filters')}
@@ -223,6 +236,55 @@ export function YearInReviewSettings({
                       🔄 Restore Chart Background
                     </button>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Stats Tab */}
+          {activeTab === 'stats' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-black text-gray-900 mb-3">
+                  Year Highlights Statistics
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Choose which stats to display in your Year in Review hero section. Select up to 6
+                  stats for the best presentation.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {(Object.keys(AVAILABLE_STATS) as StatType[]).map((statId) => {
+                    const stat = AVAILABLE_STATS[statId];
+                    const isEnabled = (yearInReview.highlightStats || ['hours', 'daysActive', 'distance', 'elevation']).includes(statId);
+                    return (
+                      <label
+                        key={statId}
+                        className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          isEnabled ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={() => toggleHighlightStat(statId)}
+                          className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <div className="font-bold text-sm text-gray-900">{stat.label}</div>
+                          <div className="text-xs text-gray-600 mt-1">{stat.description}</div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                  <p className="text-sm text-yellow-900">
+                    <strong>Note:</strong> Some stats like "Avg Heart Rate" or "Biggest Climb" will
+                    only show if you have activities with that data. Selected:{' '}
+                    <strong>{(yearInReview.highlightStats || ['hours', 'daysActive', 'distance', 'elevation']).length}</strong>
+                  </p>
                 </div>
               </div>
             </div>
