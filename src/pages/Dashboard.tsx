@@ -11,8 +11,10 @@ import { YearInReviewSettings } from '../components/ui/YearInReviewSettings.tsx'
 import { StravaSettings } from '../components/settings/StravaSettings.tsx';
 import { ActivityMap } from '../components/maps/ActivityMap.tsx';
 import { OnboardingGuide } from '../components/ui/OnboardingGuide.tsx';
+import { LoadingProgress, type LoadingStep } from '../components/ui/LoadingProgress.tsx';
 import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
+import { useLoadingStore } from '../stores/loadingStore.ts';
 import type { ActivityType } from '../types';
 
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
@@ -29,7 +31,60 @@ export const Dashboard = () => {
 
   const { stats, isLoading, error } = useYearStats(selectedYear);
   const { data: activities } = useActivities(selectedYear);
+  const loadingStage = useLoadingStore((state) => state.stage);
+  const loadingError = useLoadingStore((state) => state.error);
   const { yearInReview } = useSettingsStore();
+
+  // Build loading steps based on current stage
+  const loadingSteps: LoadingStep[] = useMemo(() => {
+    const steps = [
+      {
+        id: 'checking',
+        label: 'Checking Strava connection',
+        status: loadingStage === 'checking' ? 'active' : loadingStage === 'idle' ? 'pending' : 'complete',
+      },
+      {
+        id: 'fetching',
+        label: 'Fetching your activities from Strava',
+        status:
+          loadingStage === 'fetching'
+            ? 'active'
+            : ['idle', 'checking'].includes(loadingStage)
+              ? 'pending'
+              : 'complete',
+      },
+      {
+        id: 'transforming',
+        label: 'Transforming activity data',
+        status:
+          loadingStage === 'transforming'
+            ? 'active'
+            : ['idle', 'checking', 'fetching'].includes(loadingStage)
+              ? 'pending'
+              : 'complete',
+      },
+      {
+        id: 'aggregating',
+        label: 'Building your statistics model',
+        status:
+          loadingStage === 'aggregating'
+            ? 'active'
+            : ['idle', 'checking', 'fetching', 'transforming'].includes(loadingStage)
+              ? 'pending'
+              : 'complete',
+      },
+    ] as LoadingStep[];
+
+    // Mark error state if there's an error
+    if (loadingStage === 'error' && loadingError) {
+      const activeIndex = steps.findIndex((s) => s.status === 'active');
+      if (activeIndex !== -1) {
+        steps[activeIndex].status = 'error';
+      }
+    }
+
+    return steps;
+  }, [loadingStage, loadingError]);
 
   // Get unique activity types from current activities
   const availableActivityTypes = useMemo(() => {
@@ -210,9 +265,7 @@ export const Dashboard = () => {
         {/* Main Content */}
         <main>
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-            </div>
+            <LoadingProgress steps={loadingSteps} currentStep={loadingStage} />
           ) : stats && activities ? (
             <>
               {viewMode === 'presentation' ? (

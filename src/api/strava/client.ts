@@ -135,6 +135,50 @@ class StravaClient {
     return allActivities;
   }
 
+  /**
+   * Fetch only new activities after a given timestamp (minus 1 day buffer)
+   * This minimizes API calls by only fetching recent data
+   */
+  async getActivitiesIncremental(
+    year: number,
+    lastActivityTimestamp?: number
+  ): Promise<StravaActivity[]> {
+    const yearStart = Math.floor(new Date(year, 0, 1).getTime() / 1000);
+    const yearEnd = Math.floor(new Date(year + 1, 0, 1).getTime() / 1000);
+
+    // If we have a last activity timestamp, fetch from 1 day before it
+    // This provides a buffer in case of activity updates
+    let after: number;
+    if (lastActivityTimestamp) {
+      const oneDayInSeconds = 24 * 60 * 60;
+      after = Math.max(lastActivityTimestamp - oneDayInSeconds, yearStart);
+    } else {
+      // No previous data, fetch all for the year
+      after = yearStart;
+    }
+
+    let allActivities: StravaActivity[] = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const activities = await this.getActivities({
+        after,
+        before: yearEnd,
+        page,
+        per_page: 200,
+      });
+
+      allActivities = [...allActivities, ...activities];
+
+      // If we got less than 200, we've reached the end
+      hasMore = activities.length === 200;
+      page++;
+    }
+
+    return allActivities;
+  }
+
   async getActivity(id: number): Promise<StravaActivity> {
     const response = await this.axiosInstance.get<StravaActivity>(`/activities/${id}`);
     return response.data;

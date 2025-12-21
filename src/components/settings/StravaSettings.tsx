@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useStravaConfigStore } from '../../stores/stravaConfigStore';
+import { useDataSyncStore } from '../../stores/dataSyncStore';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRefreshActivities } from '../../hooks/useActivities';
 
 interface StravaSettingsProps {
   onClose: () => void;
@@ -7,9 +10,16 @@ interface StravaSettingsProps {
 
 export function StravaSettings({ onClose }: StravaSettingsProps) {
   const { config, setConfig, clearConfig } = useStravaConfigStore();
+  const { clearData } = useDataSyncStore();
+  const queryClient = useQueryClient();
+  const refreshActivities = useRefreshActivities();
   const [clientId, setClientId] = useState(config.clientId);
   const [clientSecret, setClientSecret] = useState(config.clientSecret);
   const [showSecret, setShowSecret] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const currentYear = new Date().getFullYear();
 
   // Extract domain without port for Strava callback
   const hostname = window.location.hostname; // e.g., "localhost" or "example.com"
@@ -29,6 +39,51 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
       )
     ) {
       clearConfig();
+    }
+  };
+
+  const handleClearData = async () => {
+    if (
+      !confirm(
+        'Are you sure you want to clear all cached activity data? This will force a full refresh on the next sync. This does NOT delete your Strava data, only the local cache.'
+      )
+    ) {
+      return;
+    }
+
+    setIsClearing(true);
+    try {
+      // Clear data sync store
+      clearData();
+      // Clear React Query cache
+      queryClient.clear();
+      // Force a fresh fetch for current year
+      await queryClient.refetchQueries({ queryKey: ['activities', currentYear] });
+      alert('Local cache cleared successfully. Data will be refreshed.');
+    } catch (error) {
+      console.error('Failed to clear data:', error);
+      alert('Failed to clear data. Please try again.');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!confirm('Sync activities from Strava? This will check for new or updated activities.')) {
+      return;
+    }
+
+    setIsSyncing(true);
+    try {
+      refreshActivities(currentYear);
+      // Wait a bit for the query to start
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      alert('Sync started! Your activities are being updated.');
+    } catch (error) {
+      console.error('Failed to sync:', error);
+      alert('Failed to sync. Please try again.');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -237,9 +292,44 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 </button>
               </div>
 
+              {/* Data Management Section */}
+              <div className="border-t pt-4 mt-2 space-y-3">
+                <h4 className="text-sm font-bold text-gray-700">Data Management</h4>
+
+                <button
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                  className="w-full bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSyncing ? (
+                    <>
+                      <span className="animate-spin">🔄</span>
+                      <span>Syncing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>🔄</span>
+                      <span>Sync Activities</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleClearData}
+                  disabled={isClearing}
+                  className="w-full bg-yellow-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isClearing ? 'Clearing...' : '🗑️ Clear Cached Data'}
+                </button>
+
+                <p className="text-xs text-gray-500">
+                  Sync checks for new activities. Clear cache to force a full refresh.
+                </p>
+              </div>
+
               <button
                 onClick={handleClear}
-                className="w-full text-red-600 hover:text-red-700 font-semibold py-2 text-sm"
+                className="w-full text-red-600 hover:text-red-700 font-semibold py-2 text-sm border-t pt-3 mt-2"
               >
                 Clear Credentials
               </button>
