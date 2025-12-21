@@ -123,9 +123,6 @@ export function SocialCard({
     }
   };
 
-  const totalDistance = stats.totalDistanceKm;
-  const totalHours = Math.round(stats.totalTimeHours);
-
   // Combine activities and highlights for display
   const allSelectedItems = [...selectedHighlights, ...selectedActivities].slice(0, 3);
 

@@ -17,18 +17,19 @@ describe('StatsSelector', () => {
       type: 'Run',
       date: new Date('2024-01-01'),
       distanceKm: 42.2,
+      durationMinutes: 240,
       movingTimeMinutes: 240,
       elevationGainMeters: 500,
-      averageSpeed: 10.5,
-      kudosCount: 10,
+      averageSpeedKmh: 10.5,
+      maxSpeedKmh: 15.0,
     },
-    highestElevation: null,
-    byType: {},
+    highestElevation: undefined,
+    byType: {} as any,
     byMonth: [],
   };
 
-  let mockOnConfirm: ReturnType<typeof vi.fn>;
-  let mockOnClose: ReturnType<typeof vi.fn>;
+  let mockOnConfirm: (selectedStats: any[]) => void;
+  let mockOnClose: () => void;
 
   beforeEach(() => {
     mockOnConfirm = vi.fn();
@@ -136,7 +137,7 @@ describe('StatsSelector', () => {
     await user.click(nextButton);
 
     expect(mockOnConfirm).toHaveBeenCalledTimes(1);
-    const selectedStats = mockOnConfirm.mock.calls[0][0];
+    const selectedStats = (mockOnConfirm as any).mock.calls[0][0];
     expect(selectedStats).toHaveLength(3); // Default 3 selected
     expect(selectedStats[0].id).toBe('distance');
     expect(selectedStats[1].id).toBe('elevation');

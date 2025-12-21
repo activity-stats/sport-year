@@ -11,7 +11,7 @@ interface LoadingProgressProps {
   currentStep?: string;
 }
 
-export function LoadingProgress({ steps, currentStep }: LoadingProgressProps) {
+export function LoadingProgress({ steps }: LoadingProgressProps) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {

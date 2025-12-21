@@ -44,7 +44,7 @@ export const availableStats: StatOption[] = [
     id: 'daysActive',
     label: 'Days Active',
     icon: '📅',
-    getValue: (stats, daysActive) => daysActive.toString(),
+    getValue: (_stats, daysActive) => daysActive.toString(),
   },
   {
     id: 'avgDistance',
