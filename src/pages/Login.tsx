@@ -1,9 +1,19 @@
 import { useAuth } from '../hooks/useAuth.ts';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login } = useAuth();
-  const expectedCallback = `${window.location.origin}/callback`;
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const domain = window.location.host;
+
+  // If already authenticated, redirect to home
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('User already authenticated, redirecting to home');
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-600">
@@ -37,12 +47,28 @@ export const Login = () => {
             We only request read access to your activities
           </p>
 
-          <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded text-xs">
-            <p className="font-semibold text-blue-900 mb-1">Strava App Configuration:</p>
-            <p className="text-blue-800">
-              <strong>Authorization Callback Domain:</strong> {domain}
-            </p>
-            <p className="text-blue-700 mt-1 text-[10px]">Expected callback: {expectedCallback}</p>
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+            <p className="font-semibold text-blue-900 mb-2 text-sm">📋 Strava App Configuration Required:</p>
+            <div className="space-y-2 text-xs text-blue-800">
+              <div>
+                <p className="font-semibold">Authorization Callback Domain:</p>
+                <code className="bg-white px-2 py-1 rounded border border-blue-300 block mt-1 break-all">
+                  {domain.split(':')[0]}
+                </code>
+                <p className="text-[10px] text-blue-600 mt-1">
+                  ⚠️ Use ONLY the domain (no http://, no port number)
+                </p>
+              </div>
+              <div className="pt-2 border-t border-blue-300">
+                <p className="font-semibold mb-1">If you're experiencing a redirect loop:</p>
+                <ul className="list-disc list-inside space-y-1 text-[11px] ml-2">
+                  <li>Check that your Strava app's callback domain matches above</li>
+                  <li>Verify Client ID and Secret are correct in Settings</li>
+                  <li>Make sure you saved the Strava app configuration</li>
+                  <li>Try clearing browser localStorage and re-entering credentials</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
