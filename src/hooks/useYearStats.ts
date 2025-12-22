@@ -10,14 +10,14 @@ export const useYearStats = (year: number) => {
 
   const stats = useMemo(() => {
     if (!activities) return undefined;
-    
+
     // Stage 4: Aggregating statistics
     setLoadingStage('aggregating');
     const result = aggregateYearStats(activities, year);
-    
+
     // Stage 5: Complete
     setLoadingStage('complete');
-    
+
     return result;
   }, [activities, year, setLoadingStage]);
 
