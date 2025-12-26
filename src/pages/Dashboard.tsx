@@ -473,7 +473,7 @@ export const Dashboard = () => {
                       </div>
 
                       {/* Achievement Timeline */}
-                      {activities && activities.length > 0 && (
+                      {activities.length > 0 && (
                         <AchievementTimeline
                           year={selectedYear}
                           highlights={highlights}
@@ -482,7 +482,7 @@ export const Dashboard = () => {
                       )}
 
                       {/* Heatmap Calendar */}
-                      {activities && activities.length > 0 && (
+                      {activities.length > 0 && (
                         <HeatmapCalendar year={selectedYear} activities={activities} />
                       )}
                     </div>
