@@ -32,6 +32,7 @@ export interface StravaActivity {
   calories?: number;
   kilojoules?: number;
   workout_type?: number; // For runs: 0=default, 1=race, 2=long run, 3=workout
+  kudos_count?: number;
   map?: {
     id: string;
     summary_polyline?: string;

@@ -780,6 +780,13 @@ export function YearInReview({
             });
           }
           break;
+        case 'kudos':
+          cards.push({
+            value: stats.totalKudos.toLocaleString('de-DE'),
+            label: 'Kudos',
+            colorClass: 'hover:shadow-rose-500/50',
+          });
+          break;
       }
     });
 

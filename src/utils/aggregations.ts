@@ -11,6 +11,7 @@ export const aggregateYearStats = (activities: Activity[], year: number): YearSt
   const totalDistanceKm = yearActivities.reduce((sum, a) => sum + a.distanceKm, 0);
   const totalElevationMeters = yearActivities.reduce((sum, a) => sum + a.elevationGainMeters, 0);
   const totalTimeHours = yearActivities.reduce((sum, a) => sum + a.durationMinutes, 0) / 60;
+  const totalKudos = yearActivities.reduce((sum, a) => sum + (a.kudosCount || 0), 0);
 
   const longestActivity = yearActivities.reduce(
     (longest, current) => (current.distanceKm > (longest?.distanceKm ?? 0) ? current : longest),
@@ -29,6 +30,7 @@ export const aggregateYearStats = (activities: Activity[], year: number): YearSt
     totalElevationMeters,
     totalTimeHours,
     activityCount: yearActivities.length,
+    totalKudos,
     byMonth,
     byType,
     longestActivity,

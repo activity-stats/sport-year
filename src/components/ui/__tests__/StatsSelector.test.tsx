@@ -12,6 +12,7 @@ describe('StatsSelector', () => {
     totalElevationMeters: 50000,
     totalTimeHours: 250,
     activityCount: 200,
+    totalKudos: 1500,
     longestActivity: {
       id: '1',
       name: 'Long Run',
