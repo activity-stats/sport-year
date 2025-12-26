@@ -42,6 +42,12 @@ export const Dashboard = () => {
   const loadingStage = useLoadingStore((state) => state.stage);
   const loadingError = useLoadingStore((state) => state.error);
   const { yearInReview, sportBreakdown } = useSettingsStore();
+  const initializeDefaultFilters = useSettingsStore((state) => state.initializeDefaultFilters);
+
+  // Initialize default filters on mount if none exist
+  useEffect(() => {
+    initializeDefaultFilters();
+  }, [initializeDefaultFilters]);
 
   // Subscribe to theme to get reactive updates
   const theme = useThemeStore((state) => state.theme);

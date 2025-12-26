@@ -6,6 +6,24 @@ interface RaceDetectionSettings {
   activityFilters?: ActivityTypeFilter[];
 }
 
+// Helper function to check if activity should be excluded from highlights based on title patterns
+function shouldExcludeFromHighlights(
+  activity: Activity,
+  titleIgnorePatterns?: TitlePattern[]
+): boolean {
+  if (!titleIgnorePatterns) return false;
+
+  for (const patternObj of titleIgnorePatterns) {
+    if (
+      patternObj.excludeFromHighlights &&
+      activity.name.toLowerCase().includes(patternObj.pattern.toLowerCase())
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export interface TriathlonRace {
   date: Date;
   activities: {
@@ -316,6 +334,12 @@ export function detectRaceHighlights(
           continue;
         }
 
+        // Check titleIgnorePatterns - skip if activity title should be excluded from highlights
+        if (shouldExcludeFromHighlights(activity, settings?.titleIgnorePatterns)) {
+          console.log(`    ⚠️ Skipping ${activity.name} - matches title ignore pattern`);
+          continue;
+        }
+
         customFilteredActivityIds.add(activity.id);
         console.log(
           `    ✅ Adding highlight: ${activity.name} (${activity.distanceKm.toFixed(2)}km)`
@@ -391,6 +415,12 @@ export function detectRaceHighlights(
           if (customFilteredActivityIds.has(activity.id)) return;
 
           if (activity.name.toLowerCase().includes(pattern.toLowerCase())) {
+            // Check titleIgnorePatterns - skip if activity title should be excluded from highlights
+            if (shouldExcludeFromHighlights(activity, settings?.titleIgnorePatterns)) {
+              console.log(`    ⚠️ Skipping ${activity.name} - matches title ignore pattern`);
+              return;
+            }
+
             customFilteredActivityIds.add(activity.id);
             const typeEmoji =
               activity.type === 'Run' ? '🏃' : activity.type.includes('Ride') ? '🚴' : '🏊';
