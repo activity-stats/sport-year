@@ -21,29 +21,29 @@ export interface SportHighlights {
   totalElevation: number;
 }
 
-// Distance ranges for each sport (in km)
-const _SWIM_DISTANCES = [
-  { name: '100m', min: 0.08, max: 0.12 },
-  { name: '500m', min: 0.4, max: 0.6 },
-  { name: '1000m', min: 0.9, max: 1.1 },
-  { name: '2000m', min: 1.8, max: 2.2 },
-  { name: '5000m', min: 4.5, max: 5.5 },
-];
+// Distance ranges for each sport (in km) - kept for potential future use
+// const _SWIM_DISTANCES = [
+//   { name: '100m', min: 0.08, max: 0.12 },
+//   { name: '500m', min: 0.4, max: 0.6 },
+//   { name: '1000m', min: 0.9, max: 1.1 },
+//   { name: '2000m', min: 1.8, max: 2.2 },
+//   { name: '5000m', min: 4.5, max: 5.5 },
+// ];
 
-const _RUN_DISTANCES = [
-  { name: '5km', min: 4.5, max: 5.5 },
-  { name: '10km', min: 9.5, max: 10.5 },
-  { name: '15km', min: 14, max: 16 },
-  { name: 'Half Marathon', min: 20, max: 22 },
-  { name: 'Marathon', min: 40, max: 44 },
-];
+// const _RUN_DISTANCES = [
+//   { name: '5km', min: 4.5, max: 5.5 },
+//   { name: '10km', min: 9.5, max: 10.5 },
+//   { name: '15km', min: 14, max: 16 },
+//   { name: 'Half Marathon', min: 20, max: 22 },
+//   { name: 'Marathon', min: 40, max: 44 },
+// ];
 
-const _CYCLING_DISTANCES = [
-  { name: '50km', min: 45, max: 55 },
-  { name: '100km', min: 95, max: 105 },
-  { name: '150km', min: 145, max: 155 },
-  { name: '200km', min: 195, max: 210 },
-];
+// const _CYCLING_DISTANCES = [
+//   { name: '50km', min: 45, max: 55 },
+//   { name: '100km', min: 95, max: 105 },
+//   { name: '150km', min: 145, max: 155 },
+//   { name: '200km', min: 195, max: 210 },
+// ];
 
 function findBestForDistance(
   activities: Activity[],

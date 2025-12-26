@@ -133,7 +133,7 @@ export const Dashboard = () => {
       return { highlights: [], sportHighlights: {} };
     }
 
-    const _filteredActivities = filterActivities(activities, yearInReview);
+    filterActivities(activities, yearInReview);
 
     const raceHighlights = detectRaceHighlights(activities, {
       titleIgnorePatterns: yearInReview.titleIgnorePatterns,

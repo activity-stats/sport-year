@@ -551,10 +551,7 @@ export function YearInReview({
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
 
   // Filter activities to exclude virtual rides if disabled and respect title patterns for highlight cards
-  const _filteredActivities = useMemo(
-    () => filterActivities(activities, highlightFilters),
-    [activities, highlightFilters]
-  );
+  useMemo(() => filterActivities(activities, highlightFilters), [activities, highlightFilters]);
 
   // For sport highlights totals, use activities filtered only by type exclusions
   // (not title patterns or virtual ride settings) to match the stats page totals
@@ -834,9 +831,9 @@ export function YearInReview({
   const running = activities.filter((a) => a.type === 'Run');
   const swimming = activities.filter((a) => a.type === 'Swim');
 
-  const _cyclingDistance = cycling.reduce((sum, a) => sum + a.distanceKm, 0);
-  const _runningDistance = running.reduce((sum, a) => sum + a.distanceKm, 0);
-  const _swimmingDistance = swimming.reduce((sum, a) => sum + a.distanceKm, 0);
+  cycling.reduce((sum, a) => sum + a.distanceKm, 0);
+  running.reduce((sum, a) => sum + a.distanceKm, 0);
+  swimming.reduce((sum, a) => sum + a.distanceKm, 0);
 
   return (
     <>

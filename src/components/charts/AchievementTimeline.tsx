@@ -56,11 +56,15 @@ export function AchievementTimeline({
           type: 'custom-highlight',
           activity,
           label: distanceLabel,
-          value: highlight.pace
-            ? `${Math.floor(highlight.pace)}:${Math.round((highlight.pace % 1) * 60)
-                .toString()
-                .padStart(2, '0')} min/km`
-            : formatDuration(highlight.duration * 60),
+          value:
+            highlight.distance > 0
+              ? (() => {
+                  const pace = highlight.duration / (highlight.distance / 1000);
+                  return `${Math.floor(pace)}:${Math.round((pace % 1) * 60)
+                    .toString()
+                    .padStart(2, '0')} min/km`;
+                })()
+              : formatDuration(highlight.duration * 60),
           icon: '⚡',
           color: 'bg-gradient-to-r from-blue-500 to-indigo-600',
         });

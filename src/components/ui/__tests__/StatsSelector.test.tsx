@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { StatsSelector, availableStats } from '../StatsSelector';
+import { StatsSelector } from '../StatsSelector';
+import { availableStats } from '../statsOptions';
 import type { YearStats } from '../../../types';
 
 describe('StatsSelector', () => {
@@ -50,7 +51,7 @@ describe('StatsSelector', () => {
     expect(screen.getByText('Choose 1-4 stats to display on your social card')).toBeInTheDocument();
 
     // Check that all stat options are rendered
-    availableStats.forEach((stat) => {
+    availableStats.forEach((stat: { label: string }) => {
       expect(screen.getByText(stat.label)).toBeInTheDocument();
     });
   });
