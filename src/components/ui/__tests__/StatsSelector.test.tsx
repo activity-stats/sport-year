@@ -140,7 +140,7 @@ describe('StatsSelector', () => {
     expect(selectedStats).toHaveLength(3); // Default 3 selected
     expect(selectedStats[0].id).toBe('distance');
     expect(selectedStats[1].id).toBe('elevation');
-    expect(selectedStats[2].id).toBe('hours');
+    expect(selectedStats[2].id).toBe('time');
   });
 
   it('calls onClose when cancel button is clicked', async () => {

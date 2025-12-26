@@ -11,10 +11,8 @@ interface StatsSelectorProps {
 }
 
 export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSelectorProps) {
-  // Default: First 3 stats from StatsOverview (Distance, Elevation, Hours)
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(['distance', 'elevation', 'hours'])
-  );
+  // Default: First 3 stats from StatsOverview (Distance, Elevation, Time)
+  const [selected, setSelected] = useState<Set<string>>(new Set(['distance', 'elevation', 'time']));
 
   const toggleStat = (id: string) => {
     const newSelected = new Set(selected);
