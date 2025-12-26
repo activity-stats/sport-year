@@ -66,8 +66,8 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 dark:bg-black/90 backdrop-blur-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6">
           <div className="flex items-center justify-between">
@@ -97,8 +97,8 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Activities</h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Activities</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Drag to reorder, toggle to enable/disable. Disabled activities are hidden from Sport
                 Breakdown.
               </p>
@@ -113,8 +113,8 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
                     onDragEnd={handleDragEnd}
                     className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all cursor-move ${
                       activity.enabled
-                        ? 'border-gray-200 bg-white hover:border-blue-300'
-                        : 'border-gray-100 bg-gray-50 opacity-60'
+                        ? 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-blue-300'
+                        : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 opacity-60'
                     } ${draggedIndex === index ? 'opacity-50' : ''}`}
                   >
                     {/* Drag Handle */}
@@ -125,8 +125,10 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
 
                     {/* Info */}
                     <div className="flex-1">
-                      <div className="font-semibold text-gray-900">{activity.label}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="font-semibold text-gray-900 dark:text-white">
+                        {activity.label}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {activity.stravaTypes.join(', ')}
                         {activity.specialType && (
                           <span className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold">
@@ -165,7 +167,7 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 bg-gray-50 p-6 flex justify-between items-center">
+        <div className="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 p-6 flex justify-between items-center">
           <button
             onClick={handleReset}
             className="text-red-600 hover:text-red-700 font-bold text-sm"
@@ -175,7 +177,7 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 text-gray-700 hover:text-gray-900 font-semibold rounded-lg"
+              className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-lg"
             >
               Cancel
             </button>

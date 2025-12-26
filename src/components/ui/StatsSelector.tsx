@@ -41,20 +41,20 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 dark:bg-black/90 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-2xl font-black text-gray-900">Select Stats</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">Select Stats</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 Choose 1-4 stats to display on your social card
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl leading-none"
             >
               ×
             </button>
@@ -74,20 +74,22 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
                   onClick={() => toggleStat(stat.id)}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     isSelected
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                      ? 'border-purple-500 bg-purple-50 dark:bg-gray-900'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-purple-300 hover:bg-gray-50 dark:hover:bg-gray-900'
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-2xl">{stat.icon}</span>
-                    <span className="font-bold text-gray-900">{stat.label}</span>
+                    <span className="font-bold text-gray-900 dark:text-white">{stat.label}</span>
                     {isSelected && (
                       <div className="ml-auto shrink-0 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
                         ✓
                       </div>
                     )}
                   </div>
-                  <div className="text-2xl font-black text-gray-700 ml-11">{value}</div>
+                  <div className="text-2xl font-black text-gray-700 dark:text-gray-300 ml-11">
+                    {value}
+                  </div>
                 </button>
               );
             })}
@@ -95,14 +97,14 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             {selected.size} of 4 selected • {selected.size < 1 ? 'Select at least 1' : 'Ready'}
           </div>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition-colors"
+              className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-semibold transition-colors"
             >
               Cancel
             </button>

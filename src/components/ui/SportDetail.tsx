@@ -49,7 +49,7 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
     sportActivities.reduce((sum, a) => sum + a.averageSpeedKmh, 0) / sportActivities.length;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
       <div className={`bg-gradient-to-r ${config.gradient} p-6 text-white`}>
         <div className="flex items-center gap-3">
           <span className="text-5xl">{config.icon}</span>
@@ -62,40 +62,50 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
 
       <div className="p-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-gray-600 text-sm font-medium mb-1">Total Distance</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
+              Total Distance
+            </div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(totalDistance * 1000)}
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-gray-600 text-sm font-medium mb-1">Total Time</div>
-            <div className="text-2xl font-bold text-gray-900">{formatDuration(totalTime * 60)}</div>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
+              Total Time
+            </div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {formatDuration(totalTime * 60)}
+            </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-gray-600 text-sm font-medium mb-1">Avg Distance</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
+              Avg Distance
+            </div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(avgDistance * 1000)}
             </div>
           </div>
 
           {sport === 'cycling' || sport === 'running' ? (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-gray-600 text-sm font-medium mb-1">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
                 {sport === 'cycling' ? 'Avg Speed' : 'Avg Pace'}
               </div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {sport === 'cycling'
                   ? `${avgSpeed.toFixed(1)} km/h`
                   : formatPace((totalDistance * 1000) / (totalTime * 60), 'Run')}
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-gray-600 text-sm font-medium mb-1">Avg Pace</div>
-              <div className="text-2xl font-bold text-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
+                Avg Pace
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {formatPace((totalDistance * 1000) / (totalTime * 60), 'Swim')}
               </div>
             </div>
@@ -107,33 +117,33 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
             href={`https://www.strava.com/activities/${longestActivity.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-gray-200 rounded-lg p-4 hover:border-orange-400 hover:shadow-md transition-all"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-orange-400 hover:shadow-md transition-all"
           >
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🏆</span>
-              <h4 className="font-semibold text-gray-900 group-hover:text-orange-600">
+              <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-orange-600">
                 Longest Activity
               </h4>
             </div>
-            <div className="text-gray-700 font-medium mb-1 hover:text-orange-600 transition-colors">
+            <div className="text-gray-700 dark:text-gray-300 font-medium mb-1 hover:text-orange-600 transition-colors">
               {longestActivity.name}
             </div>
-            <div className="flex gap-4 text-sm text-gray-600">
+            <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400">
               <span>{formatDistanceWithUnit(longestActivity.distanceKm * 1000)}</span>
               <span>{formatDuration(longestActivity.movingTimeMinutes * 60)}</span>
             </div>
           </a>
 
           {(sport === 'cycling' || sport === 'running') && (
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">⛰️</span>
-                <h4 className="font-semibold text-gray-900">Total Elevation</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-white">Total Elevation</h4>
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                 {formatElevation(totalElevation)}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 Avg {(totalElevation / sportActivities.length).toFixed(0)} m per activity
               </div>
             </div>

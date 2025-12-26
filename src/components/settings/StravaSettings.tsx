@@ -89,11 +89,11 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50"
+      className="fixed inset-0 bg-black/70 dark:bg-black/90 flex items-center justify-center p-6 z-50"
       onClick={onClose}
     >
       <div
-        className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -128,16 +128,16 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
             <h3 className="text-lg font-bold text-gray-900">Setup Instructions</h3>
 
             {/* Step 1 */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
               <div className="flex items-start gap-3">
                 <div className="bg-orange-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                   1
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Go to Strava's API Settings
                   </p>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                     Click the button below. It will open Strava's API settings page in a new tab so
                     you can easily switch back here to copy your credentials.
                   </p>
@@ -158,33 +158,37 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
             </div>
 
             {/* Step 2 */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
               <div className="flex items-start gap-3">
                 <div className="bg-orange-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                   2
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Configure Your Application
                   </p>
-                  <div className="space-y-3 text-sm text-gray-600">
+                  <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                     <div>
-                      <p className="font-semibold text-gray-700">Application Name:</p>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">
+                        Application Name:
+                      </p>
                       <p>Choose any name you like (e.g., "My Sport Year")</p>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-700">Category:</p>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">Category:</p>
                       <p>Select any category that fits</p>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-700">Website:</p>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">Website:</p>
                       <p>
                         Enter any website URL (e.g., your personal site or just use a placeholder
                         like https://example.com)
                       </p>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-700">Authorization Callback Domain:</p>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">
+                        Authorization Callback Domain:
+                      </p>
                       <p className="mb-2">
                         ⚠️ <strong>Important:</strong> Enter ONLY the domain without port number:
                       </p>
@@ -202,14 +206,16 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
             </div>
 
             {/* Step 3 */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
               <div className="flex items-start gap-3">
                 <div className="bg-orange-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                   3
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">Copy Your Credentials</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                    Copy Your Credentials
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     After creating your app, Strava will show you a <strong>Client ID</strong> and{' '}
                     <strong>Client Secret</strong>. Copy these values and enter them below.
                   </p>
@@ -220,12 +226,14 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
 
           {/* Credentials Input */}
           <div className="pt-4 border-t space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">Enter Your Credentials</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              Enter Your Credentials
+            </h3>
 
             <div>
               <label
                 htmlFor="settings-clientId"
-                className="block text-sm font-bold text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
               >
                 Client ID
               </label>
@@ -242,7 +250,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
             <div>
               <label
                 htmlFor="settings-clientSecret"
-                className="block text-sm font-bold text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
               >
                 Client Secret
               </label>
@@ -286,7 +294,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-6 py-3 text-gray-700 hover:text-gray-900 font-semibold"
+                  className="px-6 py-3 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold"
                 >
                   Cancel
                 </button>
@@ -294,7 +302,9 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
 
               {/* Data Management Section */}
               <div className="border-t pt-4 mt-2 space-y-3">
-                <h4 className="text-sm font-bold text-gray-700">Data Management</h4>
+                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                  Data Management
+                </h4>
 
                 <button
                   onClick={handleSync}

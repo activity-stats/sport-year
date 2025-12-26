@@ -40,8 +40,35 @@ export function SocialCard({
     return names;
   });
 
+  // State for edited times (in minutes)
+  const [editedTimes, setEditedTimes] = useState<Record<string, number>>(() => {
+    const times: Record<string, number> = {};
+    selectedHighlights.forEach((h) => (times[h.id] = h.duration || 0));
+    selectedActivities.forEach((a) => (times[a.id] = a.movingTimeMinutes || 0));
+    return times;
+  });
+
   const updateName = (id: string, newName: string) => {
     setEditedNames((prev) => ({ ...prev, [id]: newName }));
+  };
+
+  const updateTime = (id: string, timeString: string) => {
+    // Parse time string in format HH:MM:SS or MM:SS
+    const parts = timeString.split(':').map((p) => parseInt(p) || 0);
+    let minutes = 0;
+
+    if (parts.length === 3) {
+      // HH:MM:SS format
+      minutes = parts[0] * 60 + parts[1] + parts[2] / 60;
+    } else if (parts.length === 2) {
+      // MM:SS format
+      minutes = parts[0] + parts[1] / 60;
+    } else if (parts.length === 1) {
+      // Just minutes
+      minutes = parts[0];
+    }
+
+    setEditedTimes((prev) => ({ ...prev, [id]: minutes }));
   };
 
   const handleExport = async () => {
@@ -159,20 +186,23 @@ export function SocialCard({
   const athleteName = athlete ? `${athlete.firstname} ${athlete.lastname}` : 'Athlete';
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 dark:bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-black text-gray-900">Social Media Card</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Click on activity titles below to edit them • 1200x630px
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+                Social Media Card
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                💡 Tip: Click activity titles and times to edit them (e.g., use official race times)
+                • 1200x630px
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl leading-none"
             >
               ×
             </button>
@@ -231,22 +261,24 @@ export function SocialCard({
                               maxLength={50}
                             />
                           </div>
-                          <div className="text-sm opacity-90 font-semibold">
-                            {isRaceHighlight ? (
-                              <>
-                                {formatDistanceWithUnit(
-                                  ((item as RaceHighlight).distance || 0) * 1000
-                                )}{' '}
-                                • {formatDuration(((item as RaceHighlight).duration || 0) * 60)}
-                              </>
-                            ) : (
-                              <>
-                                {formatDistanceWithUnit(
-                                  ((item as Activity).distanceKm || 0) * 1000
-                                )}{' '}
-                                • {formatDuration(((item as Activity).movingTimeMinutes || 0) * 60)}
-                              </>
-                            )}
+                          <div className="text-sm opacity-90 font-semibold flex items-center gap-2">
+                            <span>
+                              {isRaceHighlight
+                                ? formatDistanceWithUnit(
+                                    ((item as RaceHighlight).distance || 0) * 1000
+                                  )
+                                : formatDistanceWithUnit(
+                                    ((item as Activity).distanceKm || 0) * 1000
+                                  )}
+                            </span>
+                            <span>•</span>
+                            <input
+                              type="text"
+                              value={formatDuration((editedTimes[itemId] || 0) * 60)}
+                              onChange={(e) => updateTime(itemId, e.target.value)}
+                              className="bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors w-20 text-center"
+                              placeholder="0:00"
+                            />
                           </div>
                         </div>
                       );
@@ -291,8 +323,8 @@ export function SocialCard({
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             {selectedStats.length} stat{selectedStats.length !== 1 ? 's' : ''} •{' '}
             {allSelectedItems.length === 0
               ? 'No highlights'
@@ -301,7 +333,7 @@ export function SocialCard({
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition-colors"
+              className="px-6 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
             >
               Cancel
             </button>

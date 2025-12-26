@@ -78,9 +78,9 @@ export function YearInReviewSettings({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 dark:bg-black/90 backdrop-blur-sm transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
     >
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-800 text-white p-6">
           <div className="flex items-center justify-between">
@@ -98,14 +98,14 @@ export function YearInReviewSettings({
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 bg-gray-50">
+        <div className="border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900">
           <div className="flex">
             <button
               onClick={() => setActiveTab('background')}
               className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
                 activeTab === 'background'
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               🖼️ Background
@@ -114,8 +114,8 @@ export function YearInReviewSettings({
               onClick={() => setActiveTab('stats')}
               className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
                 activeTab === 'stats'
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               📊 Stats
@@ -124,8 +124,8 @@ export function YearInReviewSettings({
               onClick={() => setActiveTab('types')}
               className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
                 activeTab === 'types'
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               🎯 Activities
@@ -134,8 +134,8 @@ export function YearInReviewSettings({
               onClick={() => setActiveTab('filters')}
               className={`flex-1 px-6 py-4 font-bold text-sm uppercase tracking-wider transition-colors ${
                 activeTab === 'filters'
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               🔍 Filters
@@ -149,15 +149,19 @@ export function YearInReviewSettings({
           {activeTab === 'background' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Hero Background Image</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3">
+                  Hero Background Image
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   Upload a custom background image or provide a URL. Maximum file size: 5MB.
                 </p>
 
                 {yearInReview.backgroundImageUrl && (
                   <>
                     <div className="mb-4">
-                      <h4 className="text-lg font-bold text-gray-900 mb-3">Position & Zoom</h4>
+                      <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                        Position & Zoom
+                      </h4>
                       <ImagePositionEditor
                         imageUrl={yearInReview.backgroundImageUrl}
                         position={yearInReview.backgroundImagePosition}
@@ -226,10 +230,10 @@ export function YearInReviewSettings({
           {activeTab === 'stats' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">
+                <h3 className="text-xl font-black text-gray-900 dark:text-white mb-3">
                   Year Highlights Statistics
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   Choose which stats to display in your Year in Review hero section. Select up to 6
                   stats for the best presentation.
                 </p>
@@ -249,7 +253,9 @@ export function YearInReviewSettings({
                       <label
                         key={statId}
                         className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          isEnabled ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                          isEnabled
+                            ? 'border-blue-500 bg-blue-50 dark:bg-gray-900'
+                            : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900'
                         }`}
                       >
                         <input
@@ -259,8 +265,12 @@ export function YearInReviewSettings({
                           className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 mt-0.5"
                         />
                         <div className="flex-1">
-                          <div className="font-bold text-sm text-gray-900">{stat.label}</div>
-                          <div className="text-xs text-gray-600 mt-1">{stat.description}</div>
+                          <div className="font-bold text-sm text-gray-900 dark:text-white">
+                            {stat.label}
+                          </div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            {stat.description}
+                          </div>
                         </div>
                       </label>
                     );
@@ -301,7 +311,7 @@ export function YearInReviewSettings({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 bg-gray-50 p-6 flex justify-between items-center">
+        <div className="border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 p-6 flex justify-between items-center">
           <button
             onClick={resetYearInReview}
             className="text-red-600 hover:text-red-700 font-bold text-sm"

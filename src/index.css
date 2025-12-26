@@ -1,1 +1,12 @@
 @import 'tailwindcss';
+@variant dark (:where(.dark) &);
+
+html,
+body {
+  background-color: #f9fafb;
+}
+
+html.dark,
+html.dark body {
+  background-color: #111827;
+}

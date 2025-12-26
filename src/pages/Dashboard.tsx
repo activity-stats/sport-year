@@ -18,6 +18,7 @@ import { LoadingProgress, type LoadingStep } from '../components/ui/LoadingProgr
 import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
+import { useThemeStore } from '../stores/themeStore.ts';
 import type { ActivityType } from '../types';
 import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
 import { calculateSportHighlights } from '../utils/sportHighlights';
@@ -41,6 +42,20 @@ export const Dashboard = () => {
   const loadingStage = useLoadingStore((state) => state.stage);
   const loadingError = useLoadingStore((state) => state.error);
   const { yearInReview, sportBreakdown } = useSettingsStore();
+
+  // Subscribe to theme to get reactive updates
+  const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+
+  // Compute effective theme based on current theme value
+  const currentTheme =
+    theme === 'system'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : theme;
+
+  console.log('[Dashboard] Current theme:', theme, '→ effective:', currentTheme);
 
   // Build loading steps based on current stage
   const loadingSteps: LoadingStep[] = useMemo(() => {
@@ -182,10 +197,10 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Left Sidebar Navigation */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-gradient-to-b from-blue-600 via-purple-600 to-pink-600 shadow-2xl transition-all duration-300 z-50 ${
+        className={`fixed left-0 top-0 h-full bg-gradient-to-b from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-2xl transition-all duration-300 z-50 ${
           sidebarExpanded ? 'w-56' : 'w-16'
         }`}
         onMouseEnter={() => setSidebarExpanded(true)}
@@ -202,10 +217,10 @@ export const Dashboard = () => {
             {/* Guide */}
             <button
               onClick={() => setShowOnboarding(true)}
-              className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
+              className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3 border border-white/20 hover:border-white/30"
               title="Show Guide"
             >
-              <span className="text-xl">❓</span>
+              <span className="text-xl">💡</span>
               {sidebarExpanded && <span className="text-sm font-semibold">Guide</span>}
             </button>
 
@@ -276,6 +291,23 @@ export const Dashboard = () => {
 
           {/* Links - GitHub and Buy Me a Coffee */}
           <div className="space-y-2 mb-4">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => {
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+              }}
+              className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
+              title={currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              <span className="text-xl">{currentTheme === 'dark' ? '☀️' : '🌙'}</span>
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">
+                  {currentTheme === 'dark' ? 'Light' : 'Dark'}
+                </span>
+              )}
+            </button>
+
             <a
               href="https://github.com/activity-stats/sport-year"
               target="_blank"
@@ -318,7 +350,7 @@ export const Dashboard = () => {
       {/* Main Content with margin for sidebar */}
       <div className="ml-16">
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-xl sticky top-0 z-40">
+        <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex justify-between items-center">
               <div>
@@ -334,7 +366,7 @@ export const Dashboard = () => {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none relative z-10"
+                className="px-6 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none relative z-10"
               >
                 {years.map((year) => (
                   <option key={year} value={year}>
@@ -375,8 +407,10 @@ export const Dashboard = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <div className="space-y-6">
                     <div>
-                      <h2 className="text-3xl font-bold text-gray-900 mb-2">Activity Map</h2>
-                      <p className="text-gray-600">
+                      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        Activity Map
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-400">
                         All your activities for {selectedYear} visualized on a map. Click any route
                         to see details.
                       </p>

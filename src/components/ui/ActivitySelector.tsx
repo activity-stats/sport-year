@@ -113,20 +113,22 @@ export function ActivitySelector({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 dark:bg-black/90 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-black text-gray-900">Select Highlights</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+                Select Highlights
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 Choose up to 3 activities to feature on your social card
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-2xl leading-none"
             >
               ×
             </button>
@@ -139,9 +141,11 @@ export function ActivitySelector({
               placeholder="Search activities..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+              🔍
+            </span>
           </div>
         </div>
 
@@ -159,26 +163,28 @@ export function ActivitySelector({
                   onClick={() => toggleActivity(item.id)}
                   className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                     isSelected
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-purple-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-gray-900 truncate">{item.name}</span>
+                        <span className="font-bold text-gray-900 dark:text-white truncate">
+                          {item.name}
+                        </span>
                         {isTriathlon && (
-                          <span className="flex-shrink-0 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold">
+                          <span className="flex-shrink-0 text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full font-semibold">
                             🏊🚴🏃 Triathlon
                           </span>
                         )}
                         {isHighlight && !isTriathlon && (
-                          <span className="flex-shrink-0 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-semibold">
+                          <span className="flex-shrink-0 text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full font-semibold">
                             ⭐ Highlight
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-600 mt-1">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {isRaceHighlight(item) ? (
                           <>
                             {item.badge} • {formatDistanceWithUnit(item.distance * 1000)} •{' '}
@@ -191,7 +197,7 @@ export function ActivitySelector({
                           </>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                         {item.date.toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -212,12 +218,14 @@ export function ActivitySelector({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">{selected.size} of 3 selected</div>
+        <div className="p-6 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {selected.size} of 3 selected
+          </div>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition-colors"
+              className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
             >
               Cancel
             </button>

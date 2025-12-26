@@ -129,7 +129,7 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
           <div className="flex gap-1">
@@ -139,7 +139,7 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
               {daysOfWeek.map((day, i) => (
                 <div
                   key={day}
-                  className="h-3 text-xs text-gray-600 flex items-center"
+                  className="h-3 text-xs text-gray-600 dark:text-gray-400 flex items-center"
                   style={{ lineHeight: '12px' }}
                 >
                   {i % 2 === 0 ? day : ''}
@@ -152,7 +152,7 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
               {weeks.map((week, weekIndex) => (
                 <div key={weekIndex} className="flex flex-col gap-1">
                   {/* Month label */}
-                  <div className="h-3 text-xs text-gray-600">
+                  <div className="h-3 text-xs text-gray-600 dark:text-gray-400">
                     {week[0] && week[0].date.getDate() <= 7
                       ? week[0].date.toLocaleDateString('en-US', { month: 'short' })
                       : ''}
@@ -193,7 +193,7 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-2 mt-4 text-xs text-gray-600">
+          <div className="flex items-center gap-2 mt-4 text-xs text-gray-600 dark:text-gray-400">
             <span>Less</span>
             {[0, 1, 2, 3, 4].map((level) => (
               <div

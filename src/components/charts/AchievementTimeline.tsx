@@ -154,18 +154,24 @@ export function AchievementTimeline({
 
   if (achievements.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Achievement Timeline</h3>
-        <p className="text-gray-600">No achievements recorded this year yet. Keep training!</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Achievement Timeline
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400">
+          No achievements recorded this year yet. Keep training!
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Achievement Timeline</h3>
-        <p className="text-sm text-gray-600">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Achievement Timeline
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Your personal records and milestones throughout {year}
         </p>
       </div>
@@ -182,7 +188,7 @@ export function AchievementTimeline({
               href={`https://www.strava.com/activities/${achievement.activity.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex gap-4 items-start hover:bg-gray-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+              className="group flex gap-4 items-start hover:bg-gray-50 dark:hover:bg-gray-900 -mx-2 px-2 py-2 rounded-lg transition-colors"
             >
               {/* Icon */}
               <div
@@ -196,19 +202,19 @@ export function AchievementTimeline({
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">
                         {getAchievementLabel(achievement)}
                       </h4>
-                      <span className="text-sm font-semibold text-gray-500">
+                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                         {formatMonth(achievement.date)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 truncate mb-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate mb-1">
                       {achievement.activity.name}
                     </p>
                     <div className="flex items-center gap-3 text-sm">
                       <span className="font-bold text-blue-600">{achievement.value}</span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500 dark:text-gray-400">
                         {formatDistanceWithUnit(achievement.activity.distanceKm * 1000)}
                       </span>
                       <span className="text-gray-500">
@@ -224,8 +230,8 @@ export function AchievementTimeline({
       </div>
 
       {/* Summary */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
           <span className="font-semibold">
             {achievements.length} achievement{achievements.length !== 1 ? 's' : ''} unlocked
           </span>

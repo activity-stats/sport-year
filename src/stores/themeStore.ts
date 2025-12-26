@@ -9,7 +9,7 @@ interface ThemeStore {
   getEffectiveTheme: () => 'light' | 'dark';
 }
 
-// Apply theme directly to DOM - this must work immediately
+// Apply theme directly to DOM
 function applyThemeToDom(theme: Theme) {
   if (typeof window === 'undefined') return;
 
@@ -23,38 +23,27 @@ function applyThemeToDom(theme: Theme) {
 
   console.log('[Theme] Applying:', theme, '→', effectiveTheme);
 
-  // Force immediate update
+  // Apply immediately - no need for RAF as this is not during React render
   if (effectiveTheme === 'dark') {
     root.classList.add('dark');
   } else {
     root.classList.remove('dark');
   }
-
-  console.log('[Theme] Classes after update:', root.classList.toString());
+  console.log('[Theme] DOM classes after apply:', root.classList.toString());
 }
 
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      theme: 'system',
+      theme: 'light',
       setTheme: (newTheme) => {
         console.log('[Theme Store] setTheme called with:', newTheme);
 
-        // Update state
-        set({ theme: newTheme });
-
-        // Apply to DOM immediately - don't wait for anything
+        // Apply to DOM immediately
         applyThemeToDom(newTheme);
 
-        // Also save to localStorage directly to ensure persistence
-        try {
-          localStorage.setItem(
-            'theme-storage',
-            JSON.stringify({ state: { theme: newTheme }, version: 0 })
-          );
-        } catch (e) {
-          console.error('[Theme] Failed to save to localStorage:', e);
-        }
+        // Update state - this will trigger persist middleware to save
+        set({ theme: newTheme });
       },
       getEffectiveTheme: () => {
         const { theme } = get();
@@ -69,6 +58,7 @@ export const useThemeStore = create<ThemeStore>()(
       onRehydrateStorage: () => (state) => {
         console.log('[Theme] Rehydrated from storage:', state?.theme);
         if (state) {
+          // Apply theme immediately after rehydration
           applyThemeToDom(state.theme);
         }
       },
@@ -85,10 +75,9 @@ if (typeof window !== 'undefined') {
     }
   });
 
-  // Initialize on first load
-  setTimeout(() => {
-    const initialTheme = useThemeStore.getState().theme;
-    console.log('[Theme] Initial load, applying:', initialTheme);
-    applyThemeToDom(initialTheme);
-  }, 0);
+  // Apply theme eagerly on module load to prevent flash
+  // This will be overridden by onRehydrateStorage if there's a saved theme
+  const initialState = useThemeStore.getState();
+  console.log('[Theme] Module init, applying initial theme:', initialState.theme);
+  applyThemeToDom(initialState.theme);
 }

@@ -146,10 +146,10 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
   const currentMetric = metrics[selectedMetric];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-bold text-gray-900">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
             {viewMode === 'month' ? 'Monthly' : 'Weekly'} Trends
           </h3>
           <div className="flex gap-2">
@@ -160,7 +160,7 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                   selectedMetric === metric
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
                 {metrics[metric].label}
