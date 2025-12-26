@@ -15,6 +15,8 @@ export interface Activity {
   averageHeartRate?: number;
   maxHeartRate?: number;
   sufferScore?: number;
+  calories?: number;
+  kilojoules?: number;
   polyline?: string;
   workoutType?: number; // For runs: 0=default, 1=race, 2=long run, 3=workout
 }

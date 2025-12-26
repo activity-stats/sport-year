@@ -39,9 +39,9 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
     });
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-900">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
           Activities ({filteredActivities.length})
         </h3>
 
@@ -49,7 +49,7 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             {activityTypes.map((type) => (
               <option key={type} value={type}>
@@ -61,7 +61,7 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="date">Date</option>
             <option value="distance">Distance</option>
@@ -77,38 +77,38 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
             href={`https://www.strava.com/activities/${activity.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block p-5 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-200 hover:border-orange-400"
+            className="block p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-750 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white dark:hover:from-gray-700 dark:hover:to-gray-750 hover:shadow-md transition-all duration-200 hover:border-orange-400"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl">{ACTIVITY_ICONS[activity.type] || '🏃'}</span>
-                  <h4 className="font-semibold text-gray-900 text-lg hover:text-orange-600 transition-colors">
+                  <h4 className="font-semibold text-gray-900 dark:text-white text-lg hover:text-orange-600 transition-colors">
                     {activity.name}
                   </h4>
-                  <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
                     {activity.type}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                  <div className="bg-gray-50 rounded-lg px-3 py-2">
-                    <span className="text-gray-600 font-medium">Distance:</span>
-                    <span className="ml-2 font-bold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">Distance:</span>
+                    <span className="ml-2 font-bold text-gray-900 dark:text-white">
                       {formatDistanceWithUnit(activity.distanceKm * 1000)}
                     </span>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg px-3 py-2">
-                    <span className="text-gray-600 font-medium">Time:</span>
-                    <span className="ml-2 font-bold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">Time:</span>
+                    <span className="ml-2 font-bold text-gray-900 dark:text-white">
                       {formatDuration(activity.movingTimeMinutes * 60)}
                     </span>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg px-3 py-2">
-                    <span className="text-gray-600 font-medium">Pace:</span>
-                    <span className="ml-2 font-bold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">Pace:</span>
+                    <span className="ml-2 font-bold text-gray-900 dark:text-white">
                       {formatPace(
                         (activity.distanceKm * 1000) / (activity.movingTimeMinutes * 60),
                         activity.type
@@ -116,16 +116,16 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
                     </span>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg px-3 py-2">
-                    <span className="text-gray-600 font-medium">Elevation:</span>
-                    <span className="ml-2 font-bold text-gray-900">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">Elevation:</span>
+                    <span className="ml-2 font-bold text-gray-900 dark:text-white">
                       {formatElevation(activity.elevationGainMeters)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="text-right text-sm font-medium text-gray-500 ml-4">
+              <div className="text-right text-sm font-medium text-gray-500 dark:text-gray-400 ml-4">
                 {formatDate(activity.date)}
               </div>
             </div>
@@ -133,7 +133,7 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
         ))}
 
         {filteredActivities.length === 0 && (
-          <p className="text-center text-gray-500 py-8">No activities found</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">No activities found</p>
         )}
       </div>
     </div>

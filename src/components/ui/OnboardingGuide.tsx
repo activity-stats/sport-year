@@ -83,10 +83,10 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
         {/* Progress Bar */}
-        <div className="h-2 bg-gray-200">
+        <div className="h-2 bg-gray-200 dark:bg-gray-700">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -98,9 +98,11 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
           {/* Step Indicator */}
           <div className="text-center mb-6">
             <div className="text-6xl mb-4">{currentStepData.emoji}</div>
-            <h2 className="text-2xl font-black text-gray-900 mb-2">{currentStepData.title}</h2>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
+              {currentStepData.title}
+            </h2>
             {currentStepData.completed && (
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full text-sm font-semibold">
                 <span>✓</span>
                 <span>Already Configured</span>
               </div>
@@ -108,36 +110,40 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
           </div>
 
           {/* Description */}
-          <p className="text-gray-600 text-center mb-6 leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-center mb-6 leading-relaxed">
             {currentStepData.description}
           </p>
 
           {/* Features List (for first step) */}
           {currentStep === 0 && (
             <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
+              <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                 <span className="text-2xl">📊</span>
                 <div>
-                  <div className="font-semibold text-gray-900">Interactive Charts</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    Interactive Charts
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     View your progress with detailed stats
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-xl">
+              <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
                 <span className="text-2xl">🗺️</span>
                 <div>
-                  <div className="font-semibold text-gray-900">Activity Map</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="font-semibold text-gray-900 dark:text-white">Activity Map</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     See where you trained throughout the year
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-xl">
+              <div className="flex items-center gap-3 p-3 bg-pink-50 dark:bg-pink-900/30 rounded-xl">
                 <span className="text-2xl">📱</span>
                 <div>
-                  <div className="font-semibold text-gray-900">Social Sharing</div>
-                  <div className="text-sm text-gray-600">Create beautiful images to share</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Social Sharing</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Create beautiful images to share
+                  </div>
                 </div>
               </div>
             </div>
@@ -145,7 +151,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
 
           {/* Navigation */}
           <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               Step {currentStep + 1} of {steps.length}
             </div>
 
@@ -153,7 +159,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
               {currentStep < steps.length - 1 && (
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-900 font-semibold rounded-lg transition"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-lg transition"
                 >
                   Skip
                 </button>
@@ -183,7 +189,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl leading-none"
+          className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
         >
           ×
         </button>

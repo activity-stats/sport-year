@@ -29,6 +29,8 @@ export interface StravaActivity {
   elev_high?: number;
   elev_low?: number;
   suffer_score?: number;
+  calories?: number;
+  kilojoules?: number;
   workout_type?: number; // For runs: 0=default, 1=race, 2=long run, 3=workout
   map?: {
     id: string;

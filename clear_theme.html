@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>Clear Theme</title></head>
+<body>
+<h1>Theme Storage Debug</h1>
+<pre id="output"></pre>
+<button onclick="clearTheme()">Clear Theme</button>
+<button onclick="showTheme()">Show Theme</button>
+<script>
+function showTheme() {
+  const theme = localStorage.getItem('theme-storage');
+  document.getElementById('output').textContent = 'Current theme storage:\n' + (theme || 'null');
+}
+function clearTheme() {
+  localStorage.removeItem('theme-storage');
+  document.getElementById('output').textContent = 'Theme cleared!';
+}
+showTheme();
+</script>
+</body>
+</html>

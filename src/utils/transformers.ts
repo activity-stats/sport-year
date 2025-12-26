@@ -17,6 +17,8 @@ export const transformActivity = (stravaActivity: StravaActivity): Activity => {
     averageHeartRate: stravaActivity.average_heartrate,
     maxHeartRate: stravaActivity.max_heartrate,
     sufferScore: stravaActivity.suffer_score,
+    calories: stravaActivity.calories,
+    kilojoules: stravaActivity.kilojoules,
     polyline: stravaActivity.map?.summary_polyline,
     workoutType: stravaActivity.workout_type,
   };

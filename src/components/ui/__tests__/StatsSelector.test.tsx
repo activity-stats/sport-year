@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { StatsSelector, availableStats } from '../StatsSelector';
+import { StatsSelector } from '../StatsSelector';
+import { availableStats } from '../statsOptions';
 import type { YearStats } from '../../../types';
 
 describe('StatsSelector', () => {
@@ -47,12 +48,10 @@ describe('StatsSelector', () => {
     );
 
     expect(screen.getByText('Select Stats')).toBeInTheDocument();
-    expect(
-      screen.getByText('Choose 1-4 stats to display on your social card')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Choose 1-4 stats to display on your social card')).toBeInTheDocument();
 
     // Check that all stat options are rendered
-    availableStats.forEach((stat) => {
+    availableStats.forEach((stat: { label: string }) => {
       expect(screen.getByText(stat.label)).toBeInTheDocument();
     });
   });
@@ -141,7 +140,7 @@ describe('StatsSelector', () => {
     expect(selectedStats).toHaveLength(3); // Default 3 selected
     expect(selectedStats[0].id).toBe('distance');
     expect(selectedStats[1].id).toBe('elevation');
-    expect(selectedStats[2].id).toBe('hours');
+    expect(selectedStats[2].id).toBe('time');
   });
 
   it('calls onClose when cancel button is clicked', async () => {

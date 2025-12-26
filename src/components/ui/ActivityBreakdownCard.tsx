@@ -1,4 +1,5 @@
 import type { Activity } from '../../types/activity.ts';
+import type { SportBreakdownActivity } from '../../stores/settingsStore.ts';
 import {
   formatDistanceWithUnit,
   formatDuration,
@@ -6,47 +7,35 @@ import {
   formatElevation,
 } from '../../utils/index.ts';
 
-interface SportDetailProps {
-  sport: 'cycling' | 'running' | 'swimming';
+interface ActivityBreakdownCardProps {
+  config: SportBreakdownActivity;
   activities: Activity[];
 }
 
-const sportConfig = {
-  cycling: {
-    icon: '🚴',
-    title: 'Cycling',
-    gradient: 'from-blue-500 to-cyan-500',
-    types: ['Ride', 'VirtualRide'],
-  },
-  running: {
-    icon: '🏃',
-    title: 'Running',
-    gradient: 'from-orange-500 to-red-500',
-    types: ['Run'],
-  },
-  swimming: {
-    icon: '🏊',
-    title: 'Swimming',
-    gradient: 'from-teal-500 to-blue-500',
-    types: ['Swim'],
-  },
-};
+export function ActivityBreakdownCard({ config, activities }: ActivityBreakdownCardProps) {
+  // Filter activities based on Strava types
+  const filteredActivities = activities.filter((a) => config.stravaTypes.includes(a.type));
 
-export function SportDetail({ sport, activities }: SportDetailProps) {
-  const config = sportConfig[sport];
-  const sportActivities = activities.filter((a) => config.types.includes(a.type));
+  // Don't render if no activities
+  if (filteredActivities.length === 0) return null;
 
-  if (sportActivities.length === 0) return null;
-
-  const totalDistance = sportActivities.reduce((sum, a) => sum + a.distanceKm, 0);
-  const totalTime = sportActivities.reduce((sum, a) => sum + a.movingTimeMinutes, 0);
-  const totalElevation = sportActivities.reduce((sum, a) => sum + a.elevationGainMeters, 0);
-  const longestActivity = sportActivities.reduce((max, a) =>
+  // Calculate stats
+  const totalDistance = filteredActivities.reduce((sum, a) => sum + a.distanceKm, 0);
+  const totalTime = filteredActivities.reduce((sum, a) => sum + a.movingTimeMinutes, 0);
+  const totalElevation = filteredActivities.reduce((sum, a) => sum + a.elevationGainMeters, 0);
+  const longestActivity = filteredActivities.reduce((max, a) =>
     a.distanceKm > max.distanceKm ? a : max
   );
-  const avgDistance = totalDistance / sportActivities.length;
+  const avgDistance = totalDistance / filteredActivities.length;
   const avgSpeed =
-    sportActivities.reduce((sum, a) => sum + a.averageSpeedKmh, 0) / sportActivities.length;
+    filteredActivities.reduce((sum, a) => sum + a.averageSpeedKmh, 0) / filteredActivities.length;
+
+  // Determine if this is a cycling/running sport for pace/speed display
+  const isCycling = config.stravaTypes.some((t) => t === 'Ride' || t === 'VirtualRide');
+  const isRunning = config.stravaTypes.includes('Run');
+  const isSwimming = config.stravaTypes.includes('Swim');
+
+  const showElevation = isCycling || isRunning;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
@@ -54,8 +43,8 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
         <div className="flex items-center gap-3">
           <span className="text-5xl">{config.icon}</span>
           <div>
-            <h3 className="text-2xl font-bold">{config.title}</h3>
-            <p className="text-white/90">{sportActivities.length} activities</p>
+            <h3 className="text-2xl font-bold">{config.label}</h3>
+            <p className="text-white/90">{filteredActivities.length} activities</p>
           </div>
         </div>
       </div>
@@ -89,27 +78,20 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
             </div>
           </div>
 
-          {sport === 'cycling' || sport === 'running' ? (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
-                {sport === 'cycling' ? 'Avg Speed' : 'Avg Pace'}
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {sport === 'cycling'
-                  ? `${avgSpeed.toFixed(1)} km/h`
-                  : formatPace((totalDistance * 1000) / (totalTime * 60), 'Run')}
-              </div>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
+              {isCycling ? 'Avg Speed' : 'Avg Pace'}
             </div>
-          ) : (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <div className="text-gray-600 dark:text-gray-300 text-sm font-medium mb-1">
-                Avg Pace
-              </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatPace((totalDistance * 1000) / (totalTime * 60), 'Swim')}
-              </div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isCycling
+                ? `${avgSpeed.toFixed(1)} km/h`
+                : isRunning
+                  ? formatPace((totalDistance * 1000) / (totalTime * 60), 'Run')
+                  : isSwimming
+                    ? formatPace((totalDistance * 1000) / (totalTime * 60), 'Swim')
+                    : `${avgSpeed.toFixed(1)} km/h`}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -134,7 +116,7 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
             </div>
           </a>
 
-          {(sport === 'cycling' || sport === 'running') && (
+          {showElevation && (
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">⛰️</span>
@@ -144,7 +126,7 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
                 {formatElevation(totalElevation)}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                Avg {(totalElevation / sportActivities.length).toFixed(0)} m per activity
+                Avg {(totalElevation / filteredActivities.length).toFixed(0)} m per activity
               </div>
             </div>
           )}

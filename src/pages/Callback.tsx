@@ -20,7 +20,9 @@ export const Callback = () => {
     if (error) {
       console.error('OAuth error from Strava:', error);
       const errorDescription = searchParams.get('error_description');
-      alert(`OAuth Error: ${error}${errorDescription ? `\n${errorDescription}` : ''}\n\nCheck browser console for details.`);
+      alert(
+        `OAuth Error: ${error}${errorDescription ? `\n${errorDescription}` : ''}\n\nCheck browser console for details.`
+      );
       navigate('/login', { replace: true });
       return;
     }
@@ -29,24 +31,29 @@ export const Callback = () => {
       console.log('Code received, exchanging for token...');
       handleCallback(code).catch((err) => {
         console.error('Token exchange failed:', err);
-        
+
         // Only show alert for actual API errors (not navigation/component unmount errors)
         if (err.response || err.message?.includes('token') || err.message?.includes('auth')) {
           console.error('API Error details:', {
             status: err.response?.status,
             data: err.response?.data,
-            message: err.message
+            message: err.message,
           });
-          alert(`Failed to connect to Strava. Please check:\n1. Client ID and Secret are correct\n2. Strava app callback domain is set to: ${window.location.hostname}\n\nError: ${err.message || 'Unknown error'}\n\nSee console for details.`);
+          alert(
+            `Failed to connect to Strava. Please check:\n1. Client ID and Secret are correct\n2. Strava app callback domain is set to: ${window.location.hostname}\n\nError: ${err.message || 'Unknown error'}\n\nSee console for details.`
+          );
         } else {
           console.log('Navigation or minor error after successful auth, ignoring');
         }
-        
+
         navigate('/login', { replace: true });
       });
     } else {
       console.warn('No code or error in callback URL - possible redirect loop');
-      alert('OAuth callback received without code. This might indicate:\n1. Wrong callback domain in Strava app settings\n2. Strava app configuration mismatch\n\nExpected domain: ' + window.location.hostname);
+      alert(
+        'OAuth callback received without code. This might indicate:\n1. Wrong callback domain in Strava app settings\n2. Strava app configuration mismatch\n\nExpected domain: ' +
+          window.location.hostname
+      );
       navigate('/login', { replace: true });
     }
   }, [searchParams, handleCallback, navigate]);

@@ -55,12 +55,12 @@ class StravaClient {
     const scope = 'read,activity:read_all';
 
     const authUrl = `${STRAVA_AUTH_BASE}/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
-    
+
     console.log('=== STRAVA AUTH DEBUG ===');
     console.log('Client ID:', clientId);
     console.log('Redirect URI:', redirectUri);
     console.log('Full Auth URL:', authUrl);
-    
+
     return authUrl;
   }
 

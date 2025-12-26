@@ -1,18 +1,25 @@
 import { useMemo, useRef, useState } from 'react';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
-import { detectRaceHighlights, type RaceHighlight } from '../../utils/raceDetection';
+import {
+  detectRaceHighlights,
+  detectRaceHighlightsWithExcluded,
+  type RaceHighlight,
+} from '../../utils/raceDetection';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
 import type { ActivityType } from '../../types';
-import type { TitlePattern, StatType } from '../../stores/settingsStore';
+import type { TitlePattern, StatType, ActivityTypeFilter } from '../../stores/settingsStore';
 import { ActivitySelector } from './ActivitySelector';
 import { SocialCard } from './SocialCard';
-import { StatsSelector, type StatOption } from './StatsSelector';
+import { StatsSelector } from './StatsSelector';
+import type { StatOption } from './statsOptions';
+import { HeatmapCalendar } from '../charts/HeatmapCalendar';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
+  backgroundImagePosition: { x: number; y: number; scale: number };
   excludedActivityTypes: ActivityType[];
   excludeVirtualPerSport: {
     cycling: { highlights: boolean; stats: boolean };
@@ -21,6 +28,16 @@ interface HighlightFilters {
   };
   titleIgnorePatterns: TitlePattern[];
   highlightStats: StatType[];
+  activityTypeSettings: {
+    order: ActivityType[];
+    includeInStats: ActivityType[];
+    includeInHighlights: ActivityType[];
+  };
+  specialOptions: {
+    enableTriathlonHighlights: boolean;
+    mergeCycling: boolean;
+  };
+  activityFilters: ActivityTypeFilter[];
 }
 
 interface YearInReviewProps {
@@ -32,7 +49,13 @@ interface YearInReviewProps {
   backgroundImageUrl?: string | null;
 }
 
-function SportDetailSection({ highlights }: { highlights: SportHighlights }) {
+function SportDetailSection({
+  highlights,
+  customHighlights = [],
+}: {
+  highlights: SportHighlights;
+  customHighlights?: RaceHighlight[];
+}) {
   const sportConfig = {
     running: {
       emoji: '🏃',
@@ -74,7 +97,7 @@ function SportDetailSection({ highlights }: { highlights: SportHighlights }) {
       <div className="text-center mb-12">
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="text-5xl">{config.emoji}</div>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
             {config.title} Highlights
           </h2>
         </div>
@@ -83,22 +106,22 @@ function SportDetailSection({ highlights }: { highlights: SportHighlights }) {
         ></div>
 
         {/* Overview stats */}
-        <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-600">
+        <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-900">
+            <span className="font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(highlights.totalDistance * 1000)}
             </span>
             <span>total</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-900">{config.paceLabel}:</span>
+            <span className="font-bold text-gray-900 dark:text-white">{config.paceLabel}:</span>
             <span>
               {formatPace(paceValue)} {config.paceUnit}
             </span>
           </div>
           {highlights.totalElevation > 100 && (
             <div className="flex items-center gap-2">
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-gray-900 dark:text-white">
                 ⛰️ {Math.round(highlights.totalElevation).toLocaleString('de-DE')}m
               </span>
               <span>elevation</span>
@@ -108,82 +131,264 @@ function SportDetailSection({ highlights }: { highlights: SportHighlights }) {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Distance records */}
-        {highlights.distanceRecords.map((record) => (
-          <div
-            key={record.distance}
-            className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow"
-          >
-            <div
-              className={`inline-block px-3 py-1 rounded-full bg-gradient-to-r ${config.gradient} text-white text-sm font-bold mb-3`}
+        {/* Custom Highlights - activities matching custom filters */}
+        {customHighlights.map((highlight) => {
+          // Check if this is the longest activity
+          const isLongest = highlight.id === highlights.longestActivity.id;
+          const sportColors = getSportBadgeColors(highlight.type);
+          const paceSpeed = formatPaceSpeed(
+            highlight.activityType || highlight.type,
+            highlight.distance,
+            highlight.duration || 0
+          );
+
+          return (
+            <a
+              key={highlight.id}
+              href={`https://www.strava.com/activities/${highlight.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
-              {record.distance}
-            </div>
-            <h4 className="font-bold text-gray-900 mb-2 line-clamp-1">{record.activity.name}</h4>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Time</span>
-                <span className="font-bold text-gray-900">
-                  {formatDuration(record.activity.movingTimeMinutes * 60)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">{config.paceLabel}</span>
-                <span className="font-bold text-gray-900">
-                  {formatPace(record.pace || record.speed || 0)} {config.paceUnit}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>
-                  {record.activity.date.toLocaleDateString('en-US', {
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex gap-2 flex-wrap">
+                  <div
+                    className={`inline-block px-4 py-2 rounded-lg ${sportColors.bg} ${sportColors.text} text-sm font-bold shadow-sm`}
+                  >
+                    {highlight.badge}
+                  </div>
+                  {isLongest && (
+                    <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
+                      🏆 Longest
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  {highlight.date.toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                   })}
-                </span>
-                <span>{formatDistanceWithUnit(record.activity.distanceKm * 1000)}</span>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+                {highlight.name}
+              </h4>
 
-        {/* Longest activity */}
-        <div
-          className={`bg-gradient-to-br ${config.gradient} rounded-2xl shadow-lg p-6 text-white hover:shadow-xl transition-shadow`}
-        >
-          <div className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold mb-3">
-            🏆 Longest
-          </div>
-          <h4 className="font-bold mb-2 line-clamp-1">{highlights.longestActivity.name}</h4>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-white/80">Distance</span>
-              <span className="font-bold">
-                {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-white/80">Time</span>
-              <span className="font-bold">
-                {formatDuration(highlights.longestActivity.movingTimeMinutes * 60)}
-              </span>
-            </div>
-            {highlights.longestActivity.elevationGainMeters &&
-              highlights.longestActivity.elevationGainMeters > 50 && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-white/80">Elevation</span>
-                  <span className="font-bold">
-                    ⛰️ {Math.round(highlights.longestActivity.elevationGainMeters)}m
-                  </span>
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Distance
+                  </div>
+                  <div className="text-xl font-black text-gray-900 dark:text-white">
+                    {formatDistanceWithUnit(highlight.distance * 1000)}
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Time
+                  </div>
+                  <div className="text-xl font-black text-gray-900 dark:text-white">
+                    {formatDuration((highlight.duration || 0) * 60)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pace row */}
+              {paceSpeed && highlight.type !== 'triathlon' && (
+                <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Pace
+                  </div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
                 </div>
               )}
-            <div className="text-xs text-white/70 mt-2">
-              {highlights.longestActivity.date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              })}
-            </div>
-          </div>
-        </div>
+            </a>
+          );
+        })}
+
+        {/* Longest activity - only show if not already displayed, or merge badges if it's in distanceRecords */}
+        {(() => {
+          // Check if longest activity is already shown in distance records or custom highlights
+          const inDistanceRecords = highlights.distanceRecords.find(
+            (r) => r.activity.id === highlights.longestActivity.id
+          );
+          const inCustomHighlights = customHighlights.some(
+            (h) => h.id === highlights.longestActivity.id
+          );
+
+          // If it's in custom highlights, don't show it again
+          if (inCustomHighlights) {
+            return null;
+          }
+
+          // If it's in distance records, ADD the "🏆 Longest" badge to that card instead of showing separately
+          if (inDistanceRecords) {
+            // Already shown in distance records with Marathon/Half Marathon badge
+            // The distance record card will be enhanced to show both badges
+            return null;
+          }
+
+          // Show as separate "Longest" card
+          const paceSpeed = formatPaceSpeed(
+            highlights.longestActivity.type,
+            highlights.longestActivity.distanceKm,
+            highlights.longestActivity.movingTimeMinutes
+          );
+
+          return (
+            <a
+              href={`https://www.strava.com/activities/${highlights.longestActivity.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
+                  🏆 Longest
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  {highlights.longestActivity.date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+                {highlights.longestActivity.name}
+              </h4>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Distance
+                  </div>
+                  <div className="text-xl font-black text-gray-900 dark:text-white">
+                    {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Time
+                  </div>
+                  <div className="text-xl font-black text-gray-900 dark:text-white">
+                    {formatDuration(highlights.longestActivity.movingTimeMinutes * 60)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pace and Elevation */}
+              {paceSpeed && (
+                <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-3">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Pace
+                  </div>
+                  <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
+                </div>
+              )}
+              {highlights.longestActivity.elevationGainMeters &&
+                highlights.longestActivity.elevationGainMeters > 50 && (
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      Elevation
+                    </div>
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">
+                      ⛰️ {Math.round(highlights.longestActivity.elevationGainMeters)}m
+                    </div>
+                  </div>
+                )}
+            </a>
+          );
+        })()}
+
+        {/* Biggest Climb - only show if exists and not already shown */}
+        {highlights.biggestClimb &&
+          highlights.biggestClimb.elevationGainMeters &&
+          highlights.biggestClimb.elevationGainMeters > 50 &&
+          (() => {
+            // Check if already shown as custom highlight or longest
+            const inCustomHighlights = customHighlights.some(
+              (h) => h.id === highlights.biggestClimb!.id
+            );
+            const isLongest = highlights.biggestClimb.id === highlights.longestActivity.id;
+
+            // If already shown, don't duplicate
+            if (inCustomHighlights || isLongest) {
+              return null;
+            }
+
+            const paceSpeed = formatPaceSpeed(
+              highlights.biggestClimb.type,
+              highlights.biggestClimb.distanceKm,
+              highlights.biggestClimb.movingTimeMinutes
+            );
+
+            return (
+              <a
+                href={`https://www.strava.com/activities/${highlights.biggestClimb.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-sm">
+                    ⛰️ Biggest Climb
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    {highlights.biggestClimb.date.toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </div>
+                </div>
+                <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+                  {highlights.biggestClimb.name}
+                </h4>
+
+                {/* Stats grid */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      Elevation
+                    </div>
+                    <div className="text-xl font-black text-gray-900 dark:text-white">
+                      {Math.round(highlights.biggestClimb.elevationGainMeters)}m
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      Distance
+                    </div>
+                    <div className="text-xl font-black text-gray-900 dark:text-white">
+                      {formatDistanceWithUnit(highlights.biggestClimb.distanceKm * 1000)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      Time
+                    </div>
+                    <div className="text-xl font-black text-gray-900 dark:text-white">
+                      {formatDuration(highlights.biggestClimb.movingTimeMinutes * 60)}
+                    </div>
+                  </div>
+                  {paceSpeed && (
+                    <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                        Pace
+                      </div>
+                      <div className="text-xl font-black text-gray-900 dark:text-white">
+                        {paceSpeed}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </a>
+            );
+          })()}
       </div>
     </div>
   );
@@ -213,7 +418,7 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
       href={stravaUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 block"
+      className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 dark:border-gray-700 block"
     >
       {/* Colorful top accent bar */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
@@ -227,13 +432,13 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
           <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
             {highlight.badge.split(' ')[0]}
           </div>
-          <span className="text-sm text-gray-500 font-semibold bg-gray-100 px-3 py-1 rounded-full">
+          <span className="text-sm text-gray-500 dark:text-gray-400 font-semibold bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
             {formattedDate}
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 transition-colors">
+        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
           {highlight.name}
         </h3>
 
@@ -244,19 +449,19 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-            <div className="text-xs text-gray-600 font-bold uppercase tracking-wider mb-1">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
+            <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
               Distance
             </div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-2xl font-black text-gray-900 dark:text-white">
               {formatDistanceWithUnit(highlight.distance * 1000)}
             </div>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100">
-            <div className="text-xs text-gray-600 font-bold uppercase tracking-wider mb-1">
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
+            <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
               Time
             </div>
-            <div className="text-2xl font-black text-gray-900">
+            <div className="text-2xl font-black text-gray-900 dark:text-white">
               {formatDuration(highlight.duration * 60)}
             </div>
           </div>
@@ -264,20 +469,20 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
 
         {/* Activity splits for triathlons */}
         {highlight.activities && highlight.activities.length > 1 && (
-          <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-4 border border-gray-200">
-            <div className="text-xs text-gray-600 font-bold uppercase tracking-wider mb-3">
+          <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+            <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-3">
               Splits
             </div>
             <div className="flex justify-between gap-2">
               {highlight.activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex flex-col items-center bg-white px-3 py-2 rounded-lg shadow-sm flex-1"
+                  className="flex flex-col items-center bg-white dark:bg-gray-700 px-3 py-2 rounded-lg shadow-sm flex-1"
                 >
                   <span className="text-2xl mb-1">
                     {activity.type === 'Swim' ? '🏊' : activity.type.includes('Ride') ? '🚴' : '🏃'}
                   </span>
-                  <span className="text-sm font-bold text-gray-900">
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">
                     {formatDistanceWithUnit(activity.distanceKm * 1000)}
                   </span>
                 </div>
@@ -289,6 +494,45 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
     </a>
   );
 }
+
+// Sport-specific badge colors for a modern, athletic look
+const getSportBadgeColors = (activityType: string) => {
+  const colors: Record<string, { bg: string; text: string; border: string }> = {
+    Run: { bg: 'bg-blue-500', text: 'text-white', border: 'border-blue-600' },
+    Ride: { bg: 'bg-emerald-500', text: 'text-white', border: 'border-emerald-600' },
+    VirtualRide: { bg: 'bg-teal-500', text: 'text-white', border: 'border-teal-600' },
+    Swim: { bg: 'bg-cyan-500', text: 'text-white', border: 'border-cyan-600' },
+    Walk: { bg: 'bg-violet-500', text: 'text-white', border: 'border-violet-600' },
+    Hike: { bg: 'bg-orange-500', text: 'text-white', border: 'border-orange-600' },
+  };
+  return (
+    colors[activityType] || { bg: 'bg-gray-500', text: 'text-white', border: 'border-gray-600' }
+  );
+};
+
+// Format pace/speed based on activity type
+const formatPaceSpeed = (activityType: string, distance: number, duration: number) => {
+  if (!distance || !duration || distance === 0 || duration === 0) return null;
+
+  if (activityType === 'Run') {
+    // Running: min/km
+    const pace = duration / distance;
+    const minutes = Math.floor(pace);
+    const seconds = Math.round((pace - minutes) * 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')} min/km`;
+  } else if (activityType === 'Ride' || activityType === 'VirtualRide') {
+    // Cycling: km/h
+    const speed = (distance / duration) * 60;
+    return `${speed.toFixed(1)} km/h`;
+  } else if (activityType === 'Swim') {
+    // Swimming: min/100m
+    const pace = duration / distance / 10; // min per 100m
+    const minutes = Math.floor(pace);
+    const seconds = Math.round((pace - minutes) * 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')} min/100m`;
+  }
+  return null;
+};
 
 export function YearInReview({
   year,
@@ -306,16 +550,50 @@ export function YearInReview({
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
 
-  // Filter activities only for highlights
-  const filteredActivities = useMemo(
-    () => filterActivities(activities, highlightFilters),
-    [activities, highlightFilters]
+  // Filter activities to exclude virtual rides if disabled and respect title patterns for highlight cards
+  useMemo(() => filterActivities(activities, highlightFilters), [activities, highlightFilters]);
+
+  // For sport highlights totals, use activities filtered only by type exclusions
+  // (not title patterns or virtual ride settings) to match the stats page totals
+  // Virtual ride exclusion only affects which highlight CARDS are shown, not the totals
+  const activitiesForTotals = useMemo(() => {
+    return activities.filter((activity) => {
+      // Filter by activity type exclusions only
+      if (highlightFilters.excludedActivityTypes.includes(activity.type)) {
+        return false;
+      }
+      return true;
+    });
+  }, [activities, highlightFilters.excludedActivityTypes]);
+
+  const highlights = useMemo(
+    () =>
+      detectRaceHighlights(activities, {
+        // Use ALL activities, not filtered
+        titleIgnorePatterns: highlightFilters.titleIgnorePatterns,
+        activityFilters: highlightFilters.activityFilters,
+      }),
+    [activities, highlightFilters.titleIgnorePatterns, highlightFilters.activityFilters]
   );
 
-  const highlights = useMemo(() => detectRaceHighlights(filteredActivities), [filteredActivities]);
+  // Get excluded activity IDs from custom filters to prevent duplicates in sport highlights
+  const excludedActivityIds = useMemo(() => {
+    const result = detectRaceHighlightsWithExcluded(activities, {
+      titleIgnorePatterns: highlightFilters.titleIgnorePatterns,
+      activityFilters: highlightFilters.activityFilters,
+    });
+    return result.excludedActivityIds;
+  }, [activities, highlightFilters.titleIgnorePatterns, highlightFilters.activityFilters]);
+
+  // Use activitiesForTotals to calculate sport highlights so totals match stats page
   const sportHighlights = useMemo(
-    () => calculateSportHighlights(filteredActivities),
-    [filteredActivities]
+    () =>
+      calculateSportHighlights(
+        activitiesForTotals,
+        highlightFilters.activityFilters,
+        excludedActivityIds
+      ),
+    [activitiesForTotals, highlightFilters.activityFilters, excludedActivityIds]
   );
 
   // Convert highlights to activities for selection, including triathlon activities
@@ -368,12 +646,19 @@ export function YearInReview({
         : 0;
 
     const maxSpeed = Math.round(Math.max(...activities.map((a) => a.maxSpeedKmh), 0));
-    const avgSpeed = stats.totalTimeHours > 0 ? (stats.totalDistanceKm / stats.totalTimeHours) : 0;
+    const avgSpeed = stats.totalTimeHours > 0 ? stats.totalDistanceKm / stats.totalTimeHours : 0;
+
+    const activitiesWithCalories = activities.filter((a) => a.calories);
+    const totalCalories =
+      activitiesWithCalories.length > 0
+        ? Math.round(activitiesWithCalories.reduce((sum, a) => sum + (a.calories || 0), 0))
+        : 0;
 
     return {
       avgHeartRate,
       maxSpeed,
       avgSpeed,
+      totalCalories,
     };
   }, [activities, stats]);
 
@@ -412,14 +697,14 @@ export function YearInReview({
         case 'distance':
           cards.push({
             value: Math.round(stats.totalDistanceKm).toLocaleString('de-DE'),
-            label: 'Distance (km)',
+            label: 'km Distance',
             colorClass: 'hover:shadow-pink-500/50',
           });
           break;
         case 'elevation':
           cards.push({
             value: Math.round(stats.totalElevationMeters).toLocaleString('de-DE'),
-            label: 'Climbing (m)',
+            label: 'm Elevation',
             colorClass: 'hover:shadow-green-500/50',
           });
           break;
@@ -473,6 +758,15 @@ export function YearInReview({
             });
           }
           break;
+        case 'calories':
+          if (additionalStats.totalCalories > 0) {
+            cards.push({
+              value: additionalStats.totalCalories.toLocaleString('de-DE'),
+              label: 'Calories Burned',
+              colorClass: 'hover:shadow-amber-500/50',
+            });
+          }
+          break;
       }
     });
 
@@ -511,23 +805,41 @@ export function YearInReview({
 
   // Categorize highlights
   const triathlons = highlights.filter((h) => h.type === 'triathlon');
+  // For "Other Achievements" section, only include standard long-run/long-ride types
+  // Custom highlights should ONLY appear in their sport-specific sections
   const longRuns = highlights.filter((h) => h.type === 'long-run');
-  const centuryRides = highlights.filter((h) => h.type === 'long-ride');
+  const fondos = highlights.filter((h) => h.type === 'long-ride');
+
+  // Extract custom highlights per sport for SportDetailSection
+  // Sort by distance to ensure proper ordering
+  const runningCustomHighlights = highlights
+    .filter((h) => h.type === 'custom-highlight' && h.activityType === 'Run')
+    .sort((a, b) => a.distance - b.distance);
+  const cyclingCustomHighlights = highlights
+    .filter(
+      (h) =>
+        h.type === 'custom-highlight' &&
+        (h.activityType === 'Ride' || h.activityType === 'VirtualRide')
+    )
+    .sort((a, b) => a.distance - b.distance);
+  const swimmingCustomHighlights = highlights
+    .filter((h) => h.type === 'custom-highlight' && h.activityType === 'Swim')
+    .sort((a, b) => a.distance - b.distance);
 
   // Get sport breakdowns
   const cycling = activities.filter((a) => ['Ride', 'VirtualRide'].includes(a.type));
   const running = activities.filter((a) => a.type === 'Run');
   const swimming = activities.filter((a) => a.type === 'Swim');
 
-  const cyclingDistance = cycling.reduce((sum, a) => sum + a.distanceKm, 0);
-  const runningDistance = running.reduce((sum, a) => sum + a.distanceKm, 0);
-  const swimmingDistance = swimming.reduce((sum, a) => sum + a.distanceKm, 0);
+  cycling.reduce((sum, a) => sum + a.distanceKm, 0);
+  running.reduce((sum, a) => sum + a.distanceKm, 0);
+  swimming.reduce((sum, a) => sum + a.distanceKm, 0);
 
   return (
     <>
       <div
         ref={containerRef}
-        className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+        className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
       >
         {/* Social Card Button - Fixed bottom right */}
         <button
@@ -540,15 +852,20 @@ export function YearInReview({
         </button>
 
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white">
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white">
           {/* Background image or pattern */}
           {backgroundImageUrl ? (
             <>
               <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+                className="absolute inset-0 bg-cover"
+                style={{
+                  backgroundImage: `url(${backgroundImageUrl})`,
+                  backgroundPosition: `${highlightFilters.backgroundImagePosition.x}% ${highlightFilters.backgroundImagePosition.y}%`,
+                  transform: `scale(${highlightFilters.backgroundImagePosition.scale})`,
+                  transformOrigin: 'center',
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/70 to-purple-800/70" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/70 to-purple-800/70 dark:from-gray-900/80 dark:via-black/70 dark:to-gray-900/80" />
             </>
           ) : (
             <>
@@ -608,64 +925,45 @@ export function YearInReview({
             </div>
           </div>
           {/* Bottom fade effect */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-50 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-50 dark:from-gray-900 to-transparent"></div>
         </div>
 
-        {/* Sport Breakdown Section */}
+        {/* Heatmap Calendar */}
         <div className="container mx-auto px-6 py-16 md:py-20">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Sport Breakdown</h2>
-            <div className="h-1.5 w-24 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto rounded-full"></div>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="text-5xl">📅</div>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+                Activity Calendar
+              </h2>
+            </div>
+            <div className="h-1.5 w-32 bg-gradient-to-r from-emerald-500 to-teal-600 mx-auto rounded-full mb-6"></div>
+            <p className="text-xl text-gray-600 dark:text-gray-400 font-semibold">
+              Your training consistency throughout the year
+            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {/* Cycling Card */}
-            <div className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2 border border-gray-100">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-600 opacity-90 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative p-8 text-white">
-                <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                  🚴
-                </div>
-                <h3 className="text-3xl font-black mb-3 tracking-tight">Cycling</h3>
-                <div className="text-5xl font-black mb-4 tracking-tight">
-                  {formatDistanceWithUnit(cyclingDistance * 1000)}
-                </div>
-              </div>
-            </div>
-
-            {/* Running Card */}
-            <div className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2 border border-gray-100">
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600 opacity-90 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative p-8 text-white">
-                <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                  🏃
-                </div>
-                <h3 className="text-3xl font-black mb-3 tracking-tight">Running</h3>
-                <div className="text-5xl font-black mb-4 tracking-tight">
-                  {formatDistanceWithUnit(runningDistance * 1000)}
-                </div>
-              </div>
-            </div>
-
-            {/* Swimming Card */}
-            <div className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2 border border-gray-100">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-blue-600 opacity-90 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative p-8 text-white">
-                <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                  🏊
-                </div>
-                <h3 className="text-3xl font-black mb-3 tracking-tight">Swimming</h3>
-                <div className="text-5xl font-black mb-4 tracking-tight">
-                  {formatDistanceWithUnit(swimmingDistance * 1000)}
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeatmapCalendar year={year} activities={activities} />
         </div>
 
         {/* Sport Detail Sections */}
-        {sportHighlights.running && <SportDetailSection highlights={sportHighlights.running} />}
-        {sportHighlights.cycling && <SportDetailSection highlights={sportHighlights.cycling} />}
-        {sportHighlights.swimming && <SportDetailSection highlights={sportHighlights.swimming} />}
+        {sportHighlights.running && (
+          <SportDetailSection
+            highlights={sportHighlights.running}
+            customHighlights={runningCustomHighlights}
+          />
+        )}
+        {sportHighlights.cycling && (
+          <SportDetailSection
+            highlights={sportHighlights.cycling}
+            customHighlights={cyclingCustomHighlights}
+          />
+        )}
+        {sportHighlights.swimming && (
+          <SportDetailSection
+            highlights={sportHighlights.swimming}
+            customHighlights={swimmingCustomHighlights}
+          />
+        )}
 
         {/* Race Highlights */}
         {triathlons.length > 0 && (
@@ -673,9 +971,11 @@ export function YearInReview({
             <div className="mb-12">
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="text-5xl">🏊🚴🏃</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900">Triathlons</h2>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+                  Triathlons
+                </h2>
               </div>
-              <p className="text-xl text-gray-600 text-center font-semibold mb-4">
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
                 {triathlons.length} epic multi-sport adventure{triathlons.length !== 1 ? 's' : ''}
               </p>
               <div className="h-1.5 w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
@@ -689,22 +989,22 @@ export function YearInReview({
         )}
 
         {/* Other Achievements */}
-        {(longRuns.length > 0 || centuryRides.length > 0) && (
+        {(longRuns.length > 0 || fondos.length > 0) && (
           <div className="container mx-auto px-6 py-16 md:py-20">
             <div className="mb-12">
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="text-5xl">🌟</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
                   Other Achievements
                 </h2>
               </div>
-              <p className="text-xl text-gray-600 text-center font-semibold mb-4">
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
                 Even more incredible performances
               </p>
               <div className="h-1.5 w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full"></div>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[...longRuns, ...centuryRides].map((highlight) => (
+              {[...longRuns, ...fondos].map((highlight) => (
                 <RaceCard key={highlight.id} highlight={highlight} />
               ))}
             </div>
@@ -712,7 +1012,7 @@ export function YearInReview({
         )}
 
         {/* Footer Message */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-20 md:py-24 mt-16">
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20" />
           <div className="container mx-auto px-6 text-center relative">
             <div className="inline-block mb-8">

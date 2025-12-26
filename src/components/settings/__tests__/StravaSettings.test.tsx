@@ -107,7 +107,9 @@ describe('StravaSettings', () => {
 
     it('should call onClose when clicking backdrop', async () => {
       const user = userEvent.setup();
-      const { container } = render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+      const { container } = render(<StravaSettings onClose={mockOnClose} />, {
+        wrapper: createWrapper(),
+      });
 
       const backdrop = container.firstChild as HTMLElement;
       await user.click(backdrop);

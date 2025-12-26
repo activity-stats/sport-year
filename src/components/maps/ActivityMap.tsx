@@ -3,6 +3,7 @@ import L from 'leaflet';
 import polyline from 'polyline-encoded';
 import 'leaflet/dist/leaflet.css';
 import type { Activity } from '../../types/activity';
+import { useThemeStore } from '../../stores/themeStore';
 
 interface ActivityMapProps {
   activities: Activity[];
@@ -32,6 +33,29 @@ export const ActivityMap = ({ activities, height = '600px' }: ActivityMapProps) 
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const layersRef = useRef<L.LayerGroup | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const getEffectiveTheme = useThemeStore((state) => state.getEffectiveTheme);
+  const isDark = getEffectiveTheme() === 'dark';
+
+  // Update tile layer when theme changes
+  useEffect(() => {
+    if (!mapRef.current || !tileLayerRef.current) return;
+
+    tileLayerRef.current.remove();
+
+    const tileUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const attribution = isDark
+      ? '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
+      : '© OpenStreetMap contributors';
+
+    tileLayerRef.current = L.tileLayer(tileUrl, {
+      attribution,
+      maxZoom: 18,
+    }).addTo(mapRef.current);
+  }, [isDark]);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -41,10 +65,19 @@ export const ActivityMap = ({ activities, height = '600px' }: ActivityMapProps) 
       mapRef.current = L.map(mapContainerRef.current, {
         center: [51.505, -0.09], // Default center
         zoom: 3,
+        zoomControl: true,
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+      const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+      const attribution = isDark
+        ? '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>'
+        : '© OpenStreetMap contributors';
+
+      tileLayerRef.current = L.tileLayer(tileUrl, {
+        attribution,
         maxZoom: 18,
       }).addTo(mapRef.current);
 
@@ -176,20 +209,20 @@ export const ActivityMap = ({ activities, height = '600px' }: ActivityMapProps) 
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: ACTIVITY_COLORS[type] || ACTIVITY_COLORS.default }}
               ></span>
-              <span className="text-gray-600">
+              <span className="text-gray-600 dark:text-gray-400">
                 {type} ({count})
               </span>
             </div>
           ))}
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           {activitiesWithMaps} of {totalActivities} activities
         </div>
       </div>
       <div
         ref={mapContainerRef}
-        style={{ height, width: '100%' }}
-        className="rounded-lg border border-gray-200 shadow-sm"
+        style={{ height, width: '100%', zIndex: 0 }}
+        className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
       />
     </div>
   );
