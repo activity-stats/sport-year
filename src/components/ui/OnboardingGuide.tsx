@@ -10,6 +10,17 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
   const { yearInReview } = useSettingsStore();
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   // Check what's already configured
   const hasBackgroundImage = yearInReview.backgroundImageUrl !== null;
   const hasFilters =

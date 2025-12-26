@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Activity } from '../../types';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
@@ -32,6 +32,17 @@ export function ActivitySelector({
   ]);
   const [selected, setSelected] = useState<Set<string>>(initialSelectedIds);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const toggleActivity = (id: string) => {
     const newSelected = new Set(selected);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStravaConfigStore } from '../../stores/stravaConfigStore';
 import { useDataSyncStore } from '../../stores/dataSyncStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,6 +18,17 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
   const [showSecret, setShowSecret] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const currentYear = new Date().getFullYear();
 
