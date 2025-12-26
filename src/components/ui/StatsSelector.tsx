@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import type { YearStats } from '../../types';
-
-export type StatOption = {
-  id: string;
-  label: string;
-  icon: string;
-  getValue: (stats: YearStats, daysActive: number) => string;
-};
+import type { StatOption } from './statsOptions';
+import { availableStats } from './statsOptions';
 
 interface StatsSelectorProps {
   stats: YearStats;
@@ -14,62 +9,6 @@ interface StatsSelectorProps {
   onConfirm: (selectedStats: StatOption[]) => void;
   onClose: () => void;
 }
-
-export const availableStats: StatOption[] = [
-  {
-    id: 'distance',
-    label: 'Distance',
-    icon: '🏃',
-    getValue: (stats) => `${Math.round(stats.totalDistanceKm).toLocaleString('de-DE')} km`,
-  },
-  {
-    id: 'elevation',
-    label: 'Elevation',
-    icon: '⛰️',
-    getValue: (stats) => `${Math.round(stats.totalElevationMeters).toLocaleString('de-DE')} m`,
-  },
-  {
-    id: 'hours',
-    label: 'Hours',
-    icon: '⏱️',
-    getValue: (stats) => Math.round(stats.totalTimeHours).toLocaleString('de-DE'),
-  },
-  {
-    id: 'activities',
-    label: 'Activities',
-    icon: '📊',
-    getValue: (stats) => stats.activityCount.toString(),
-  },
-  {
-    id: 'daysActive',
-    label: 'Days Active',
-    icon: '📅',
-    getValue: (_stats, daysActive) => daysActive.toString(),
-  },
-  {
-    id: 'avgDistance',
-    label: 'Avg Distance',
-    icon: '📏',
-    getValue: (stats) =>
-      `${Math.round(stats.totalDistanceKm / stats.activityCount).toLocaleString('de-DE')} km`,
-  },
-  {
-    id: 'avgSpeed',
-    label: 'Avg Speed',
-    icon: '⚡',
-    getValue: (stats) =>
-      `${(stats.totalDistanceKm / stats.totalTimeHours).toFixed(1)} km/h`,
-  },
-  {
-    id: 'maxDistance',
-    label: 'Longest Activity',
-    icon: '🏆',
-    getValue: (stats) =>
-      stats.longestActivity
-        ? `${Math.round(stats.longestActivity.distanceKm).toLocaleString('de-DE')} km`
-        : '0 km',
-  },
-];
 
 export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSelectorProps) {
   // Default: First 3 stats from StatsOverview (Distance, Elevation, Hours)
@@ -143,7 +82,7 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
                     <span className="text-2xl">{stat.icon}</span>
                     <span className="font-bold text-gray-900">{stat.label}</span>
                     {isSelected && (
-                      <div className="ml-auto flex-shrink-0 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+                      <div className="ml-auto shrink-0 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
                         ✓
                       </div>
                     )}

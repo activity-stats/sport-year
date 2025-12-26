@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react';
 import { useSettingsStore, AVAILABLE_STATS, type StatType } from '../../stores/settingsStore';
 import type { ActivityType } from '../../types';
+import { ImagePositionEditor } from './ImagePositionEditor';
+import { ActivityManagement } from './ActivityManagement';
+import { AdvancedFilters } from './AdvancedFilters';
 
 interface YearInReviewSettingsProps {
   isOpen: boolean;
@@ -17,20 +20,13 @@ export function YearInReviewSettings({
     'background'
   );
   const [imageUrl, setImageUrl] = useState('');
-  const [newPattern, setNewPattern] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isClickingRef = useRef(false);
 
   const {
     yearInReview,
     setBackgroundImage,
-    toggleActivityType,
-    selectAllActivityTypes,
-    deselectAllActivityTypes,
-    toggleExcludeVirtual,
-    addIgnorePattern,
-    updateIgnorePattern,
-    removeIgnorePattern,
+    setBackgroundImagePosition,
     toggleHighlightStat,
     resetYearInReview,
   } = useSettingsStore();
@@ -78,21 +74,6 @@ export function YearInReviewSettings({
   const handleRemoveBackground = () => {
     setBackgroundImage(null);
     setImageUrl('');
-  };
-
-  const handleAddPattern = () => {
-    if (newPattern.trim()) {
-      addIgnorePattern(newPattern.trim());
-      setNewPattern('');
-    }
-  };
-
-  const handleSelectAll = () => {
-    selectAllActivityTypes();
-  };
-
-  const handleDeselectAll = () => {
-    deselectAllActivityTypes(availableActivityTypes);
   };
 
   return (
@@ -174,16 +155,16 @@ export function YearInReviewSettings({
                 </p>
 
                 {yearInReview.backgroundImageUrl && (
-                  <div className="mb-4 relative rounded-xl overflow-hidden border-2 border-gray-200">
-                    <img
-                      src={yearInReview.backgroundImageUrl}
-                      alt="Background preview"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
-                      <span className="text-white font-bold text-sm">Current Background</span>
+                  <>
+                    <div className="mb-4">
+                      <h4 className="text-lg font-bold text-gray-900 mb-3">Position & Zoom</h4>
+                      <ImagePositionEditor
+                        imageUrl={yearInReview.backgroundImageUrl}
+                        position={yearInReview.backgroundImagePosition}
+                        onPositionChange={setBackgroundImagePosition}
+                      />
                     </div>
-                  </div>
+                  </>
                 )}
 
                 <div className="space-y-3">
@@ -256,7 +237,14 @@ export function YearInReviewSettings({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {(Object.keys(AVAILABLE_STATS) as StatType[]).map((statId) => {
                     const stat = AVAILABLE_STATS[statId];
-                    const isEnabled = (yearInReview.highlightStats || ['hours', 'daysActive', 'distance', 'elevation']).includes(statId);
+                    const isEnabled = (
+                      yearInReview.highlightStats || [
+                        'hours',
+                        'daysActive',
+                        'distance',
+                        'elevation',
+                      ]
+                    ).includes(statId);
                     return (
                       <label
                         key={statId}
@@ -283,7 +271,18 @@ export function YearInReviewSettings({
                   <p className="text-sm text-yellow-900">
                     <strong>Note:</strong> Some stats like "Avg Heart Rate" or "Biggest Climb" will
                     only show if you have activities with that data. Selected:{' '}
-                    <strong>{(yearInReview.highlightStats || ['hours', 'daysActive', 'distance', 'elevation']).length}</strong>
+                    <strong>
+                      {
+                        (
+                          yearInReview.highlightStats || [
+                            'hours',
+                            'daysActive',
+                            'distance',
+                            'elevation',
+                          ]
+                        ).length
+                      }
+                    </strong>
                   </p>
                 </div>
               </div>
@@ -292,181 +291,12 @@ export function YearInReviewSettings({
 
           {/* Activity Types Tab */}
           {activeTab === 'types' && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Include Activity Types</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Select which activity types to include in your Year in Review.
-                </p>
-
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={handleSelectAll}
-                    className="bg-green-500 text-white font-bold py-2 px-4 rounded-xl hover:bg-green-600 transition-colors text-sm"
-                  >
-                    ✓ Select All
-                  </button>
-                  <button
-                    onClick={handleDeselectAll}
-                    className="bg-red-500 text-white font-bold py-2 px-4 rounded-xl hover:bg-red-600 transition-colors text-sm"
-                  >
-                    ✗ Deselect All
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                  {availableActivityTypes.map((type) => {
-                    const isIncluded = !yearInReview.excludedActivityTypes.includes(type);
-                    return (
-                      <label
-                        key={type}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                          isIncluded ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isIncluded}
-                          onChange={() => toggleActivityType(type)}
-                          className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                        <span className="font-semibold text-sm text-gray-900">{type}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <ActivityManagement availableActivityTypes={availableActivityTypes} />
           )}
 
           {/* Filters Tab */}
           {activeTab === 'filters' && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Virtual Activities</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Control how virtual activities are excluded per sport.
-                </p>
-
-                <div className="space-y-4">
-                  {(['cycling', 'running', 'swimming'] as const).map((sport) => (
-                    <div key={sport} className="p-4 rounded-xl border-2 border-gray-200 bg-gray-50">
-                      <div className="font-bold text-gray-900 capitalize mb-3 flex items-center gap-2">
-                        <span>
-                          {sport === 'cycling'
-                            ? '🚴 Cycling'
-                            : sport === 'running'
-                              ? '🏃 Running'
-                              : '🏊 Swimming'}
-                        </span>
-                      </div>
-                      <div className="space-y-2 ml-6">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={yearInReview.excludeVirtualPerSport[sport].highlights}
-                            onChange={() => toggleExcludeVirtual(sport, 'highlights')}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">
-                            Exclude from highlight cards
-                          </span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={yearInReview.excludeVirtualPerSport[sport].stats}
-                            onChange={() => toggleExcludeVirtual(sport, 'stats')}
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-700">Exclude from all stats</span>
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Filter by Title</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Exclude activities with specific text in their title (case-insensitive).
-                </p>
-
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={newPattern}
-                    onChange={(e) => setNewPattern(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddPattern()}
-                    placeholder="e.g., 'lunch', 'test', 'warmup'..."
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddPattern}
-                    disabled={!newPattern.trim()}
-                    className="bg-blue-500 text-white font-bold px-6 py-2 rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Add
-                  </button>
-                </div>
-
-                {yearInReview.titleIgnorePatterns.length > 0 && (
-                  <div className="space-y-3">
-                    {yearInReview.titleIgnorePatterns.map((patternObj) => (
-                      <div
-                        key={patternObj.pattern}
-                        className="p-4 bg-red-50 border-2 border-red-200 rounded-xl"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-bold text-gray-900">
-                            "{patternObj.pattern}"
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeIgnorePattern(patternObj.pattern)}
-                            className="text-red-600 hover:text-red-700 font-bold text-sm"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                        <div className="space-y-2 ml-2">
-                          <label className="flex items-center gap-3 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={patternObj.excludeFromHighlights}
-                              onChange={() =>
-                                updateIgnorePattern(patternObj.pattern, {
-                                  excludeFromHighlights: !patternObj.excludeFromHighlights,
-                                })
-                              }
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-gray-700">
-                              Exclude from highlight cards
-                            </span>
-                          </label>
-                          <label className="flex items-center gap-3 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={patternObj.excludeFromStats}
-                              onChange={() =>
-                                updateIgnorePattern(patternObj.pattern, {
-                                  excludeFromStats: !patternObj.excludeFromStats,
-                                })
-                              }
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-gray-700">Exclude from all stats</span>
-                          </label>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <AdvancedFilters availableActivityTypes={availableActivityTypes} />
           )}
         </div>
 

@@ -48,7 +48,9 @@ export const Login = () => {
           </p>
 
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="font-semibold text-blue-900 mb-2 text-sm">📋 Strava App Configuration Required:</p>
+            <p className="font-semibold text-blue-900 mb-2 text-sm">
+              📋 Strava App Configuration Required:
+            </p>
             <div className="space-y-2 text-xs text-blue-800">
               <div>
                 <p className="font-semibold">Authorization Callback Domain:</p>

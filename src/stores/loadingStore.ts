@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 
-export type LoadingStage = 'idle' | 'checking' | 'fetching' | 'transforming' | 'aggregating' | 'complete' | 'error';
+export type LoadingStage =
+  | 'idle'
+  | 'checking'
+  | 'fetching'
+  | 'transforming'
+  | 'aggregating'
+  | 'complete'
+  | 'error';
 
 interface LoadingState {
   stage: LoadingStage;

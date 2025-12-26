@@ -4,11 +4,14 @@ import { useYearStats } from '../hooks/useYearStats.ts';
 import { StatsOverview } from '../components/ui/StatsOverview.tsx';
 import { MonthlyChart } from '../components/charts/MonthlyChart.tsx';
 import { ActivityTypeChart } from '../components/charts/ActivityTypeChart.tsx';
+import { HeatmapCalendar } from '../components/charts/HeatmapCalendar.tsx';
+import { AchievementTimeline } from '../components/charts/AchievementTimeline.tsx';
 import { ActivityList } from '../components/activities/ActivityList.tsx';
-import { SportDetail } from '../components/ui/SportDetail.tsx';
+import { ActivityBreakdownCard } from '../components/ui/ActivityBreakdownCard.tsx';
 import { YearInReview } from '../components/ui/YearInReview.tsx';
 import { YearInReviewSettings } from '../components/ui/YearInReviewSettings.tsx';
 import { StravaSettings } from '../components/settings/StravaSettings.tsx';
+import { SportBreakdownSettings } from '../components/settings/SportBreakdownSettings.tsx';
 import { ActivityMap } from '../components/maps/ActivityMap.tsx';
 import { OnboardingGuide } from '../components/ui/OnboardingGuide.tsx';
 import { LoadingProgress, type LoadingStep } from '../components/ui/LoadingProgress.tsx';
@@ -16,6 +19,9 @@ import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
 import type { ActivityType } from '../types';
+import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
+import { calculateSportHighlights } from '../utils/sportHighlights';
+import { filterActivities } from '../utils/activityFilters';
 
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
 
@@ -26,6 +32,7 @@ export const Dashboard = () => {
   const [viewMode, setViewMode] = useState<'presentation' | 'detailed' | 'map'>('presentation');
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaSettings, setShowStravaSettings] = useState(false);
+  const [showSportBreakdownSettings, setShowSportBreakdownSettings] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
@@ -33,7 +40,7 @@ export const Dashboard = () => {
   const { data: activities } = useActivities(selectedYear);
   const loadingStage = useLoadingStore((state) => state.stage);
   const loadingError = useLoadingStore((state) => state.error);
-  const { yearInReview } = useSettingsStore();
+  const { yearInReview, sportBreakdown } = useSettingsStore();
 
   // Build loading steps based on current stage
   const loadingSteps: LoadingStep[] = useMemo(() => {
@@ -41,7 +48,8 @@ export const Dashboard = () => {
       {
         id: 'checking',
         label: 'Checking Strava connection',
-        status: loadingStage === 'checking' ? 'active' : loadingStage === 'idle' ? 'pending' : 'complete',
+        status:
+          loadingStage === 'checking' ? 'active' : loadingStage === 'idle' ? 'pending' : 'complete',
       },
       {
         id: 'fetching',
@@ -93,6 +101,53 @@ export const Dashboard = () => {
     activities.forEach((a) => types.add(a.type));
     return Array.from(types).sort();
   }, [activities]);
+
+  // Get enabled and sorted sport breakdown activities
+  const enabledSportActivities = useMemo(() => {
+    const result = sportBreakdown.activities
+      .filter((a) => a.enabled)
+      .sort((a, b) => a.order - b.order);
+    console.log('[Dashboard] enabledSportActivities:', result);
+    console.log('[Dashboard] sportBreakdown:', sportBreakdown);
+    return result;
+  }, [sportBreakdown.activities]);
+
+  // Calculate highlights for Achievement Timeline
+  const { highlights, sportHighlights } = useMemo(() => {
+    if (!activities || activities.length === 0) {
+      return { highlights: [], sportHighlights: {} };
+    }
+
+    const _filteredActivities = filterActivities(activities, yearInReview);
+
+    const raceHighlights = detectRaceHighlights(activities, {
+      titleIgnorePatterns: yearInReview.titleIgnorePatterns,
+      activityFilters: yearInReview.activityFilters,
+    });
+
+    const excludedResult = detectRaceHighlightsWithExcluded(activities, {
+      titleIgnorePatterns: yearInReview.titleIgnorePatterns,
+      activityFilters: yearInReview.activityFilters,
+    });
+
+    const activitiesForTotals = activities.filter((activity) => {
+      if (yearInReview.excludedActivityTypes.includes(activity.type)) {
+        return false;
+      }
+      return true;
+    });
+
+    const sportStats = calculateSportHighlights(
+      activitiesForTotals,
+      yearInReview.activityFilters,
+      excludedResult.excludedActivityIds
+    );
+
+    return {
+      highlights: raceHighlights,
+      sportHighlights: sportStats,
+    };
+  }, [activities, yearInReview]);
 
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
@@ -311,11 +366,38 @@ export const Dashboard = () => {
 
                     {/* Sport Details Section */}
                     <div className="space-y-6">
-                      <h2 className="text-3xl font-bold text-gray-900 mb-6">Sport Breakdown</h2>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-3xl font-bold text-gray-900">Sport Breakdown</h2>
+                        <button
+                          onClick={() => setShowSportBreakdownSettings(true)}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition flex items-center gap-2"
+                        >
+                          <span>⚙️</span>
+                          <span>Customize</span>
+                        </button>
+                      </div>
                       <div className="grid grid-cols-1 gap-6">
-                        <SportDetail sport="cycling" activities={activities} />
-                        <SportDetail sport="running" activities={activities} />
-                        <SportDetail sport="swimming" activities={activities} />
+                        {enabledSportActivities.length > 0 ? (
+                          enabledSportActivities.map((activityConfig) => (
+                            <ActivityBreakdownCard
+                              key={activityConfig.id}
+                              config={activityConfig}
+                              activities={activities}
+                            />
+                          ))
+                        ) : (
+                          <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                            <p className="text-gray-600 mb-4">
+                              No activities selected for Sport Breakdown.
+                            </p>
+                            <button
+                              onClick={() => setShowSportBreakdownSettings(true)}
+                              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                            >
+                              Configure Activities
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -323,9 +405,23 @@ export const Dashboard = () => {
                     <div className="space-y-6">
                       <h2 className="text-3xl font-bold text-gray-900">Activity Trends</h2>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <MonthlyChart data={stats.byMonth} />
+                        <MonthlyChart data={stats.byMonth} activities={activities} />
                         <ActivityTypeChart data={stats.byType} />
                       </div>
+
+                      {/* Achievement Timeline */}
+                      {activities && activities.length > 0 && (
+                        <AchievementTimeline
+                          year={selectedYear}
+                          highlights={highlights}
+                          sportHighlights={sportHighlights}
+                        />
+                      )}
+
+                      {/* Heatmap Calendar */}
+                      {activities && activities.length > 0 && (
+                        <HeatmapCalendar year={selectedYear} activities={activities} />
+                      )}
                     </div>
 
                     {/* Activity List */}
@@ -333,6 +429,12 @@ export const Dashboard = () => {
                   </div>
                   {showStravaSettings && (
                     <StravaSettings onClose={() => setShowStravaSettings(false)} />
+                  )}
+                  {showSportBreakdownSettings && (
+                    <SportBreakdownSettings
+                      isOpen={showSportBreakdownSettings}
+                      onClose={() => setShowSportBreakdownSettings(false)}
+                    />
                   )}
                 </div>
               )}

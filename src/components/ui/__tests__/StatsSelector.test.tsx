@@ -47,9 +47,7 @@ describe('StatsSelector', () => {
     );
 
     expect(screen.getByText('Select Stats')).toBeInTheDocument();
-    expect(
-      screen.getByText('Choose 1-4 stats to display on your social card')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Choose 1-4 stats to display on your social card')).toBeInTheDocument();
 
     // Check that all stat options are rendered
     availableStats.forEach((stat) => {

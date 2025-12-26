@@ -3,7 +3,7 @@ import { domToPng } from 'modern-screenshot';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import type { RaceHighlight } from '../../utils/raceDetection';
-import type { StatOption } from './StatsSelector';
+import type { StatOption } from './statsOptions';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
 
 interface SocialCardProps {
@@ -269,7 +269,7 @@ export function SocialCard({
                   {selectedStats.map((stat) => {
                     const value = stat.getValue(stats, daysActive);
                     // Extract numeric value and unit
-                    const parts = value.match(/^([\d,\.]+)\s*(.*)$/);
+                    const parts = value.match(/^([\d,.]+)\s*(.*)$/);
                     const numericValue = parts ? parts[1] : value;
                     const unit = parts ? parts[2] : '';
 

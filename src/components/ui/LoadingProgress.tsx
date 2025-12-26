@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 export interface LoadingStep {
   id: string;
   label: string;
@@ -12,14 +10,10 @@ interface LoadingProgressProps {
 }
 
 export function LoadingProgress({ steps }: LoadingProgressProps) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const completedSteps = steps.filter((s) => s.status === 'complete').length;
-    const totalSteps = steps.length;
-    const newProgress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
-    setProgress(newProgress);
-  }, [steps]);
+  // Calculate progress directly from props
+  const completedSteps = steps.filter((s) => s.status === 'complete').length;
+  const totalSteps = steps.length;
+  const progress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
 
   const getStepIcon = (status: LoadingStep['status']) => {
     switch (status) {
