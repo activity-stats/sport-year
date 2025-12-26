@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSettingsStore, type SportBreakdownActivity } from '../../stores/settingsStore';
 
 interface SportBreakdownSettingsProps {
@@ -12,6 +12,18 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
 
   const [localActivities, setLocalActivities] = useState(sportBreakdown.activities);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Close on ESC key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Sync with store when opened
   useState(() => {

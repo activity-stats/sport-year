@@ -87,8 +87,12 @@ function SportDetailSection({
     if (highlights.sport === 'cycling') {
       return pace.toFixed(1);
     }
-    const minutes = Math.floor(pace);
-    const seconds = Math.round((pace - minutes) * 60);
+    let minutes = Math.floor(pace);
+    let seconds = Math.round((pace - minutes) * 60);
+    if (seconds >= 60) {
+      minutes += 1;
+      seconds = 0;
+    }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
@@ -517,8 +521,12 @@ const formatPaceSpeed = (activityType: string, distance: number, duration: numbe
   if (activityType === 'Run') {
     // Running: min/km
     const pace = duration / distance;
-    const minutes = Math.floor(pace);
-    const seconds = Math.round((pace - minutes) * 60);
+    let minutes = Math.floor(pace);
+    let seconds = Math.round((pace - minutes) * 60);
+    if (seconds >= 60) {
+      minutes += 1;
+      seconds = 0;
+    }
     return `${minutes}:${seconds.toString().padStart(2, '0')} min/km`;
   } else if (activityType === 'Ride' || activityType === 'VirtualRide') {
     // Cycling: km/h
@@ -527,8 +535,13 @@ const formatPaceSpeed = (activityType: string, distance: number, duration: numbe
   } else if (activityType === 'Swim') {
     // Swimming: min/100m
     const pace = duration / distance / 10; // min per 100m
-    const minutes = Math.floor(pace);
-    const seconds = Math.round((pace - minutes) * 60);
+    let minutes = Math.floor(pace);
+    let seconds = Math.round((pace - minutes) * 60);
+    // Handle case where seconds rounds to 60
+    if (seconds >= 60) {
+      minutes += 1;
+      seconds = 0;
+    }
     return `${minutes}:${seconds.toString().padStart(2, '0')} min/100m`;
   }
   return null;
@@ -766,6 +779,13 @@ export function YearInReview({
               colorClass: 'hover:shadow-amber-500/50',
             });
           }
+          break;
+        case 'kudos':
+          cards.push({
+            value: stats.totalKudos.toLocaleString('de-DE'),
+            label: 'Kudos',
+            colorClass: 'hover:shadow-rose-500/50',
+          });
           break;
       }
     });

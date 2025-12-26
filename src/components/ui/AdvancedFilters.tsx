@@ -51,7 +51,7 @@ export function AdvancedFilters({ availableActivityTypes }: AdvancedFiltersProps
     removeDistanceFilter,
     addTitleFilter,
     removeTitleFilter,
-    toggleExcludeVirtual,
+    addIgnorePattern,
     updateIgnorePattern,
     removeIgnorePattern,
     initializeDefaultFilters,
@@ -416,71 +416,43 @@ export function AdvancedFilters({ availableActivityTypes }: AdvancedFiltersProps
         );
       })}
 
-      {/* Global Settings */}
+      {/* Global Title Patterns */}
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl p-6 border-2 border-gray-300 dark:border-gray-700">
-        <h3 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <span>⚙️</span>
-          Global Settings
-        </h3>
-
-        {/* Virtual Activities */}
-        <div className="mb-6">
-          <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-3">
-            Virtual Activities
-          </h4>
-          <div className="space-y-3">
-            {(['cycling', 'running', 'swimming'] as const).map((sport) => {
-              const highlightsEnabled = yearInReview.excludeVirtualPerSport[sport].highlights;
-              const statsEnabled = yearInReview.excludeVirtualPerSport[sport].stats;
-              const sportIcon = sport === 'cycling' ? '🚴' : sport === 'running' ? '🏃' : '🏊';
-
-              return (
-                <div
-                  key={sport}
-                  className="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4"
-                >
-                  <div className="font-bold text-gray-900 dark:text-white capitalize mb-2 flex items-center gap-2">
-                    <span>{sportIcon}</span>
-                    <span>{sport}</span>
-                  </div>
-                  <div className="ml-6 space-y-2">
-                    <div className="flex gap-2 text-xs">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={highlightsEnabled}
-                          onChange={() => toggleExcludeVirtual(sport, 'highlights')}
-                          className="w-4 h-4 text-orange-600 dark:text-orange-500 rounded"
-                        />
-                        <span className="text-gray-700 dark:text-gray-300">
-                          Exclude from highlights
-                        </span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={statsEnabled}
-                          onChange={() => toggleExcludeVirtual(sport, 'stats')}
-                          className="w-4 h-4 text-red-600 dark:text-red-500 rounded"
-                        />
-                        <span className="text-gray-700 dark:text-gray-300">Exclude from stats</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Title Ignore Patterns */}
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-3">
             Global Title Patterns
           </h4>
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-            Exclude activities with specific titles from all activity types
+            Exclude activities with titles containing these patterns (case-insensitive, partial
+            match).
+            <br />
+            <span className="text-orange-600 dark:text-orange-400 font-semibold">
+              Example: "Zwemles" matches "Zwemles #1", "Morning Zwemles", etc.
+            </span>
           </p>
+
+          {/* Add new pattern input */}
+          <div className="mb-4 flex gap-2">
+            <input
+              type="text"
+              value={titlePattern}
+              onChange={(e) => setTitlePattern(e.target.value)}
+              placeholder="e.g., Lunch Ride, Recovery"
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400"
+            />
+            <button
+              onClick={() => {
+                if (titlePattern.trim()) {
+                  addIgnorePattern(titlePattern.trim());
+                  setTitlePattern('');
+                }
+              }}
+              className="px-4 py-2 bg-orange-600 dark:bg-orange-500 hover:bg-orange-700 dark:hover:bg-orange-600 text-white text-sm font-bold rounded-lg transition-colors"
+            >
+              Add
+            </button>
+          </div>
+
           {yearInReview.titleIgnorePatterns.length > 0 ? (
             <div className="space-y-2">
               {yearInReview.titleIgnorePatterns.map((patternObj) => (

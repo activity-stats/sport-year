@@ -56,7 +56,8 @@ export type StatType =
   | 'biggestClimb'
   | 'avgHeartRate'
   | 'maxSpeed'
-  | 'calories';
+  | 'calories'
+  | 'kudos';
 
 export interface StatOption {
   id: StatType;
@@ -307,6 +308,11 @@ export const AVAILABLE_STATS: Record<StatType, Omit<StatOption, 'enabled'>> = {
     id: 'calories',
     label: 'Calories Burned',
     description: 'Total calories burned across all activities',
+  },
+  kudos: {
+    id: 'kudos',
+    label: 'Kudos',
+    description: 'Total kudos received from the community',
   },
 };
 

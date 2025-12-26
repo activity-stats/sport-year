@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { domToPng } from 'modern-screenshot';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
@@ -31,6 +31,17 @@ export function SocialCard({
 }: SocialCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // State for edited activity names
   const [editedNames, setEditedNames] = useState<Record<string, string>>(() => {

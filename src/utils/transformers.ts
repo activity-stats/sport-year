@@ -21,6 +21,7 @@ export const transformActivity = (stravaActivity: StravaActivity): Activity => {
     kilojoules: stravaActivity.kilojoules,
     polyline: stravaActivity.map?.summary_polyline,
     workoutType: stravaActivity.workout_type,
+    kudosCount: stravaActivity.kudos_count,
   };
 };
 

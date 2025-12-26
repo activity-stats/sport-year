@@ -69,4 +69,10 @@ export const availableStats: StatOption[] = [
       return `${Math.round(stats.highestElevation.elevationGainMeters).toLocaleString('de-DE')} m`;
     },
   },
+  {
+    id: 'kudos',
+    label: 'Kudos',
+    icon: '👍',
+    getValue: (stats) => `${stats.totalKudos.toLocaleString('de-DE')}`,
+  },
 ];

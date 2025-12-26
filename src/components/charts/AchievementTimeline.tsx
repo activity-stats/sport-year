@@ -60,9 +60,13 @@ export function AchievementTimeline({
             highlight.distance > 0
               ? (() => {
                   const pace = highlight.duration / (highlight.distance / 1000);
-                  return `${Math.floor(pace)}:${Math.round((pace % 1) * 60)
-                    .toString()
-                    .padStart(2, '0')} min/km`;
+                  let minutes = Math.floor(pace);
+                  let seconds = Math.round((pace % 1) * 60);
+                  if (seconds >= 60) {
+                    minutes += 1;
+                    seconds = 0;
+                  }
+                  return `${minutes}:${seconds.toString().padStart(2, '0')} min/km`;
                 })()
               : formatDuration(highlight.duration * 60),
           icon: '⚡',

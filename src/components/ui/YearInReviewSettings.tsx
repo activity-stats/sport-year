@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSettingsStore, AVAILABLE_STATS, type StatType } from '../../stores/settingsStore';
 import type { ActivityType } from '../../types';
 import { ImagePositionEditor } from './ImagePositionEditor';
@@ -22,6 +22,18 @@ export function YearInReviewSettings({
   const [imageUrl, setImageUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isClickingRef = useRef(false);
+
+  // Close on ESC key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const {
     yearInReview,

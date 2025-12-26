@@ -19,6 +19,7 @@ export interface Activity {
   kilojoules?: number;
   polyline?: string;
   workoutType?: number; // For runs: 0=default, 1=race, 2=long run, 3=workout
+  kudosCount?: number;
 }
 
 export interface YearStats {
@@ -27,6 +28,7 @@ export interface YearStats {
   totalElevationMeters: number;
   totalTimeHours: number;
   activityCount: number;
+  totalKudos: number;
   byMonth: MonthlyStats[];
   byType: Record<ActivityType, TypeStats>;
   longestActivity?: Activity;

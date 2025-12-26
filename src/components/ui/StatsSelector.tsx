@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { YearStats } from '../../types';
 import type { StatOption } from './statsOptions';
 import { availableStats } from './statsOptions';
@@ -13,6 +13,17 @@ interface StatsSelectorProps {
 export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSelectorProps) {
   // Default: First 3 stats from StatsOverview (Distance, Elevation, Time)
   const [selected, setSelected] = useState<Set<string>>(new Set(['distance', 'elevation', 'time']));
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const toggleStat = (id: string) => {
     const newSelected = new Set(selected);
