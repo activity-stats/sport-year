@@ -591,10 +591,14 @@ export function YearInReview({
         scale: 2,
       });
       console.log('Export completed successfully');
+      // Close the dialog after successful export
+      setShowExportDialog(false);
     } catch (error) {
       console.error('Export failed:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
+      // Close the dialog even on error so user can try again
+      setShowExportDialog(false);
     }
   };
 
