@@ -7,14 +7,25 @@ import { availableStats } from './statsOptions';
 interface StatsSelectorProps {
   stats: YearStats;
   daysActive: number;
+  initialSelectedStats?: StatOption[];
   onConfirm: (selectedStats: StatOption[]) => void;
   onClose: () => void;
 }
 
-export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSelectorProps) {
+export function StatsSelector({
+  stats,
+  daysActive,
+  initialSelectedStats,
+  onConfirm,
+  onClose,
+}: StatsSelectorProps) {
   const { t } = useTranslation();
   // Default: First 3 stats from StatsOverview (Distance, Elevation, Time)
-  const [selected, setSelected] = useState<Set<string>>(new Set(['distance', 'elevation', 'time']));
+  const defaultStats =
+    initialSelectedStats && initialSelectedStats.length > 0
+      ? new Set(initialSelectedStats.map((s) => s.id))
+      : new Set(['distance', 'elevation', 'time']);
+  const [selected, setSelected] = useState<Set<string>>(defaultStats);
 
   // Close on ESC key
   useEffect(() => {

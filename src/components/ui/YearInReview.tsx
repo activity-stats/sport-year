@@ -580,8 +580,8 @@ export function YearInReview({
       const athleteName =
         athlete?.firstname || athlete?.lastname
           ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
-          : '';
-      const filename = athleteName ? `${athleteName}-sport-year-${year}` : `sport-year-${year}`;
+          : 'athlete';
+      const filename = `${athleteName}-year-in-sports-review-${year}`;
 
       await exportWithOptions(sections, format, {
         filename,
@@ -701,6 +701,16 @@ export function YearInReview({
     setSelectedHighlights(selectedHighlightItems);
     setShowActivitySelector(false);
     setShowSocialCard(true);
+  };
+
+  const handleBackToStats = () => {
+    setShowActivitySelector(false);
+    setShowStatsSelector(true);
+  };
+
+  const handleBackToActivities = () => {
+    setShowSocialCard(false);
+    setShowActivitySelector(true);
   };
 
   // Calculate days with activities
@@ -1401,6 +1411,7 @@ export function YearInReview({
         <StatsSelector
           stats={stats}
           daysActive={daysActive}
+          initialSelectedStats={selectedStats}
           onConfirm={handleStatsSelected}
           onClose={() => setShowStatsSelector(false)}
         />
@@ -1412,7 +1423,10 @@ export function YearInReview({
           activities={activities}
           highlightActivities={highlightActivities}
           highlights={highlights}
+          initialSelectedActivities={selectedActivities}
+          initialSelectedHighlights={selectedHighlights}
           onConfirm={handleActivitiesSelected}
+          onBack={handleBackToStats}
           onClose={() => setShowActivitySelector(false)}
         />
       )}
@@ -1428,11 +1442,8 @@ export function YearInReview({
           selectedHighlights={selectedHighlights}
           selectedStats={selectedStats}
           backgroundImageUrl={backgroundImageUrl || null}
-          onClose={() => {
-            setShowSocialCard(false);
-            setSelectedActivities([]);
-            setSelectedHighlights([]);
-          }}
+          onBack={handleBackToActivities}
+          onClose={() => setShowSocialCard(false)}
         />
       )}
 
@@ -1442,6 +1453,8 @@ export function YearInReview({
         onClose={() => setShowExportDialog(false)}
         onExport={handleAdvancedExport}
         availableSections={availableSections}
+        isExporting={isAdvancedExporting}
+        exportProgress={advancedProgress}
       />
     </>
   );

@@ -16,6 +16,7 @@ interface SocialCardProps {
   selectedHighlights: RaceHighlight[];
   selectedStats: StatOption[];
   backgroundImageUrl: string | null;
+  onBack?: () => void;
   onClose: () => void;
 }
 
@@ -28,6 +29,7 @@ export function SocialCard({
   selectedHighlights,
   selectedStats,
   backgroundImageUrl,
+  onBack,
   onClose,
 }: SocialCardProps) {
   const { t } = useTranslation();
@@ -70,8 +72,10 @@ export function SocialCard({
   // State for edited distances (in km)
   const [editedDistances, setEditedDistances] = useState<Record<string, number>>(() => {
     const distances: Record<string, number> = {};
-    selectedHighlights.forEach((h) => (distances[h.id] = h.distance || 0));
-    selectedActivities.forEach((a) => (distances[a.id] = a.distanceKm || 0));
+    selectedHighlights.forEach((h) => (distances[h.id] = parseFloat((h.distance || 0).toFixed(2))));
+    selectedActivities.forEach(
+      (a) => (distances[a.id] = parseFloat((a.distanceKm || 0).toFixed(2)))
+    );
     return distances;
   });
 
@@ -96,7 +100,7 @@ export function SocialCard({
   };
 
   const updateDistance = (id: string, distanceString: string) => {
-    const distance = parseFloat(distanceString) || 0;
+    const distance = parseFloat((parseFloat(distanceString) || 0).toFixed(2));
     setEditedDistances((prev) => ({ ...prev, [id]: distance }));
   };
 
@@ -119,7 +123,12 @@ export function SocialCard({
 
       const response = await fetch(dataUrl);
       const blob = await response.blob();
-      const file = new File([blob], `${year}-year-in-sports.png`, { type: 'image/png' });
+      const athleteSlug = athlete
+        ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
+        : 'athlete';
+      const file = new File([blob], `${athleteSlug}-year-in-sports-${year}.png`, {
+        type: 'image/png',
+      });
 
       const shareText = t('socialCard.shareText', { year });
 
@@ -151,7 +160,7 @@ export function SocialCard({
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${year}-year-in-sports.png`;
+      link.download = `${athleteSlug}-year-in-sports-${year}.png`;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
@@ -192,7 +201,7 @@ export function SocialCard({
       const athleteSlug = athlete
         ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
         : 'athlete';
-      const filename = `${athleteSlug}-${year}-year-in-sports.png`;
+      const filename = `${athleteSlug}-year-in-sports-${year}.png`;
 
       // Try File System Access API first (Chrome/Edge)
       if ('showSaveFilePicker' in window) {
@@ -353,46 +362,48 @@ export function SocialCard({
               </div>
 
               {/* Bottom section with stats and highlights */}
-              <div className="space-y-6">
-                {/* Selected Activities */}
+              <div className="space-y-4">
+                {/* Selected Activities - Compact 2-line format */}
                 {allSelectedItems.length > 0 && (
-                  <div className="grid grid-cols-3 gap-6">
+                  <div className="grid grid-cols-3 gap-4">
                     {allSelectedItems.map((item) => {
                       const itemId = item.id;
 
                       return (
-                        <div
-                          key={itemId}
-                          className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/30 shadow-xl"
-                        >
-                          <div className="text-xl font-bold mb-3 drop-shadow">
-                            <input
-                              type="text"
-                              value={editedNames[itemId] || item.name}
-                              onChange={(e) => updateName(itemId, e.target.value)}
-                              className="w-full bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors"
-                              placeholder="Activity name"
-                              maxLength={50}
-                            />
+                        <div key={itemId} className="text-left">
+                          {/* Line 1: Activity title */}
+                          <div
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => updateName(itemId, e.currentTarget.textContent || '')}
+                            className="text-base font-bold drop-shadow outline-none text-white truncate"
+                          >
+                            {editedNames[itemId] || item.name}
                           </div>
-                          <div className="text-base opacity-90 font-semibold flex items-center gap-2">
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={editedDistances[itemId] || 0}
-                              onChange={(e) => updateDistance(itemId, e.target.value)}
-                              className="w-16 bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors text-right"
-                              placeholder="0"
-                            />
+                          {/* Line 2: Distance - Time */}
+                          <div className="text-sm opacity-90 font-medium flex items-center gap-1.5">
+                            <span
+                              contentEditable
+                              suppressContentEditableWarning
+                              onBlur={(e) =>
+                                updateDistance(itemId, e.currentTarget.textContent || '0')
+                              }
+                              className="outline-none text-white"
+                            >
+                              {(editedDistances[itemId] || 0).toFixed(2)}
+                            </span>
                             <span>km</span>
-                            <span>•</span>
-                            <input
-                              type="text"
-                              value={editedTimes[itemId] || '0:00'}
-                              onChange={(e) => updateTime(itemId, e.target.value)}
-                              className="bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors w-20 text-center"
-                              placeholder="0:00"
-                            />
+                            <span>-</span>
+                            <span
+                              contentEditable
+                              suppressContentEditableWarning
+                              onBlur={(e) =>
+                                updateTime(itemId, e.currentTarget.textContent || '0:00')
+                              }
+                              className="outline-none text-white"
+                            >
+                              {editedTimes[itemId] || '0:00'}
+                            </span>
                           </div>
                         </div>
                       );
@@ -429,10 +440,12 @@ export function SocialCard({
                           type="text"
                           value={displayValue}
                           onChange={(e) => updateStat(stat.id, e.target.value)}
-                          className="text-6xl font-black mb-3 drop-shadow-2xl bg-transparent outline-none text-white text-center w-full placeholder-white/60"
+                          className={`${selectedStats.length === 4 ? 'text-4xl' : 'text-6xl'} font-black mb-3 drop-shadow-2xl bg-transparent outline-none text-white text-center w-full placeholder-white/60`}
                           placeholder="0"
                         />
-                        <div className="text-xl font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
+                        <div
+                          className={`${selectedStats.length === 4 ? 'text-base' : 'text-xl'} font-bold opacity-90 drop-shadow-lg uppercase tracking-wide`}
+                        >
                           {stat.label}
                         </div>
                       </div>
@@ -454,6 +467,14 @@ export function SocialCard({
               : `${allSelectedItems.length} ${allSelectedItems.length !== 1 ? t('socialCard.highlightsPlural') : t('socialCard.highlight')}`}
           </div>
           <div className="flex gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-6 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
+              >
+                ← Back
+              </button>
+            )}
             <button
               onClick={onClose}
               className="px-6 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
