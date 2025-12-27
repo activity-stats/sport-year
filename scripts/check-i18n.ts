@@ -48,7 +48,11 @@ function extractKeysFromCode(content: string): string[] {
   for (const pattern of patterns) {
     let match;
     while ((match = pattern.exec(content)) !== null) {
-      keys.push(match[1]);
+      const key = match[1];
+      // Filter out invalid keys (empty, single char like '.', or whitespace)
+      if (key && key.length > 1 && key.trim() && !/^[^\w]+$/.test(key)) {
+        keys.push(key);
+      }
     }
   }
 
