@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 import { Login, Callback, Dashboard } from './pages/index.ts';
 import { useAuth } from './hooks/useAuth.ts';
 import { useStravaConfigStore } from './stores/stravaConfigStore';
@@ -27,6 +28,17 @@ function App() {
   if (!isConfigured) {
     return (
       <ErrorBoundary>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              zIndex: 99999,
+            },
+          }}
+          containerStyle={{
+            zIndex: 99999,
+          }}
+        />
         <SetupWizard />
       </ErrorBoundary>
     );
@@ -34,6 +46,17 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            zIndex: 99999,
+          },
+        }}
+        containerStyle={{
+          zIndex: 99999,
+        }}
+      />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>

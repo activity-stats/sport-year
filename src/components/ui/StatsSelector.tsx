@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { YearStats } from '../../types';
 import type { StatOption } from './statsOptions';
 import { availableStats } from './statsOptions';
+import { showWarning } from '../../utils/toast';
 
 interface StatsSelectorProps {
   stats: YearStats;
@@ -45,13 +46,13 @@ export function StatsSelector({
         // Don't allow deselecting all stats
         newSelected.delete(id);
       } else {
-        alert(t('statsSelector.selectOne'));
+        showWarning(t('statsSelector.selectOne'));
       }
     } else {
       if (newSelected.size < 4) {
         newSelected.add(id);
       } else {
-        alert(t('statsSelector.maxFour'));
+        showWarning(t('statsSelector.maxFour'));
       }
     }
     setSelected(newSelected);

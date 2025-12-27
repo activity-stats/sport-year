@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Activity } from '../../types';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
+import { showWarning } from '../../utils/toast';
 
 type SelectableItem = Activity | RaceHighlight;
 
@@ -70,7 +71,7 @@ export function ActivitySelector({
       if (newSelected.size < 6) {
         newSelected.add(id);
       } else {
-        alert(t('errors.maxItemsReached'));
+        showWarning(t('errors.maxItemsReached'));
       }
     }
     setSelected(newSelected);

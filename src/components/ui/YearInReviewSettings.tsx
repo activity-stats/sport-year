@@ -5,6 +5,7 @@ import type { ActivityType } from '../../types';
 import { ImagePositionEditor } from './ImagePositionEditor';
 import { ActivityManagement } from './ActivityManagement';
 import { AdvancedFilters } from './AdvancedFilters';
+import { showWarning, showError } from '../../utils/toast';
 
 interface YearInReviewSettingsProps {
   isOpen: boolean;
@@ -52,7 +53,7 @@ export function YearInReviewSettings({
     // Check file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      alert(t('yearInReviewSettings.background.sizeLimit'));
+      showWarning(t('yearInReviewSettings.background.sizeLimit'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -70,7 +71,7 @@ export function YearInReviewSettings({
       }
     };
     reader.onerror = () => {
-      alert(t('yearInReviewSettings.background.uploadFailed'));
+      showError(t('yearInReviewSettings.background.uploadFailed'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

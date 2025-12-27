@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.ts';
+import { showError } from '../utils/toast';
 
 export const Callback = () => {
   const [searchParams] = useSearchParams();
@@ -13,7 +14,7 @@ export const Callback = () => {
 
     if (error) {
       const errorDescription = searchParams.get('error_description');
-      alert(
+      showError(
         `OAuth Error: ${error}${errorDescription ? `\n${errorDescription}` : ''}\n\nCheck browser console for details.`
       );
       navigate('/login', { replace: true });
@@ -22,9 +23,9 @@ export const Callback = () => {
 
     if (code) {
       handleCallback(code).catch((err) => {
-        // Only show alert for actual API errors (not navigation/component unmount errors)
+        // Only show error for actual API errors (not navigation/component unmount errors)
         if (err.response || err.message?.includes('token') || err.message?.includes('auth')) {
-          alert(
+          showError(
             `Failed to connect to Strava. Please check:\n1. Client ID and Secret are correct\n2. Strava app callback domain is set to: ${window.location.hostname}\n\nError: ${err.message || 'Unknown error'}\n\nSee console for details.`
           );
         }
@@ -32,7 +33,7 @@ export const Callback = () => {
         navigate('/login', { replace: true });
       });
     } else {
-      alert(
+      showError(
         'OAuth callback received without code. This might indicate:\n1. Wrong callback domain in Strava app settings\n2. Strava app configuration mismatch\n\nExpected domain: ' +
           window.location.hostname
       );

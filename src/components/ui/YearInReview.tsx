@@ -26,6 +26,7 @@ import type { StatOption } from './statsOptions';
 import { HeatmapCalendar } from '../charts/HeatmapCalendar';
 import { useAdvancedExport } from '../../hooks/useAdvancedExport';
 import { ExportDialog, type ExportSection, type ExportFormat } from './ExportDialog';
+import { showError } from '../../utils/toast';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
@@ -591,7 +592,7 @@ export function YearInReview({
       setShowExportDialog(false);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
+      showError(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
       // Close the dialog even on error so user can try again
       setShowExportDialog(false);
     }

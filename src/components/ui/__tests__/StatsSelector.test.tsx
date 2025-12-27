@@ -6,6 +6,15 @@ import i18n from '../../../i18n';
 import { StatsSelector } from '../StatsSelector';
 import { availableStats } from '../statsOptions';
 import type { YearStats } from '../../../types';
+import * as toast from '../../../utils/toast';
+
+// Mock the toast utility
+vi.mock('../../../utils/toast', () => ({
+  showWarning: vi.fn(),
+  showSuccess: vi.fn(),
+  showError: vi.fn(),
+  showInfo: vi.fn(),
+}));
 
 describe('StatsSelector', () => {
   const mockStats: YearStats = {
@@ -102,7 +111,6 @@ describe('StatsSelector', () => {
 
   it('prevents selecting more than 4 stats', async () => {
     const user = userEvent.setup();
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     renderWithI18n(
       <StatsSelector
@@ -123,10 +131,8 @@ describe('StatsSelector', () => {
     const daysActiveButton = screen.getByText('Days Active').closest('button');
     if (daysActiveButton) {
       await user.click(daysActiveButton);
-      expect(alertSpy).toHaveBeenCalledWith('You can select up to 4 stats');
+      expect(toast.showWarning).toHaveBeenCalledWith('You can select up to 4 stats');
     }
-
-    alertSpy.mockRestore();
   });
 
   it('calls onConfirm with selected stats when Next button is clicked', async () => {
