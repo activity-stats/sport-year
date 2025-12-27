@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import {
@@ -56,26 +57,27 @@ function SportDetailSection({
   highlights: SportHighlights;
   customHighlights?: RaceHighlight[];
 }) {
+  const { t } = useTranslation();
   const sportConfig = {
     running: {
       emoji: '🏃',
-      title: 'Running',
+      title: t('activityTypes.Run'),
       gradient: 'from-orange-500 to-red-600',
-      paceLabel: 'Avg Pace',
+      paceLabel: t('yearInReview.avgPace'),
       paceUnit: 'min/km',
     },
     cycling: {
       emoji: '🚴',
-      title: 'Cycling',
+      title: t('activityTypes.Ride'),
       gradient: 'from-blue-500 to-cyan-600',
-      paceLabel: 'Avg Speed',
+      paceLabel: t('yearInReview.avgSpeed'),
       paceUnit: 'km/h',
     },
     swimming: {
       emoji: '🏊',
-      title: 'Swimming',
+      title: t('activityTypes.Swim'),
       gradient: 'from-teal-500 to-blue-600',
-      paceLabel: 'Avg Pace',
+      paceLabel: t('yearInReview.avgPace'),
       paceUnit: 'min/100m',
     },
   };
@@ -102,7 +104,7 @@ function SportDetailSection({
         <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4">
           <div className="text-3xl sm:text-5xl">{config.emoji}</div>
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-            {config.title} Highlights
+            {config.title} {t('yearInReview.highlights')}
           </h2>
         </div>
         <div
@@ -115,7 +117,7 @@ function SportDetailSection({
             <span className="font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(highlights.totalDistance * 1000)}
             </span>
-            <span>total</span>
+            <span>{t('yearInReview.total')}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-gray-900 dark:text-white">{config.paceLabel}:</span>
@@ -128,7 +130,7 @@ function SportDetailSection({
               <span className="font-bold text-gray-900 dark:text-white">
                 ⛰️ {Math.round(highlights.totalElevation).toLocaleString('de-DE')}m
               </span>
-              <span>elevation</span>
+              <span>{t('yearInReview.elevation')}</span>
             </div>
           )}
         </div>
@@ -163,7 +165,7 @@ function SportDetailSection({
                   </div>
                   {isLongest && (
                     <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
-                      🏆 Longest
+                      🏆 {t('yearInReview.longest')}
                     </div>
                   )}
                 </div>
@@ -182,7 +184,7 @@ function SportDetailSection({
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Distance
+                    {t('yearInReview.distance')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
                     {formatDistanceWithUnit(highlight.distance * 1000)}
@@ -190,7 +192,7 @@ function SportDetailSection({
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Time
+                    {t('yearInReview.time')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
                     {formatDuration((highlight.duration || 0) * 60)}
@@ -202,7 +204,7 @@ function SportDetailSection({
               {paceSpeed && highlight.type !== 'triathlon' && (
                 <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Pace
+                    {t('yearInReview.pace')}
                   </div>
                   <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
                 </div>
@@ -249,7 +251,7 @@ function SportDetailSection({
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
-                  🏆 Longest
+                  🏆 {t('yearInReview.longest')}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                   {highlights.longestActivity.date.toLocaleDateString('en-US', {
@@ -266,7 +268,7 @@ function SportDetailSection({
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Distance
+                    {t('yearInReview.distance')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
                     {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
@@ -274,7 +276,7 @@ function SportDetailSection({
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Time
+                    {t('yearInReview.time')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
                     {formatDuration(highlights.longestActivity.movingTimeMinutes * 60)}
@@ -286,7 +288,7 @@ function SportDetailSection({
               {paceSpeed && (
                 <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-3">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Pace
+                    {t('yearInReview.pace')}
                   </div>
                   <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
                 </div>
@@ -295,7 +297,7 @@ function SportDetailSection({
                 highlights.longestActivity.elevationGainMeters > 50 && (
                   <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Elevation
+                      {t('yearInReview.elevation')}
                     </div>
                     <div className="text-lg font-bold text-gray-900 dark:text-white">
                       ⛰️ {Math.round(highlights.longestActivity.elevationGainMeters)}m
@@ -337,7 +339,7 @@ function SportDetailSection({
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-sm">
-                    ⛰️ Biggest Climb
+                    ⛰️ {t('yearInReview.biggestClimb')}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                     {highlights.biggestClimb.date.toLocaleDateString('en-US', {
@@ -354,7 +356,7 @@ function SportDetailSection({
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Elevation
+                      {t('yearInReview.elevation')}
                     </div>
                     <div className="text-xl font-black text-gray-900 dark:text-white">
                       {Math.round(highlights.biggestClimb.elevationGainMeters)}m
@@ -362,7 +364,7 @@ function SportDetailSection({
                   </div>
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Distance
+                      {t('yearInReview.distance')}
                     </div>
                     <div className="text-xl font-black text-gray-900 dark:text-white">
                       {formatDistanceWithUnit(highlights.biggestClimb.distanceKm * 1000)}
@@ -373,7 +375,7 @@ function SportDetailSection({
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Time
+                      {t('yearInReview.time')}
                     </div>
                     <div className="text-xl font-black text-gray-900 dark:text-white">
                       {formatDuration(highlights.biggestClimb.movingTimeMinutes * 60)}
@@ -382,7 +384,7 @@ function SportDetailSection({
                   {paceSpeed && (
                     <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                       <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                        Pace
+                        {t('yearInReview.pace')}
                       </div>
                       <div className="text-xl font-black text-gray-900 dark:text-white">
                         {paceSpeed}
@@ -549,6 +551,7 @@ export function YearInReview({
   highlightFilters,
   backgroundImageUrl,
 }: YearInReviewProps) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showStatsSelector, setShowStatsSelector] = useState(false);
   const [showActivitySelector, setShowActivitySelector] = useState(false);
@@ -690,42 +693,42 @@ export function YearInReview({
         case 'daysActive':
           cards.push({
             value: daysActive.toString(),
-            label: 'Days Active',
+            label: t('stats.daysActive'),
             colorClass: 'hover:shadow-purple-500/50',
           });
           break;
         case 'hours':
           cards.push({
             value: Math.round(stats.totalTimeHours).toLocaleString('de-DE'),
-            label: 'Active Hours',
+            label: t('stats.activeHours'),
             colorClass: 'hover:shadow-blue-500/50',
           });
           break;
         case 'distance':
           cards.push({
             value: Math.round(stats.totalDistanceKm).toLocaleString('de-DE'),
-            label: 'km Distance',
+            label: t('stats.kmDistance'),
             colorClass: 'hover:shadow-pink-500/50',
           });
           break;
         case 'elevation':
           cards.push({
             value: Math.round(stats.totalElevationMeters).toLocaleString('de-DE'),
-            label: 'm Elevation',
+            label: t('stats.mElevation'),
             colorClass: 'hover:shadow-green-500/50',
           });
           break;
         case 'activities':
           cards.push({
             value: stats.activityCount.toLocaleString('de-DE'),
-            label: 'Activities',
+            label: t('stats.activities'),
             colorClass: 'hover:shadow-orange-500/50',
           });
           break;
         case 'avgSpeed':
           cards.push({
             value: Math.round(additionalStats.avgSpeed).toLocaleString('de-DE'),
-            label: 'Avg Speed (km/h)',
+            label: t('stats.avgSpeedKmh'),
             colorClass: 'hover:shadow-cyan-500/50',
           });
           break;
@@ -733,7 +736,7 @@ export function YearInReview({
           if (stats.longestActivity) {
             cards.push({
               value: Math.round(stats.longestActivity.distanceKm).toLocaleString('de-DE'),
-              label: 'Longest (km)',
+              label: t('stats.longestKm'),
               colorClass: 'hover:shadow-indigo-500/50',
             });
           }
@@ -742,7 +745,7 @@ export function YearInReview({
           if (stats.highestElevation) {
             cards.push({
               value: Math.round(stats.highestElevation.elevationGainMeters).toLocaleString('de-DE'),
-              label: 'Biggest Climb (m)',
+              label: t('stats.biggestClimbM'),
               colorClass: 'hover:shadow-emerald-500/50',
             });
           }
@@ -751,7 +754,7 @@ export function YearInReview({
           if (additionalStats.avgHeartRate > 0) {
             cards.push({
               value: additionalStats.avgHeartRate.toString(),
-              label: 'Avg Heart Rate',
+              label: t('stats.avgHeartRate'),
               colorClass: 'hover:shadow-red-500/50',
             });
           }
@@ -760,7 +763,7 @@ export function YearInReview({
           if (additionalStats.maxSpeed > 0) {
             cards.push({
               value: additionalStats.maxSpeed.toLocaleString('de-DE'),
-              label: 'Max Speed (km/h)',
+              label: t('stats.maxSpeedKmh'),
               colorClass: 'hover:shadow-yellow-500/50',
             });
           }
@@ -769,7 +772,7 @@ export function YearInReview({
           if (additionalStats.totalCalories > 0) {
             cards.push({
               value: additionalStats.totalCalories.toLocaleString('de-DE'),
-              label: 'Calories Burned',
+              label: t('stats.caloriesBurned'),
               colorClass: 'hover:shadow-amber-500/50',
             });
           }
@@ -777,7 +780,7 @@ export function YearInReview({
         case 'kudos':
           cards.push({
             value: stats.totalKudos.toLocaleString('de-DE'),
-            label: 'Kudos',
+            label: t('stats.kudos'),
             colorClass: 'hover:shadow-rose-500/50',
           });
           break;
@@ -785,7 +788,7 @@ export function YearInReview({
     });
 
     return cards;
-  }, [stats, daysActive, additionalStats, highlightFilters.highlightStats]);
+  }, [stats, daysActive, additionalStats, highlightFilters.highlightStats, t]);
 
   // Generate monthly duration data for background chart
   const monthlyDurations = useMemo(() => {
@@ -862,7 +865,7 @@ export function YearInReview({
           title="Create Social Card"
         >
           <span className="text-2xl">📱</span>
-          <span className="text-lg">Share</span>
+          <span className="text-lg">{t('yearInReview.share')}</span>
         </button>
 
         {/* Hero Section */}
@@ -912,11 +915,11 @@ export function YearInReview({
             <div className="text-center">
               <div className="inline-block">
                 <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tight drop-shadow-2xl">
-                  {year === 'last365' ? 'Last 365 Days' : year}
+                  {year === 'last365' ? t('yearInReview.last365Title') : year}
                 </h1>
                 <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8 rounded-full"></div>
                 <p className="text-3xl md:text-4xl font-light mb-4 text-white/90 tracking-wide">
-                  Your Epic Year in Sports
+                  {t('app.tagline')}
                 </p>
               </div>
 
@@ -948,12 +951,12 @@ export function YearInReview({
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="text-5xl">📅</div>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                Activity Calendar
+                {t('yearInReview.activityCalendar')}
               </h2>
             </div>
             <div className="h-1.5 w-32 bg-gradient-to-r from-emerald-500 to-teal-600 mx-auto rounded-full mb-6"></div>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-semibold">
-              Your training consistency throughout the year
+              {t('yearInReview.trainingConsistency')}
             </p>
           </div>
           <HeatmapCalendar year={year} activities={activities} />
@@ -986,11 +989,14 @@ export function YearInReview({
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="text-5xl">🏊🚴🏃</div>
                 <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                  Triathlons
+                  {t('yearInReview.triathlons')}
                 </h2>
               </div>
               <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
-                {triathlons.length} epic multi-sport adventure{triathlons.length !== 1 ? 's' : ''}
+                {triathlons.length}{' '}
+                {triathlons.length === 1
+                  ? t('yearInReview.epicMultiSport')
+                  : t('yearInReview.epicMultiSportPlural')}
               </p>
               <div className="h-1.5 w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
             </div>
@@ -1009,11 +1015,11 @@ export function YearInReview({
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="text-5xl">🌟</div>
                 <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                  Other Achievements
+                  {t('yearInReview.otherAchievements')}
                 </h2>
               </div>
               <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
-                Even more incredible performances
+                {t('yearInReview.morePerformances')}
               </p>
               <div className="h-1.5 w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full"></div>
             </div>
@@ -1032,28 +1038,36 @@ export function YearInReview({
             <div className="inline-block mb-8">
               <div className="text-7xl mb-6">🎉</div>
               <h2 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-2xl">
-                What an Epic Year!
+                {t('yearInReview.epicYear')}
               </h2>
               <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto rounded-full mb-8"></div>
             </div>
 
             <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 md:p-10 border border-white/20 shadow-2xl max-w-4xl mx-auto">
               <p className="text-2xl md:text-3xl font-light leading-relaxed mb-4">
-                You crushed{' '}
+                {t('yearInReview.crushedDistance')}{' '}
                 <span className="font-black">
                   {formatDistanceWithUnit(stats.totalDistanceKm * 1000)}
                 </span>{' '}
-                across <span className="font-black">{stats.activityCount} activities</span>,
-                dedicating{' '}
-                <span className="font-black">{Math.round(stats.totalTimeHours)} hours</span> to your
-                passion.
+                {t('yearInReview.across')}{' '}
+                <span className="font-black">
+                  {stats.activityCount} {t('stats.activities').toLowerCase()}
+                </span>
+                , {t('yearInReview.dedicating')}{' '}
+                <span className="font-black">
+                  {Math.round(stats.totalTimeHours)} {t('units.hours')}
+                </span>{' '}
+                {t('yearInReview.toYourPassion')}.
               </p>
               <p className="text-xl md:text-2xl font-light">
-                Here's to even more epic adventures{year === 'last365' ? '' : ' in'}{' '}
+                {t('yearInReview.closingMessage')}
                 {year === 'last365' ? (
-                  'ahead'
+                  ` ${t('yearInReview.closingMessageAhead')}`
                 ) : (
-                  <span className="font-black text-3xl">{year + 1}</span>
+                  <span className="font-black text-3xl">
+                    {' '}
+                    {t('yearInReview.closingMessageYear', { year: year + 1 })}
+                  </span>
                 )}
                 ! 🚀
               </p>

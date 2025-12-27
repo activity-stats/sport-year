@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { domToPng } from 'modern-screenshot';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
@@ -29,6 +30,7 @@ export function SocialCard({
   backgroundImageUrl,
   onClose,
 }: SocialCardProps) {
+  const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -119,7 +121,7 @@ export function SocialCard({
       const blob = await response.blob();
       const file = new File([blob], `${year}-year-in-sports.png`, { type: 'image/png' });
 
-      const shareText = `My ${year} Year in Sports! 🏃‍♂️🚴‍♂️ #YearInSports #Strava`;
+      const shareText = t('socialCard.shareText', { year });
 
       // Check if Web Share API is available (works on mobile and some desktop browsers)
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -433,31 +435,32 @@ export function SocialCard({
         {/* Actions */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {selectedStats.length} stat{selectedStats.length !== 1 ? 's' : ''} •{' '}
+            {selectedStats.length}{' '}
+            {selectedStats.length !== 1 ? t('socialCard.statsPlural') : t('socialCard.stats')} •{' '}
             {allSelectedItems.length === 0
-              ? 'No highlights'
-              : `${allSelectedItems.length} highlight${allSelectedItems.length !== 1 ? 's' : ''}`}
+              ? t('socialCard.noHighlights')
+              : `${allSelectedItems.length} ${allSelectedItems.length !== 1 ? t('socialCard.highlightsPlural') : t('socialCard.highlight')}`}
           </div>
           <div className="flex gap-3">
             <button
               onClick={onClose}
               className="px-6 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
             >
-              Cancel
+              {t('socialCard.cancel')}
             </button>
             <button
               onClick={handleShare}
               disabled={isExporting}
               className="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all shadow-lg disabled:opacity-50"
             >
-              {isExporting ? 'Preparing...' : '🚀 Share'}
+              {isExporting ? t('socialCard.preparing') : t('socialCard.shareButton')}
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting}
               className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
             >
-              {isExporting ? 'Exporting...' : '📥 Download'}
+              {isExporting ? t('socialCard.exporting') : t('socialCard.downloadButton')}
             </button>
           </div>
         </div>

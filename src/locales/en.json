@@ -1,0 +1,313 @@
+{
+  "app": {
+    "title": "Sport Year",
+    "tagline": "Your Epic Year in Sports"
+  },
+  "navigation": {
+    "review": "Review",
+    "yearReview": "Year Review",
+    "stats": "Stats",
+    "map": "Map",
+    "custom": "Custom",
+    "customize": "Customize",
+    "settings": "Settings",
+    "more": "More",
+    "guide": "Guide",
+    "strava": "Strava",
+    "light": "Light",
+    "dark": "Dark",
+    "github": "GitHub",
+    "support": "Support",
+    "logout": "Logout"
+  },
+  "moreMenu": {
+    "title": "More Options",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "github": "GitHub",
+    "support": "Support",
+    "settings": "Settings",
+    "customize": "Customize",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "yearSelector": {
+    "last365Days": "Last 365 Days"
+  },
+  "yearInReview": {
+    "title": "{{year}}",
+    "last365Title": "Last 365 Days",
+    "tagline": "Your Epic Year in Sports",
+    "share": "Share",
+    "createSocialCard": "Create Social Card",
+    "totalDistance": "Total Distance",
+    "totalTime": "Total Time",
+    "activities": "Activities",
+    "longestRide": "Longest Ride",
+    "longestRun": "Longest Run",
+    "longestSwim": "Longest Swim",
+    "achievementTimeline": "Achievement Timeline",
+    "raceHighlights": "Race Highlights",
+    "sportHighlights": "Sport Highlights",
+    "activityHeatmap": "Activity Heatmap",
+    "everyDay": "Every single day you showed up, you got stronger.",
+    "closingMessage": "Here's to even more epic adventures",
+    "closingMessageYear": "in {{year}}",
+    "closingMessageAhead": "ahead",
+    "restDay": "Rest day",
+    "highlights": "Highlights",
+    "total": "total",
+    "elevation": "elevation",
+    "longest": "Longest",
+    "distance": "Distance",
+    "time": "Time",
+    "pace": "Pace",
+    "avgPace": "Avg Pace",
+    "avgSpeed": "Avg Speed",
+    "activityCalendar": "Activity Calendar",
+    "trainingConsistency": "Your training consistency throughout the year",
+    "biggestClimb": "Biggest Climb",
+    "triathlons": "Triathlons",
+    "epicMultiSport": "epic multi-sport adventure",
+    "epicMultiSportPlural": "epic multi-sport adventures",
+    "otherAchievements": "Other Achievements",
+    "morePerformances": "Even more incredible performances",
+    "epicYear": "What an Epic Year!",
+    "crushedDistance": "You crushed",
+    "across": "across",
+    "dedicating": "dedicating",
+    "toYourPassion": "to your passion"
+  },
+  "stats": {
+    "distance": "Distance",
+    "time": "Time",
+    "activeHours": "Active Hours",
+    "activities": "Activities",
+    "elevation": "Elevation",
+    "calories": "Calories Burned",
+    "kudos": "Kudos",
+    "avgPace": "Avg Pace",
+    "avgSpeed": "Avg Speed",
+    "longestActivity": "Longest Activity",
+    "daysActive": "Days Active",
+    "kmDistance": "km Distance",
+    "mElevation": "m Elevation",
+    "avgSpeedKmh": "Avg Speed (km/h)",
+    "longestKm": "Longest (km)",
+    "biggestClimbM": "Biggest Climb (m)",
+    "avgHeartRate": "Avg Heart Rate",
+    "maxSpeedKmh": "Max Speed (km/h)",
+    "caloriesBurned": "Calories Burned"
+  },
+  "activities": {
+    "all": "All Activities",
+    "running": "Running",
+    "cycling": "Cycling",
+    "swimming": "Swimming",
+    "viewActivity": "View Activity"
+  },
+  "socialCard": {
+    "yearInSports": "Year in Sports",
+    "share": "Share",
+    "download": "Download",
+    "shareTitle": "{{year}} Year in Sports",
+    "shareText": "My {{year}} Year in Sports! 🏃‍♂️🚴‍♂️ #YearInSports #Strava",
+    "cancel": "Cancel",
+    "preparing": "Preparing...",
+    "exporting": "Exporting...",
+    "shareButton": "🚀 Share",
+    "downloadButton": "📥 Download",
+    "stats": "stat",
+    "statsPlural": "stats",
+    "noHighlights": "No highlights",
+    "highlight": "highlight",
+    "highlightsPlural": "highlights",
+    "downloadSuccess": "Image downloaded and share text copied to clipboard! 📋\nPaste it when sharing on Strava or other platforms.",
+    "shareFailed": "Failed to share. Please try downloading instead."
+  },
+  "settings": {
+    "title": "Settings",
+    "stravaSettings": "Strava Settings",
+    "customizeView": "Customize View",
+    "sportBreakdown": "Sport Breakdown",
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply"
+  },
+  "loading": {
+    "checking": "Checking Strava connection",
+    "fetching": "Fetching your activities from Strava",
+    "transforming": "Transforming activity data",
+    "aggregating": "Building your statistics model"
+  },
+  "login": {
+    "title": "Welcome to Sport Year",
+    "subtitle": "Connect your Strava account to view your year in sports",
+    "connectButton": "Connect with Strava"
+  },
+  "errors": {
+    "loadingFailed": "Failed to load activities",
+    "noActivities": "No activities found for this period",
+    "tryAgain": "Try again"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Sport Year!",
+    "getStarted": "Let's get started with your sports journey"
+  },
+  "units": {
+    "km": "km",
+    "mi": "mi",
+    "m": "m",
+    "hours": "h",
+    "minutes": "min",
+    "seconds": "s"
+  },
+  "months": {
+    "short": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    }
+  },
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "statsOverview": {
+    "title": "{{year}} Overview",
+    "totalDistance": "Total Distance",
+    "totalElevation": "Total Elevation",
+    "totalTime": "Total Time",
+    "activities": "Activities",
+    "longestActivity": "Longest Activity",
+    "mostElevation": "Most Elevation"
+  },
+  "statsSelector": {
+    "title": "Select Stats",
+    "subtitle": "Choose 1-4 stats to display on your social card",
+    "selectOne": "You must select at least 1 stat",
+    "maxFour": "You can select up to 4 stats",
+    "confirm": "Confirm Selection",
+    "close": "Close",
+    "selected": "{{count}} of 4 selected",
+    "ready": "Ready",
+    "selectAtLeastOne": "Select at least 1",
+    "cancel": "Cancel",
+    "nextSelectHighlights": "Next: Select Highlights"
+  },
+  "activityBreakdown": {
+    "activities": "activities",
+    "totalDistance": "Total Distance",
+    "totalTime": "Total Time",
+    "avgDistance": "Avg Distance",
+    "avgSpeed": "Avg Speed",
+    "avgPace": "Avg Pace",
+    "elevation": "Elevation",
+    "longestActivity": "Longest Activity",
+    "totalElevation": "Total Elevation",
+    "avgPerActivity": "Avg {{value}} m per activity"
+  },
+  "loading": {
+    "title": "Loading Your Activities",
+    "subtitle": "Please wait while we prepare your data...",
+    "complete": "{{progress}}% Complete",
+    "helpText": "This may take a few moments depending on the amount of data...",
+    "stages": {
+      "checking": "Checking Strava connection",
+      "fetching": "Fetching your activities from Strava",
+      "transforming": "Transforming activity data",
+      "aggregating": "Building your statistics model"
+    }
+  },
+  "yearInReviewSettings": {
+    "title": "Customize Year in Review",
+    "tabs": {
+      "background": "Background",
+      "types": "Activity Types",
+      "filters": "Advanced Filters",
+      "stats": "Stats Display"
+    },
+    "background": {
+      "title": "Background Image",
+      "subtitle": "Customize the background for your Year in Review presentation",
+      "upload": "Upload Image",
+      "urlPlaceholder": "Or paste image URL",
+      "setUrl": "Set URL",
+      "remove": "Remove Background",
+      "sizeLimit": "Image size must be less than 5MB",
+      "uploadFailed": "Failed to read file. Please try again."
+    },
+    "close": "Close",
+    "reset": "Reset All"
+  },
+  "dashboard": {
+    "activityTrends": "Activity Trends",
+    "sportBreakdown": "Sport Breakdown",
+    "activityMap": "Activity Map",
+    "customize": "Customize",
+    "noActivitiesSelected": "No activities selected for Sport Breakdown.",
+    "configureActivities": "Configure Activities",
+    "allActivitiesFor": "All your activities for {{year}} visualized on a map. Click any route to see details."
+  },
+  "charts": {
+    "monthlyBreakdown": "Monthly Breakdown",
+    "monthlyTrends": "Monthly Trends",
+    "weeklyTrends": "Weekly Trends",
+    "byActivityType": "By Activity Type",
+    "activityTypes": "Activity Types",
+    "noActivitiesYet": "No activities yet",
+    "view": "View",
+    "sport": "Sport",
+    "all": "All",
+    "allSports": "All Sports",
+    "month": "Month",
+    "week": "Week",
+    "metrics": {
+      "distance": "Distance",
+      "time": "Time",
+      "elevation": "Elevation",
+      "activities": "Activities",
+      "count": "Count"
+    },
+    "units": {
+      "km": "km",
+      "hours": "hours",
+      "activities": "activities",
+      "meters": "m"
+    }
+  },
+  "activityTypes": {
+    "Run": "Running",
+    "Ride": "Cycling",
+    "Swim": "Swimming",
+    "Walk": "Walking",
+    "Hike": "Hiking",
+    "VirtualRide": "Virtual Ride",
+    "WeightTraining": "Weight Training",
+    "Workout": "Workout"
+  },
+  "achievements": {
+    "title": "Achievement Timeline",
+    "subtitle": "Your biggest accomplishments throughout the year",
+    "sportHighlights": "Sport Highlights",
+    "sportHighlightsSubtitle": "Your best performances in each sport",
+    "longestRun": "Longest Run",
+    "biggestClimb": "Biggest Climb",
+    "longestRide": "Longest Ride",
+    "longestSwim": "Longest Swim"
+  }
+}

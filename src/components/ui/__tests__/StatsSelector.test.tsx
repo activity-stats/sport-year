@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../../i18n';
 import { StatsSelector } from '../StatsSelector';
 import { availableStats } from '../statsOptions';
 import type { YearStats } from '../../../types';
@@ -36,10 +38,15 @@ describe('StatsSelector', () => {
   beforeEach(() => {
     mockOnConfirm = vi.fn();
     mockOnClose = vi.fn();
+    i18n.changeLanguage('en'); // Ensure tests run in English
   });
 
+  const renderWithI18n = (component: React.ReactElement) => {
+    return render(<I18nextProvider i18n={i18n}>{component}</I18nextProvider>);
+  };
+
   it('renders stats selector with all stat options', () => {
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -58,7 +65,7 @@ describe('StatsSelector', () => {
   });
 
   it('has first 3 stats selected by default', () => {
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -73,7 +80,7 @@ describe('StatsSelector', () => {
 
   it('allows selecting and deselecting stats', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -97,7 +104,7 @@ describe('StatsSelector', () => {
     const user = userEvent.setup();
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -124,7 +131,7 @@ describe('StatsSelector', () => {
 
   it('calls onConfirm with selected stats when Next button is clicked', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -146,7 +153,7 @@ describe('StatsSelector', () => {
 
   it('calls onClose when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}
@@ -163,7 +170,7 @@ describe('StatsSelector', () => {
 
   it('calls onClose when X button is clicked', async () => {
     const user = userEvent.setup();
-    render(
+    renderWithI18n(
       <StatsSelector
         stats={mockStats}
         daysActive={150}

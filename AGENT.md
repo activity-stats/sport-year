@@ -56,20 +56,51 @@ Key files:
 
 ### SOLID Architecture
 
-The codebase follows SOLID principles, particularly in the config system:
+The codebase follows SOLID principles to maintain clean, maintainable code:
 
-- **Single Responsibility**: Each class has one purpose
-- **Open/Closed**: Extensible through interfaces
-- **Liskov Substitution**: All providers are interchangeable
-- **Interface Segregation**: Focused interfaces
-- **Dependency Inversion**: Depend on abstractions
+#### Single Responsibility Principle (SRP)
 
-Example: `stravaConfigProvider.ts` implements a provider pattern with:
+- Each module has one reason to change
+- Example: `stravaConfigProvider.ts` handles config loading only
+- Separate stores for auth, settings, config
+- Utility functions do one thing well
 
-- `IConfigProvider` interface
-- `EnvConfigProvider`, `StorageConfigProvider` implementations
-- `CompositeConfigProvider` for fallback chains
-- `ConfigProviderFactory` for creation
+#### Open/Closed Principle (OCP)
+
+- Open for extension, closed for modification
+- Example: `IConfigProvider` interface allows new providers without changing existing code
+- `CompositeConfigProvider` adds fallback behavior through composition
+
+#### Liskov Substitution Principle (LSP)
+
+- All `IConfigProvider` implementations are interchangeable
+- Hooks can be swapped without breaking components
+- Store interfaces remain consistent
+
+#### Interface Segregation Principle (ISP)
+
+- Focused interfaces: `IConfigProvider` has minimal methods
+- Stores expose only needed methods
+- Components receive only props they use
+
+#### Dependency Inversion Principle (DIP)
+
+- Depend on abstractions (interfaces), not concretions
+- `stravaConfigStore` depends on `IConfigProvider` interface
+- `ConfigProviderFactory` creates concrete implementations
+- Easy to mock for testing
+
+**Config System Example:**
+
+```typescript
+IConfigProvider (interface)
+├── EnvConfigProvider (env vars)
+├── StorageConfigProvider (localStorage)
+└── CompositeConfigProvider (fallback chain)
+
+// Factory creates providers
+ConfigProviderFactory.create() → IConfigProvider
+```
 
 ### Code Quality Standards
 
@@ -86,46 +117,561 @@ Example: `stravaConfigProvider.ts` implements a provider pattern with:
 1. User creates Strava API app (OAuth client)
 2. User enters Client ID + Secret in setup wizard
 3. App stores credentials in localStorage
-4. OAuth flow: redirect to Strava → callback with code → exchange for token
-5. Token stored in Zustand store + localStorage
-6. Auto-refresh on expiry
+4. OAuth-Driven Development (TDD) Approach
 
-### Configuration System
+**Always write tests when implementing features:**
+
+1. **Red**: Write a failing test that describes the desired behavior
+2. **Green**: Write minimum code to make the test pass
+3. **Refactor**: Improve code while keeping tests green
+
+**Example TDD workflow:**
 
 ```typescript
-// Provider pattern for flexibility
-IConfigProvider
-├── EnvConfigProvider (env vars)
-├── StorageConfigProvider (localStorage)
-└── CompositeConfigProvider (fallback chain)
+// 1. RED - Write failing test
+it('should calculate total distance', () => {
+  const activities = [{ distance: 1000 }, { distance: 2000 }];
+  expect(calculateTotalDistance(activities)).toBe(3000);
+});
 
-// Used by stores
-stravaConfigStore.ts uses ConfigProviderFactory
+// 2. GREEN - Implement minimum code
+function calculateTotalDistance(activities) {
+  return activities.reduce((sum, a) => sum + a.distance, 0);
+}
+
+// 3. REFACTOR - Improve while tests stay green
+function calculateTotalDistance(activities: Activity[]): number {
+  return activities.reduce((sum, a) => sum + (a.distance || 0), 0);
+}
 ```
-
-### State Management
-
-- **authStore**: Access tokens, athlete data
-- **stravaConfigStore**: Client ID/Secret
-- **settingsStore**: UI preferences
-
-## 🧪 Testing Guidelines
 
 ### Test Structure
 
 ```typescript
 describe('ComponentName', () => {
   beforeEach(() => {
-    // Setup mocks
+    // Setup: Reset mocks, clear stores
+    vi.clearAllMocks();
   });
 
-  describe('feature group', () => {
-    it('should do specific thing', () => {
-      // Arrange, Act, Assert
+  describe('Feature: User Authentication', () => {
+    it('should display login button when not authenticated', () => {
+      // Arrange
+      const { getByRole } = render(<Component />);
+
+      // Act
+      const button = getByRole('button', { name: /login/i });
+
+      // Assert
+      expect(button).toBeInTheDocument();
+    });
+
+    it('should redirect after successful login', async () => {
+      // Arrange, Act, Assert with async
+      const user = userEvent.setup();
+      render(<LoginForm />);
+
+      await user.click(screen.getByRole('button'));
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+      });
     });
   });
 });
 ```
+
+### Testing Patterns
+
+#### Component Testing
+
+- Use React Testing Library (`render`, `screen`, `userEvent`)
+- Test user interactions, not implementation details
+- Query by accessible roles: `getByRole`, `getByLabelText`
+- Avoid querying by class names or test IDs when possible
+
+#### Store Testing
+
+- Mock stores with `vi.mock()`
+- Test state changes and side effects
+- Verify localStorage persistence
+
+```typescript
+vi.mock('../stores/authStore', () => ({
+  useAuthStore: vi.fn(() => ({
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+}));
+```
+
+###🏛️ Architectural Guidelines
+
+### Caching Strategy
+
+**TanStack Query (React Query)** provides intelligent caching:
+
+```typescript
+useQuery({
+  queryKey: ['activities', year],
+  queryFn: () => fetchActivities(year),
+  staleTime: 1000 * 60 * 60, // 1 hour - data stays fresh
+  gcTime: 1000 * 60 * 60 * 24, // 24 hours - cache retention
+  refetchOnWindowFocus: false, // Don't refetch on tab focus
+});
+```
+
+**Incremental Data Fetching:**
+
+- Store last activity timestamp per year
+- Fetch only new activities since last sync
+- 1-day buffer for activity updates
+- Merge and deduplicate on client side
+
+**localStorage Persistence:**
+
+- Auth tokens (authStore)
+- Settings (settingsStore)
+- Last sync times (dataSyncStore)
+- Language preference (languageStore)
+
+**Cache invalidation:**
+
+- Manual refresh via UI button
+- Automatic refresh after 1 hour stale time
+- Token expiry triggers re-auth
+
+### Rate Limit Respect
+
+**Strava API Limits:**
+
+- 100 requests per 15 minutes
+- 1,000 requests per day
+
+**Implementation:**
+
+```typescript
+// api/strava/client.ts
+interceptors.response.use((response) => {
+  const rateLimit = response.headers['x-ratelimit-limit'];
+  const rateUsage = response.headers['x-ratelimit-usage'];
+  console.log(`Rate Limit: ${rateUsage}/${rateLimit}`);
+  return response;
+});
+```
+
+**Best practices:**
+
+- Use pagination (max 200 items per request)
+- Implement incremental fetching
+- Cache aggressively (1 hour stale time)
+- Batch operations when possible
+- Handle 429 errors gracefully
+
+**Typical usage:**
+
+- Initial load: 1-5 requests (depending on activity count)
+- Subsequent visits: 0-2 requests (cache hit + incremental)
+- Page reload < 1 hour: 0 requests (cache)
+
+### Internationalization (i18n)
+
+**Language Support:**
+
+- English (en) - Default
+- Nederlands (nl) - Dutch
+
+**Implementation:**
+
+```typescript
+// In components
+const { t } = useTranslation();
+<h1>{t('app.title')}</h1>
+
+// With variables
+t('yearInReview.closingMessageYear', { year: 2024 })
+
+// In stores
+const { language, setLanguage } = useLanguageStore();
+```
+
+**File structure:**
+
+```
+src/locales/
+├── en.json    # English translations
+└── nl.json    # Dutch translations
+```
+
+**Adding translations:**
+
+1. Never hardcode user-facing text
+2. Add keys to both locale files
+3. Use dot notation: `namespace.key`
+4. Test in all languages
+5. Consider string length variations
+
+**Language detection:**
+
+- Browser language auto-detected
+- User preference persisted in localStorage
+- Switcher in sidebar (desktop) and more menu (mobile)
+
+See [docs/I18N.md](docs/I18N.md) for complete i18n guide.
+
+### Desktop & Mobile Support
+
+**Responsive Design Strategy:**
+
+**Breakpoints (Tailwind):**
+
+```
+sm:  640px   - Small tablets
+md:  768px   - Tablets, sidebar appears
+lg:  1024px  - Desktop
+xl:  1280px  - Large desktop
+```
+
+**Mobile-first approach:**
+
+```tsx
+// Base: mobile styles
+className = 'px-3 py-2';
+
+// Add desktop styles
+className = 'px-3 py-2 md:px-6 md:py-4';
+```
+
+**Navigation:**
+
+- **Desktop (md+)**: Left sidebar with hover expand
+- **Mobile**: Bottom navigation bar + drawer menu
+
+**Layout patterns:**
+
+```tsx
+{
+  /* Hide on mobile, show on desktop */
+}
+className = 'hidden md:block';
+
+{
+  /* Show on mobile, hide on desktop */
+}
+className = 'block md:hidden';
+
+{
+  /* Responsive grid */
+}
+className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+```
+
+**Touch vs Click:**
+
+- Use adequate touch targets (min 44x44px)
+- Hover states for desktop only
+- Swipe gestures considered for mobile
+
+**Performance:**
+
+- Lazy load images
+- Code splitting for routes
+- Smaller images on mobile
+- Conditional rendering based on screen size
+
+### State Management Patterns
+
+**Zustand Stores:**
+
+```typescript
+// Persist to localStorage
+create()(
+  persist(
+    (set) => ({
+      /* state */
+    }),
+    { name: 'store-name' }
+  )
+);
+
+// No persistence
+create()((set) => ({
+  /* state */
+}));
+```
+
+**Store organization:**
+
+- `authStore` - Authentication state
+- `settingsStore` - UI preferences, filters
+- `stravaConfigStore` - API credentials
+- `dataSyncStore` - Sync metadata
+- `loadingStore` - Loading states
+- `themeStore` - Theme preferences
+- `languageStore` - Language selection
+
+**Best practices:**
+
+- Keep stores focused (SRP)
+- Use TypeScript interfaces
+- Export typed hooks
+- Test store behavior in isolation
+
+### Error Handling
+
+**API errors:**
+
+```typescript
+try {
+  const data = await api.fetchData();
+} catch (error) {
+  if (error.response?.status === 429) {
+    // Rate limit exceeded
+  } else if (error.response?.status === 401) {
+    // Token expired - trigger refresh
+  } else {
+    // Generic error handling
+  }
+}
+```
+
+**User feedback:**
+
+- Loading states (LoadingProgress component)
+- Error messages in UI
+- Toast notifications for actions
+- Fallback UI for errors
+
+## 🔒 Security Considerations
+
+### Never Commit
+
+- API keys or secrets
+- `.env` files (use `.env.example` templates)
+- Tokens or credentials
+- User data or PII
+- Strava Client Secret
+
+### Always
+
+- Validate user input
+- Sanitize data before display
+- Use TypeScript for type safety
+- Keep dependencies updated (`npm audit`)
+- Review `dependabot` PRs promptly
+- Use HTTPS for all API requests
+
+### Strava API Security
+
+- OAuth 2.0 flow only
+- Tokens stored in localStorage (not cookies)
+- Client Secret never exposed in frontend
+- HTTPS for all Strava API requests
+- Handle 401/403 properly (re-auth)
+- Respect rate limits (prevent abuse)
+
+### Data Privacy
+
+- No data sent to external servers (except Strava API)
+- All processing happens client-side
+- localStorage only - no cookies
+- No analytics or tracking
+- User controls their data completely
+
+### CI/CD Pipeline Security
+
+**GitHub Actions Security Best Practices:**
+
+**1. Action Version Pinning (SHA Locking)**
+
+```yaml
+# ✅ GOOD - Pinned to specific SHA with version comment
+uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+
+# ❌ BAD - Floating tag (can be hijacked)
+uses: actions/checkout@v4
+```
+
+**Why pin to SHA:**
+
+- Prevents supply chain attacks
+- Tag references can be moved to malicious code
+- SHA is immutable - guarantees exact code version
+- Comment shows human-readable version
+
+**Current pinned actions:**
+
+- `actions/checkout@eef61447...` (v4.2.1)
+- `actions/setup-node@0a44ba78...` (v4.0.4)
+- `actions/upload-artifact@b4b15b8c...` (v4.4.3)
+- `codecov/codecov-action@b9fd7d16...` (v4.6.0)
+
+**2. Minimal Permissions (Principle of Least Privilege)**
+
+```yaml
+# Workflow level - default to minimal
+permissions:
+  contents: read # Only read access
+
+# Job level - grant only what's needed
+jobs:
+  build:
+    permissions:
+      contents: read # No write access unless required
+```
+
+**Never grant:**
+
+- `write` permissions unless absolutely necessary
+- `permissions: write-all` (dangerous)
+- Unnecessary scopes
+
+**3. Secret Management**
+
+```yaml
+# Use GitHub Secrets, never hardcode
+token: ${{ secrets.CODECOV_TOKEN }}
+
+# Disable credential persistence
+with:
+  persist-credentials: false
+```
+
+**4. Dependency Installation Security**
+
+```yaml
+# Use npm ci (clean install) not npm install
+run: npm ci --ignore-scripts
+
+# --ignore-scripts prevents malicious postinstall scripts
+```
+
+**5. Concurrency Control**
+
+```yaml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true # Save resources, prevent duplicate runs
+```
+
+### Dependency Management & Version Pinning
+
+**package.json Strategy:**
+
+```json
+{
+  "dependencies": {
+    "react": "^19.2.0", // Allow patch updates
+    "axios": "^1.13.2" // Minor updates acceptable
+  },
+  "devDependencies": {
+    "vite": "^7.2.4" // Caret allows minor updates
+  }
+}
+```
+
+**Version Ranges:**
+
+- `^X.Y.Z` - Allow minor and patch updates (recommended)
+- `~X.Y.Z` - Allow only patch updates (stricter)
+- `X.Y.Z` - Exact version (too strict, miss security patches)
+
+**package-lock.json:**
+
+- **Always committed** - ensures reproducible builds
+- Locks transitive dependencies to exact versions
+- `npm ci` respects lockfile exactly
+- Update with `npm update` when needed
+
+**Security Workflow:**
+
+1. **Automated Security Scanning:**
+   - CodeQL (`.github/workflows/codeql.yml`)
+   - Dependency Review (`.github/workflows/dependency-review.yml`)
+   - npm audit in CI pipeline
+
+2. **Dependabot:**
+   - Automatically creates PRs for updates
+   - Includes security patches
+   - Review and merge promptly
+
+3. **Manual Audits:**
+
+```bash
+npm audit                    # Check for vulnerabilities
+npm audit fix               # Auto-fix compatible issues
+npm audit fix --force       # Force fix (may break things)
+npm outdated               # Check for updates
+```
+
+4. **Before Merging:**
+   - [ ] Review dependency changes
+   - [ ] Check for breaking changes in changelogs
+   - [ ] Run full test suite
+   - [ ] Verify build still works
+   - [ ] Check bundle size impact
+
+**Security Levels:**
+
+- `low` - Monitor
+- `moderate` - Fix in next release
+- `high` - Fix immediately
+- `critical` - Emergency patch
+
+### Security Checklist for PRs
+
+When reviewing or creating PRs:
+
+- [ ] No secrets, API keys, or tokens in code
+- [ ] All actions pinned to SHA (not tags)
+- [ ] Minimal permissions in workflows
+- [ ] `npm audit` passes (moderate+)
+- [ ] No suspicious dependency additions
+- [ ] User input validated and sanitized
+- [ ] HTTPS for all external requests
+- [ ] TypeScript strict mode enforced
+- [ ] Tests cover security-critical paths
+- [ ] No console.log with sensitive data
+- **Critical paths**: 100% (auth, config, data fetching)
+- **Overall target**: 80%+ statements
+- **Run coverage**: `npm run test:coverage`
+- Coverage report in `coverage/` directory
+
+### When to Write Tests
+
+**Always:**
+
+- New components and hooks
+- Business logic and utilities
+- Store state management
+- API integration code
+- Bug fixes (regression tests)
+
+**Test file naming:**
+
+- Place in `__tests__/` subdirectory
+- Name: `ComponentName.test.tsx` or `utilityName.test.ts`
+
+### Testing Checklist
+
+- [ ] Positive cases (happy path)
+- [ ] Negative cases (errors, edge cases)
+- [ ] Loading states
+- [ ] User interactions (clicks, input)
+- [ ] Async operations
+- [ ] Accessibility (screen reader labels)
+- [ ] Responsive behavior (if applicable)> {
+      beforeEach(() => {
+      // Setup mocks
+      });
+
+  describe('feature group', () => {
+  it('should do specific thing', () => {
+  // Arrange, Act, Assert
+  });
+  });
+  });
+
+````
 
 ### Testing Patterns
 
@@ -199,29 +745,64 @@ describe('ComponentName', () => {
 
 ## 🛠️ Development Commands
 
+### Testing
+
 ```bash
-# Development
-npm run dev              # Start dev server (port 5173)
-npm run build           # Production build
-npm run preview         # Preview build
+npm test                # Run tests in watch mode
+npm test -- --run       # Run tests once (CI mode)
+npm run test:coverage   # Run with coverage report
+npm run test:ui         # Open Vitest UI for visual test debugging
+````
 
-# Quality Checks
-npm run type-check      # TypeScript
-npm run lint            # ESLint
-npm run lint:fix        # Auto-fix
-npm run format          # Prettier
-npm run format:check    # Check formatting
+**Test-Driven Development (TDD) Workflow:**
 
-# Testing
-npm test                # Watch mode
-npm test -- --run       # Single run
-npm run test:coverage   # With coverage
-npm run test:ui         # Vitest UI
+1. Write failing test first
+2. Implement minimum code to pass
+3. Refactor while keeping tests green
+4. Repeat
 
-# All Checks
-npm run validate        # Run all checks
-npm run ci:local        # Simulate CI
+### Linting & Formatting
+
+```bash
+npm run lint            # Check for linting errors (ESLint)
+npm run lint:fix        # Auto-fix linting issues
+npm run format          # Format code with Prettier
+npm run format:check    # Check if code is formatted correctly
 ```
+
+**Pre-commit**: Husky + lint-staged automatically runs on `git commit`
+
+### Type Checking
+
+```bash
+npm run type-check      # TypeScript compilation check (no emit)
+```
+
+### Building
+
+```bash
+npm run build           # Production build (includes type-check)
+npm run preview         # Preview production build locally
+```
+
+**Build output**: `dist/` directory with optimized assets
+
+### Development Server
+
+```bash
+npm run dev             # Start dev server (http://localhost:5173)
+```
+
+**Hot Module Replacement (HMR)** enabled for instant updates
+
+### Complete Validation
+
+```bash
+npm run validate        # Run all checks: type-check + lint + format + test
+npm run ci:local        # Simulate CI pipeline locally
+```
+
+**Before pushing**: Always run `npm run validate` to catch issues early
 
 ## 📝 Code Patterns
 

@@ -1,0 +1,313 @@
+{
+  "app": {
+    "title": "Sportjaar",
+    "tagline": "Jouw Epische Sportjaar"
+  },
+  "navigation": {
+    "review": "Overzicht",
+    "yearReview": "Jaaroverzicht",
+    "stats": "Statistieken",
+    "map": "Kaart",
+    "custom": "Aangepast",
+    "customize": "Aanpassen",
+    "settings": "Instellingen",
+    "more": "Meer",
+    "guide": "Gids",
+    "strava": "Strava",
+    "light": "Licht",
+    "dark": "Donker",
+    "github": "GitHub",
+    "support": "Ondersteuning",
+    "logout": "Uitloggen"
+  },
+  "moreMenu": {
+    "title": "Meer Opties",
+    "lightMode": "Lichte Modus",
+    "darkMode": "Donkere Modus",
+    "github": "GitHub",
+    "support": "Support",
+    "settings": "Instellingen",
+    "customize": "Aanpassen",
+    "logout": "Uitloggen",
+    "language": "Taal"
+  },
+  "yearSelector": {
+    "last365Days": "Laatste 365 Dagen"
+  },
+  "yearInReview": {
+    "title": "{{year}}",
+    "last365Title": "Laatste 365 Dagen",
+    "tagline": "Jouw Epische Sportjaar",
+    "share": "Delen",
+    "createSocialCard": "Maak Sociale Media Kaart",
+    "totalDistance": "Totale Afstand",
+    "totalTime": "Totale Tijd",
+    "activities": "Activiteiten",
+    "longestRide": "Langste Rit",
+    "longestRun": "Langste Loop",
+    "longestSwim": "Langste Zwempartij",
+    "achievementTimeline": "Prestatie Tijdlijn",
+    "raceHighlights": "Race Hoogtepunten",
+    "sportHighlights": "Sport Hoogtepunten",
+    "activityHeatmap": "Activiteiten Heatmap",
+    "everyDay": "Elke dag dat je verscheen, werd je sterker.",
+    "closingMessage": "Op naar nog meer epische avonturen",
+    "closingMessageYear": "in {{year}}",
+    "closingMessageAhead": "vooruit",
+    "restDay": "Rustdag",
+    "highlights": "Hoogtepunten",
+    "total": "totaal",
+    "elevation": "hoogtemeters",
+    "longest": "Langste",
+    "distance": "Afstand",
+    "time": "Tijd",
+    "pace": "Tempo",
+    "avgPace": "Gem. Tempo",
+    "avgSpeed": "Gem. Snelheid",
+    "activityCalendar": "Activiteitenkalender",
+    "trainingConsistency": "Je trainingsconsistentie gedurende het jaar",
+    "biggestClimb": "Grootste Klim",
+    "triathlons": "Triathlons",
+    "epicMultiSport": "episch multi-sport avontuur",
+    "epicMultiSportPlural": "epische multi-sport avonturen",
+    "otherAchievements": "Andere Prestaties",
+    "morePerformances": "Nog meer ongelooflijke prestaties",
+    "epicYear": "Wat een Episch Jaar!",
+    "crushedDistance": "Je hebt",
+    "across": "over",
+    "dedicating": "en besteedde",
+    "toYourPassion": "aan je passie"
+  },
+  "stats": {
+    "distance": "Afstand",
+    "time": "Tijd",
+    "activeHours": "Actieve Uren",
+    "activities": "Activiteiten",
+    "elevation": "Hoogtemeters",
+    "calories": "Calorieën Verbrand",
+    "kudos": "Kudos",
+    "avgPace": "Gem. Tempo",
+    "avgSpeed": "Gem. Snelheid",
+    "longestActivity": "Langste Activiteit",
+    "daysActive": "Actieve Dagen",
+    "kmDistance": "km Afstand",
+    "mElevation": "m Hoogtemeters",
+    "avgSpeedKmh": "Gem. Snelheid (km/u)",
+    "longestKm": "Langste (km)",
+    "biggestClimbM": "Grootste Klim (m)",
+    "avgHeartRate": "Gem. Hartslag",
+    "maxSpeedKmh": "Max Snelheid (km/u)",
+    "caloriesBurned": "Verbrande Calorieën"
+  },
+  "activities": {
+    "all": "Alle Activiteiten",
+    "running": "Hardlopen",
+    "cycling": "Fietsen",
+    "swimming": "Zwemmen",
+    "viewActivity": "Bekijk Activiteit"
+  },
+  "socialCard": {
+    "yearInSports": "Jaar in Sport",
+    "share": "Delen",
+    "download": "Downloaden",
+    "shareTitle": "{{year}} Jaar in Sport",
+    "shareText": "Mijn {{year}} Jaar in Sport! 🏃‍♂️🚴‍♂️ #JaarInSport #Strava",
+    "cancel": "Annuleren",
+    "preparing": "Voorbereiden...",
+    "exporting": "Exporteren...",
+    "shareButton": "🚀 Delen",
+    "downloadButton": "📥 Downloaden",
+    "stats": "statistiek",
+    "statsPlural": "statistieken",
+    "noHighlights": "Geen hoogtepunten",
+    "highlight": "hoogtepunt",
+    "highlightsPlural": "hoogtepunten",
+    "downloadSuccess": "Afbeelding gedownload en deeltekst gekopieerd naar klembord! 📋\nPlak het bij het delen op Strava of andere platforms.",
+    "shareFailed": "Delen mislukt. Probeer te downloaden."
+  },
+  "settings": {
+    "title": "Instellingen",
+    "stravaSettings": "Strava Instellingen",
+    "customizeView": "Weergave Aanpassen",
+    "sportBreakdown": "Sport Verdeling",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "apply": "Toepassen"
+  },
+  "loading": {
+    "checking": "Strava verbinding controleren",
+    "fetching": "Jouw activiteiten ophalen van Strava",
+    "transforming": "Activiteitengegevens transformeren",
+    "aggregating": "Statistiekenmodel bouwen"
+  },
+  "login": {
+    "title": "Welkom bij Sportjaar",
+    "subtitle": "Verbind je Strava account om je sportjaar te bekijken",
+    "connectButton": "Verbind met Strava"
+  },
+  "errors": {
+    "loadingFailed": "Laden van activiteiten mislukt",
+    "noActivities": "Geen activiteiten gevonden voor deze periode",
+    "tryAgain": "Probeer opnieuw"
+  },
+  "onboarding": {
+    "welcome": "Welkom bij Sportjaar!",
+    "getStarted": "Laten we beginnen met jouw sportreis"
+  },
+  "units": {
+    "km": "km",
+    "mi": "mi",
+    "m": "m",
+    "hours": "u",
+    "minutes": "min",
+    "seconds": "s"
+  },
+  "months": {
+    "short": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mrt": "Mrt",
+      "apr": "Apr",
+      "mei": "Mei",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "okt": "Okt",
+      "nov": "Nov",
+      "dec": "Dec"
+    }
+  },
+  "days": {
+    "mon": "Ma",
+    "tue": "Di",
+    "wed": "Wo",
+    "thu": "Do",
+    "fri": "Vr",
+    "sat": "Za",
+    "sun": "Zo"
+  },
+  "statsOverview": {
+    "title": "{{year}} Overzicht",
+    "totalDistance": "Totale Afstand",
+    "totalElevation": "Totale Hoogtemeters",
+    "totalTime": "Totale Tijd",
+    "activities": "Activiteiten",
+    "longestActivity": "Langste Activiteit",
+    "mostElevation": "Meeste Hoogtemeters"
+  },
+  "statsSelector": {
+    "title": "Selecteer Statistieken",
+    "subtitle": "Kies 1-4 statistieken om weer te geven op je sociale media kaart",
+    "selectOne": "Je moet minimaal 1 statistiek selecteren",
+    "maxFour": "Je kunt maximaal 4 statistieken selecteren",
+    "confirm": "Bevestig Selectie",
+    "close": "Sluiten",
+    "selected": "{{count}} van 4 geselecteerd",
+    "ready": "Klaar",
+    "selectAtLeastOne": "Selecteer minimaal 1",
+    "cancel": "Annuleren",
+    "nextSelectHighlights": "Volgende: Selecteer Hoogtepunten"
+  },
+  "activityBreakdown": {
+    "activities": "activiteiten",
+    "totalDistance": "Totale Afstand",
+    "totalTime": "Totale Tijd",
+    "avgDistance": "Gem. Afstand",
+    "avgSpeed": "Gem. Snelheid",
+    "avgPace": "Gem. Tempo",
+    "elevation": "Hoogtemeters",
+    "longestActivity": "Langste Activiteit",
+    "totalElevation": "Totale Hoogtemeters",
+    "avgPerActivity": "Gem. {{value}} m per activiteit"
+  },
+  "loading": {
+    "title": "Activiteiten Laden",
+    "subtitle": "Even geduld terwijl we je gegevens voorbereiden...",
+    "complete": "{{progress}}% Voltooid",
+    "helpText": "Dit kan even duren afhankelijk van de hoeveelheid gegevens...",
+    "stages": {
+      "checking": "Strava verbinding controleren",
+      "fetching": "Je activiteiten ophalen van Strava",
+      "transforming": "Activiteitengegevens transformeren",
+      "aggregating": "Statistiekmodel bouwen"
+    }
+  },
+  "yearInReviewSettings": {
+    "title": "Pas Jaaroverzicht Aan",
+    "tabs": {
+      "background": "Achtergrond",
+      "types": "Activiteit Types",
+      "filters": "Geavanceerde Filters",
+      "stats": "Statistieken Weergave"
+    },
+    "background": {
+      "title": "Achtergrondafbeelding",
+      "subtitle": "Pas de achtergrond aan voor je Jaaroverzicht presentatie",
+      "upload": "Upload Afbeelding",
+      "urlPlaceholder": "Of plak afbeeldings-URL",
+      "setUrl": "Stel URL in",
+      "remove": "Verwijder Achtergrond",
+      "sizeLimit": "Afbeeldingsgrootte moet kleiner zijn dan 5MB",
+      "uploadFailed": "Kan bestand niet lezen. Probeer opnieuw."
+    },
+    "close": "Sluiten",
+    "reset": "Alles Resetten"
+  },
+  "dashboard": {
+    "activityTrends": "Activiteit Trends",
+    "sportBreakdown": "Per sport",
+    "activityMap": "Activiteiten Kaart",
+    "customize": "Aanpassen",
+    "noActivitiesSelected": "Geen activiteiten geselecteerd voor Sport Verdeling.",
+    "configureActivities": "Configureer Activiteiten",
+    "allActivitiesFor": "Alle activiteiten voor {{year}} gevisualiseerd op een kaart. Klik op een route voor details."
+  },
+  "charts": {
+    "monthlyBreakdown": "Maandelijkse Verdeling",
+    "monthlyTrends": "Maandelijkse Trends",
+    "weeklyTrends": "Wekelijkse Trends",
+    "byActivityType": "Per Activiteit Type",
+    "activityTypes": "Activiteit Types",
+    "noActivitiesYet": "Nog geen activiteiten",
+    "view": "Weergave",
+    "sport": "Sport",
+    "all": "Alle",
+    "allSports": "Alle Sporten",
+    "month": "Maand",
+    "week": "Week",
+    "metrics": {
+      "distance": "Afstand",
+      "time": "Tijd",
+      "elevation": "Hoogtemeters",
+      "activities": "Activiteiten",
+      "count": "Aantal"
+    },
+    "units": {
+      "km": "km",
+      "hours": "uur",
+      "activities": "activiteiten",
+      "meters": "m"
+    }
+  },
+  "activityTypes": {
+    "Run": "Hardlopen",
+    "Ride": "Fietsen",
+    "Swim": "Zwemmen",
+    "Walk": "Wandelen",
+    "Hike": "Wandelen",
+    "VirtualRide": "Virtueel Fietsen",
+    "WeightTraining": "Krachttraining",
+    "Workout": "Workout"
+  },
+  "achievements": {
+    "title": "Prestatie Tijdlijn",
+    "subtitle": "Jouw grootste prestaties gedurende het jaar",
+    "sportHighlights": "Sport Hoogtepunten",
+    "sportHighlightsSubtitle": "Jouw beste prestaties in elke sport",
+    "longestRun": "Langste Loop",
+    "biggestClimb": "Grootste Klim",
+    "longestRide": "Langste Rit",
+    "longestSwim": "Langste Zwempartij"
+  }
+}

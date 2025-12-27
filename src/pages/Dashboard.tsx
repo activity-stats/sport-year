@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth.ts';
 import { useYearStats } from '../hooks/useYearStats.ts';
 import { StatsOverview } from '../components/ui/StatsOverview.tsx';
@@ -19,6 +20,7 @@ import { useActivities } from '../hooks/useActivities.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
 import { useThemeStore } from '../stores/themeStore.ts';
+import { useLanguageStore } from '../stores/languageStore.ts';
 import type { ActivityType } from '../types';
 import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
 import { calculateSportHighlights } from '../utils/sportHighlights';
@@ -27,6 +29,7 @@ import { filterActivities } from '../utils/activityFilters';
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
 
 export const Dashboard = () => {
+  const { t } = useTranslation();
   const { athlete, logout } = useAuth();
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number | 'last365'>(currentYear);
@@ -44,6 +47,7 @@ export const Dashboard = () => {
   const loadingError = useLoadingStore((state) => state.error);
   const { yearInReview, sportBreakdown } = useSettingsStore();
   const initializeDefaultFilters = useSettingsStore((state) => state.initializeDefaultFilters);
+  const { language, setLanguage } = useLanguageStore();
 
   // Initialize default filters on mount if none exist
   useEffect(() => {
@@ -69,13 +73,13 @@ export const Dashboard = () => {
     const steps = [
       {
         id: 'checking',
-        label: 'Checking Strava connection',
+        label: t('loading.stages.checking'),
         status:
           loadingStage === 'checking' ? 'active' : loadingStage === 'idle' ? 'pending' : 'complete',
       },
       {
         id: 'fetching',
-        label: 'Fetching your activities from Strava',
+        label: t('loading.stages.fetching'),
         status:
           loadingStage === 'fetching'
             ? 'active'
@@ -85,7 +89,7 @@ export const Dashboard = () => {
       },
       {
         id: 'transforming',
-        label: 'Transforming activity data',
+        label: t('loading.stages.transforming'),
         status:
           loadingStage === 'transforming'
             ? 'active'
@@ -95,7 +99,7 @@ export const Dashboard = () => {
       },
       {
         id: 'aggregating',
-        label: 'Building your statistics model',
+        label: t('loading.stages.aggregating'),
         status:
           loadingStage === 'aggregating'
             ? 'active'
@@ -114,7 +118,7 @@ export const Dashboard = () => {
     }
 
     return steps;
-  }, [loadingStage, loadingError]);
+  }, [loadingStage, loadingError, t]);
 
   // Get unique activity types from current activities
   const availableActivityTypes = useMemo(() => {
@@ -132,7 +136,7 @@ export const Dashboard = () => {
     console.log('[Dashboard] enabledSportActivities:', result);
     console.log('[Dashboard] sportBreakdown:', sportBreakdown);
     return result;
-  }, [sportBreakdown.activities]);
+  }, [sportBreakdown]);
 
   // Calculate highlights for Achievement Timeline
   const { highlights, sportHighlights } = useMemo(() => {
@@ -228,7 +232,9 @@ export const Dashboard = () => {
               title="Show Guide"
             >
               <span className="text-xl">💡</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Guide</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.guide')}</span>
+              )}
             </button>
 
             {/* View Mode Buttons */}
@@ -242,7 +248,9 @@ export const Dashboard = () => {
               title="Year in Review"
             >
               <span className="text-xl">📊</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Year Review</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.yearReview')}</span>
+              )}
             </button>
 
             <button
@@ -255,7 +263,9 @@ export const Dashboard = () => {
               title="Detailed Statistics"
             >
               <span className="text-xl">📈</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Stats</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.stats')}</span>
+              )}
             </button>
 
             <button
@@ -268,7 +278,9 @@ export const Dashboard = () => {
               title="Activity Map"
             >
               <span className="text-xl">🗺️</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Map</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.map')}</span>
+              )}
             </button>
 
             <div className="my-4 border-t border-white/20"></div>
@@ -281,7 +293,9 @@ export const Dashboard = () => {
                 title="Customize Year in Review"
               >
                 <span className="text-xl">🎨</span>
-                {sidebarExpanded && <span className="text-sm font-semibold">Customize</span>}
+                {sidebarExpanded && (
+                  <span className="text-sm font-semibold">{t('navigation.customize')}</span>
+                )}
               </button>
             )}
 
@@ -292,7 +306,9 @@ export const Dashboard = () => {
               title="Strava Settings"
             >
               <span className="text-xl">🔑</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Strava</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.strava')}</span>
+              )}
             </button>
           </nav>
 
@@ -310,7 +326,7 @@ export const Dashboard = () => {
               <span className="text-xl">{currentTheme === 'dark' ? '☀️' : '🌙'}</span>
               {sidebarExpanded && (
                 <span className="text-sm font-semibold">
-                  {currentTheme === 'dark' ? 'Light' : 'Dark'}
+                  {currentTheme === 'dark' ? t('navigation.light') : t('navigation.dark')}
                 </span>
               )}
             </button>
@@ -327,7 +343,9 @@ export const Dashboard = () => {
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                 </svg>
               </span>
-              {sidebarExpanded && <span className="text-sm font-semibold">GitHub</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.github')}</span>
+              )}
             </a>
 
             <a
@@ -338,8 +356,51 @@ export const Dashboard = () => {
               title="Buy Me a Coffee"
             >
               <span className="text-xl">☕</span>
-              {sidebarExpanded && <span className="text-sm font-semibold">Support</span>}
+              {sidebarExpanded && (
+                <span className="text-sm font-semibold">{t('navigation.support')}</span>
+              )}
             </a>
+
+            {/* Language Selector - Desktop */}
+            {sidebarExpanded ? (
+              <div className="w-full">
+                <div className="flex items-center gap-2 px-3 py-2.5 text-white/90 mb-2">
+                  <span className="text-xl">🌐</span>
+                  <span className="text-sm font-semibold">{t('moreMenu.language')}</span>
+                </div>
+                <div className="flex gap-2 px-3">
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      language === 'en'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    EN
+                  </button>
+                  <button
+                    onClick={() => setLanguage('nl')}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      language === 'nl'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    NL
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'nl' : 'en')}
+                className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center justify-center gap-2"
+                title={language === 'en' ? 'Switch to Nederlands' : 'Switch to English'}
+              >
+                <span className="text-xl">🌐</span>
+                <span className="text-sm font-bold">{language.toUpperCase()}</span>
+              </button>
+            )}
           </div>
 
           {/* Logout at bottom */}
@@ -349,7 +410,9 @@ export const Dashboard = () => {
             title="Logout"
           >
             <span className="text-xl">🚪</span>
-            {sidebarExpanded && <span className="text-sm font-semibold">Logout</span>}
+            {sidebarExpanded && (
+              <span className="text-sm font-semibold">{t('navigation.logout')}</span>
+            )}
           </button>
         </div>
       </aside>
@@ -358,10 +421,12 @@ export const Dashboard = () => {
       <div className="md:ml-16 pb-20 md:pb-0">
         {/* Header */}
         <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
-            <div className="flex justify-between items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-3xl font-bold text-white truncate">Sport Year</h1>
+          <div className="max-w-7xl mx-auto pl-3 sm:pl-6 lg:pl-8 pr-2 sm:pr-3 py-3 sm:py-6">
+            <div className="flex justify-between items-center gap-2">
+              <div className="min-w-0 flex-1 mr-2">
+                <h1 className="text-xl sm:text-3xl font-bold text-white truncate">
+                  {t('app.title')}
+                </h1>
                 {athlete && (
                   <p className="text-white/90 text-xs sm:text-sm mt-1 truncate">
                     {athlete.firstname} {athlete.lastname}
@@ -376,9 +441,9 @@ export const Dashboard = () => {
                   const value = e.target.value;
                   setSelectedYear(value === 'last365' ? 'last365' : Number(value));
                 }}
-                className="px-3 sm:px-6 py-2 sm:py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none relative z-10 text-sm sm:text-base flex-shrink-0"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-lg shadow-lg focus:ring-2 focus:ring-white focus:outline-none text-sm sm:text-base flex-shrink-0"
               >
-                <option value="last365">Last 365 Days</option>
+                <option value="last365">{t('yearSelector.last365Days')}</option>
                 {years.map((year) => (
                   <option key={year} value={year}>
                     {year}
@@ -419,11 +484,10 @@ export const Dashboard = () => {
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        Activity Map
+                        {t('dashboard.activityMap')}
                       </h2>
                       <p className="text-gray-600 dark:text-gray-400">
-                        All your activities for {selectedYear} visualized on a map. Click any route
-                        to see details.
+                        {t('dashboard.allActivitiesFor', { year: selectedYear })}
                       </p>
                     </div>
                     <ActivityMap activities={activities} height="calc(100vh - 300px)" />
@@ -441,13 +505,15 @@ export const Dashboard = () => {
                     {/* Sport Details Section */}
                     <div className="space-y-6">
                       <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-3xl font-bold text-gray-900">Sport Breakdown</h2>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                          {t('dashboard.sportBreakdown')}
+                        </h2>
                         <button
                           onClick={() => setShowSportBreakdownSettings(true)}
                           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition flex items-center gap-2"
                         >
                           <span>⚙️</span>
-                          <span>Customize</span>
+                          <span>{t('dashboard.customize')}</span>
                         </button>
                       </div>
                       <div className="grid grid-cols-1 gap-6">
@@ -460,15 +526,15 @@ export const Dashboard = () => {
                             />
                           ))
                         ) : (
-                          <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                            <p className="text-gray-600 mb-4">
-                              No activities selected for Sport Breakdown.
+                          <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                            <p className="text-gray-600 dark:text-gray-400 mb-4">
+                              {t('dashboard.noActivitiesSelected')}
                             </p>
                             <button
                               onClick={() => setShowSportBreakdownSettings(true)}
                               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
                             >
-                              Configure Activities
+                              {t('dashboard.configureActivities')}
                             </button>
                           </div>
                         )}
@@ -477,7 +543,9 @@ export const Dashboard = () => {
 
                     {/* Charts */}
                     <div className="space-y-6">
-                      <h2 className="text-3xl font-bold text-gray-900">Activity Trends</h2>
+                      <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        {t('dashboard.activityTrends')}
+                      </h2>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <MonthlyChart data={stats.byMonth} activities={activities} />
                         <ActivityTypeChart data={stats.byType} />
@@ -539,7 +607,7 @@ export const Dashboard = () => {
             }`}
           >
             <span className="text-2xl">📱</span>
-            <span className="text-xs mt-1 font-medium">Review</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.review')}</span>
           </button>
 
           <button
@@ -549,7 +617,7 @@ export const Dashboard = () => {
             }`}
           >
             <span className="text-2xl">📈</span>
-            <span className="text-xs mt-1 font-medium">Stats</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.stats')}</span>
           </button>
 
           <button
@@ -559,7 +627,7 @@ export const Dashboard = () => {
             }`}
           >
             <span className="text-2xl">🗺️</span>
-            <span className="text-xs mt-1 font-medium">Map</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.map')}</span>
           </button>
 
           <button
@@ -567,7 +635,7 @@ export const Dashboard = () => {
             className="flex flex-col items-center px-4 py-2 text-white/70 rounded-lg"
           >
             <span className="text-2xl">⋯</span>
-            <span className="text-xs mt-1 font-medium">More</span>
+            <span className="text-xs mt-1 font-medium">{t('navigation.more')}</span>
           </button>
         </div>
       </nav>
@@ -586,7 +654,7 @@ export const Dashboard = () => {
             <div className="p-6 space-y-3">
               {/* Header */}
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-white">More Options</h3>
+                <h3 className="text-lg font-bold text-white">{t('moreMenu.title')}</h3>
                 <button
                   onClick={() => setShowMoreMenu(false)}
                   className="text-white/70 hover:text-white text-2xl"
@@ -605,7 +673,7 @@ export const Dashboard = () => {
               >
                 <span className="text-xl">{currentTheme === 'dark' ? '☀️' : '🌙'}</span>
                 <span className="text-sm font-semibold">
-                  {currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                  {t(currentTheme === 'dark' ? 'moreMenu.lightMode' : 'moreMenu.darkMode')}
                 </span>
               </button>
 
@@ -621,7 +689,7 @@ export const Dashboard = () => {
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                   </svg>
                 </span>
-                <span className="text-sm font-semibold">GitHub</span>
+                <span className="text-sm font-semibold">{t('moreMenu.github')}</span>
               </a>
 
               {/* Support Link */}
@@ -632,8 +700,38 @@ export const Dashboard = () => {
                 className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
               >
                 <span className="text-xl">☕</span>
-                <span className="text-sm font-semibold">Support</span>
+                <span className="text-sm font-semibold">{t('moreMenu.support')}</span>
               </a>
+
+              {/* Language Selector */}
+              <div className="w-full px-4 py-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-xl">🌐</span>
+                  <span className="text-sm font-semibold text-white">{t('moreMenu.language')}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`flex-1 px-3 py-2 rounded text-sm font-medium transition ${
+                      language === 'en'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => setLanguage('nl')}
+                    className={`flex-1 px-3 py-2 rounded text-sm font-medium transition ${
+                      language === 'nl'
+                        ? 'bg-white text-gray-900'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    Nederlands
+                  </button>
+                </div>
+              </div>
 
               {/* Settings */}
               <button
@@ -644,7 +742,7 @@ export const Dashboard = () => {
                 className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
               >
                 <span className="text-xl">⚙️</span>
-                <span className="text-sm font-semibold">Settings</span>
+                <span className="text-sm font-semibold">{t('moreMenu.settings')}</span>
               </button>
 
               {/* Custom (only show in presentation mode) */}
@@ -657,7 +755,7 @@ export const Dashboard = () => {
                   className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
                 >
                   <span className="text-xl">🎨</span>
-                  <span className="text-sm font-semibold">Customize</span>
+                  <span className="text-sm font-semibold">{t('moreMenu.customize')}</span>
                 </button>
               )}
 
@@ -670,7 +768,7 @@ export const Dashboard = () => {
                 className="w-full px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3 border border-red-500/30"
               >
                 <span className="text-xl">🚪</span>
-                <span className="text-sm font-semibold">Logout</span>
+                <span className="text-sm font-semibold">{t('moreMenu.logout')}</span>
               </button>
             </div>
           </div>

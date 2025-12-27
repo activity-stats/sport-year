@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Activity } from '../../types/activity';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
 import type { RaceHighlight } from '../../utils/raceDetection';
@@ -25,10 +26,11 @@ interface Achievement {
 }
 
 export function AchievementTimeline({
-  year,
+  year: _year,
   highlights,
   sportHighlights,
 }: AchievementTimelineProps) {
+  const { t } = useTranslation();
   const achievements = useMemo(() => {
     const results: Achievement[] = [];
 
@@ -81,7 +83,7 @@ export function AchievementTimeline({
         date: activity.date,
         type: 'longest',
         activity,
-        label: 'Longest Run',
+        label: t('achievements.longestRun'),
         value: formatDistanceWithUnit(activity.distanceKm * 1000),
         icon: '🏆',
         color: 'bg-gradient-to-r from-blue-400 to-blue-600',
@@ -94,7 +96,7 @@ export function AchievementTimeline({
         date: activity.date,
         type: 'longest',
         activity,
-        label: 'Longest Ride',
+        label: t('achievements.longestRide'),
         value: formatDistanceWithUnit(activity.distanceKm * 1000),
         icon: '🏆',
         color: 'bg-gradient-to-r from-emerald-400 to-emerald-600',
@@ -107,7 +109,7 @@ export function AchievementTimeline({
         date: activity.date,
         type: 'longest',
         activity,
-        label: 'Longest Swim',
+        label: t('achievements.longestSwim'),
         value: formatDistanceWithUnit(activity.distanceKm * 1000),
         icon: '🏆',
         color: 'bg-gradient-to-r from-cyan-400 to-cyan-600',
@@ -121,7 +123,7 @@ export function AchievementTimeline({
         date: activity.date,
         type: 'biggest-climb',
         activity,
-        label: 'Biggest Climb (Run)',
+        label: t('achievements.biggestClimb'),
         value: `${Math.round(activity.elevationGainMeters || 0)}m`,
         icon: '⛰️',
         color: 'bg-gradient-to-r from-green-500 to-emerald-600',
@@ -134,7 +136,7 @@ export function AchievementTimeline({
         date: activity.date,
         type: 'biggest-climb',
         activity,
-        label: 'Biggest Climb (Ride)',
+        label: t('achievements.biggestClimb'),
         value: `${Math.round(activity.elevationGainMeters || 0)}m`,
         icon: '⛰️',
         color: 'bg-gradient-to-r from-green-500 to-emerald-600',
@@ -150,7 +152,7 @@ export function AchievementTimeline({
     });
 
     return unique.sort((a, b) => a.date.getTime() - b.date.getTime());
-  }, [highlights, sportHighlights]);
+  }, [highlights, sportHighlights, t]);
 
   const getAchievementLabel = (achievement: Achievement): string => {
     return achievement.label;
@@ -164,11 +166,9 @@ export function AchievementTimeline({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Achievement Timeline
+          {t('achievements.title')}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
-          No achievements recorded this year yet. Keep training!
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t('charts.noActivitiesYet')}</p>
       </div>
     );
   }
@@ -177,11 +177,9 @@ export function AchievementTimeline({
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Achievement Timeline
+          {t('achievements.title')}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Your personal records and milestones throughout {year}
-        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('achievements.subtitle')}</p>
       </div>
 
       <div className="relative">

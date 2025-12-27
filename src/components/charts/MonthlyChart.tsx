@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart,
   Bar,
@@ -21,6 +22,7 @@ type MetricType = 'distance' | 'time' | 'elevation' | 'activities';
 type ViewMode = 'month' | 'week';
 
 export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
+  const { t } = useTranslation();
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('time');
   const [selectedSport, setSelectedSport] = useState<ActivityType | 'all'>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('month');
@@ -137,10 +139,25 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
   const chartData = viewMode === 'month' ? filteredChartData : weeklyChartData;
 
   const metrics = {
-    distance: { key: 'distance', label: 'Distance', unit: 'km', color: '#3b82f6' },
-    time: { key: 'time', label: 'Time', unit: 'hours', color: '#8b5cf6' },
-    elevation: { key: 'elevation', label: 'Elevation', unit: 'm', color: '#f59e0b' },
-    activities: { key: 'activities', label: 'Activities', unit: 'count', color: '#10b981' },
+    distance: {
+      key: 'distance',
+      label: t('charts.metrics.distance'),
+      unit: 'km',
+      color: '#3b82f6',
+    },
+    time: { key: 'time', label: t('charts.metrics.time'), unit: 'h', color: '#8b5cf6' },
+    elevation: {
+      key: 'elevation',
+      label: t('charts.metrics.elevation'),
+      unit: 'm',
+      color: '#f59e0b',
+    },
+    activities: {
+      key: 'activities',
+      label: t('charts.metrics.activities'),
+      unit: 'count',
+      color: '#10b981',
+    },
   };
 
   const currentMetric = metrics[selectedMetric];
@@ -150,7 +167,7 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {viewMode === 'month' ? 'Monthly' : 'Weekly'} Trends
+            {viewMode === 'month' ? t('charts.monthlyTrends') : t('charts.weeklyTrends')}
           </h3>
           <div className="flex gap-2">
             {(Object.keys(metrics) as MetricType[]).map((metric) => (
@@ -171,42 +188,46 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
 
         {/* View Mode Toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">View:</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('charts.view')}:
+          </span>
           <button
             onClick={() => setViewMode('month')}
             className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
               viewMode === 'month'
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
-            Month
+            {t('charts.month')}
           </button>
           <button
             onClick={() => setViewMode('week')}
             className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
               viewMode === 'week'
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
-            Week
+            {t('charts.week')}
           </button>
         </div>
 
         {/* Sport Filter */}
         {activities && availableSports.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-gray-700">Sport:</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('charts.sport')}:
+            </span>
             <button
               onClick={() => setSelectedSport('all')}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                 selectedSport === 'all'
                   ? 'bg-purple-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
-              All Sports
+              {t('charts.allSports')}
             </button>
             {availableSports.map((sport) => (
               <button
@@ -215,10 +236,10 @@ export const MonthlyChart = ({ data, activities }: MonthlyChartProps) => {
                 className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                   selectedSport === sport
                     ? 'bg-purple-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                {sport}
+                {t(`activityTypes.${sport}`, sport)}
               </button>
             ))}
           </div>
