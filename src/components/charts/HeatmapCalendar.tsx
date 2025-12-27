@@ -4,6 +4,7 @@ import type { Activity } from '../../types/activity';
 interface HeatmapCalendarProps {
   year: number | 'last365';
   activities: Activity[];
+  onDateClick?: (date: Date) => void;
 }
 
 interface DayData {
@@ -14,7 +15,7 @@ interface DayData {
   activities: Activity[];
 }
 
-export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
+export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalendarProps) {
   // Calculate daily totals
   const dailyData = useMemo(() => {
     const days = new Map<string, DayData>();
@@ -214,6 +215,11 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
                               ? `${formatDate(day.date)}: Rest day`
                               : ''
                         }
+                        onClick={() => {
+                          if (isInPeriod && day.activityCount > 0 && onDateClick) {
+                            onDateClick(day.date);
+                          }
+                        }}
                       ></div>
                     );
                   })}

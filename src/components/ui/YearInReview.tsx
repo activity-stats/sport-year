@@ -56,6 +56,7 @@ interface YearInReviewProps {
   athlete: StravaAthlete | null;
   highlightFilters: HighlightFilters;
   backgroundImageUrl?: string | null;
+  onDateClick?: (date: Date) => void;
 }
 
 function SportDetailSection({
@@ -557,6 +558,7 @@ export function YearInReview({
   athlete,
   highlightFilters,
   backgroundImageUrl,
+  onDateClick,
 }: YearInReviewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1122,7 +1124,7 @@ export function YearInReview({
               {t('yearInReview.trainingConsistency')}
             </p>
           </div>
-          <HeatmapCalendar year={year} activities={activities} />
+          <HeatmapCalendar year={year} activities={activities} onDateClick={onDateClick} />
         </div>
 
         {/* Triathlons Section - Moved to top */}

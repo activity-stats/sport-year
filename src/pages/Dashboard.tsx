@@ -40,6 +40,7 @@ export const Dashboard = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const { stats, isLoading, error } = useYearStats(selectedYear);
   const { data: activities } = useActivities(selectedYear);
@@ -251,7 +252,10 @@ export const Dashboard = () => {
 
             {/* View Mode Buttons */}
             <button
-              onClick={() => setViewMode('presentation')}
+              onClick={() => {
+                setViewMode('presentation');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className={`w-full px-3 py-3 rounded-lg transition flex items-center gap-3 ${
                 viewMode === 'presentation'
                   ? 'bg-white text-purple-600 shadow-lg'
@@ -481,6 +485,17 @@ export const Dashboard = () => {
                     athlete={athlete}
                     highlightFilters={yearInReview}
                     backgroundImageUrl={yearInReview.backgroundImageUrl}
+                    onDateClick={(date) => {
+                      setSelectedDate(date);
+                      setViewMode('detailed');
+                      // Scroll to activity list after view change
+                      setTimeout(() => {
+                        const activityList = document.getElementById('activity-list');
+                        if (activityList) {
+                          activityList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }, 100);
+                    }}
                   />
                   <YearInReviewSettings
                     isOpen={showSettings}
@@ -513,6 +528,24 @@ export const Dashboard = () => {
                   <div className="space-y-8">
                     {/* Stats Overview */}
                     <StatsOverview stats={stats} />
+
+                    {/* Heatmap Calendar */}
+                    {activities.length > 0 && (
+                      <HeatmapCalendar
+                        year={selectedYear}
+                        activities={activities}
+                        onDateClick={(date) => {
+                          setSelectedDate(date);
+                          // Scroll to activity list
+                          setTimeout(() => {
+                            const activityList = document.getElementById('activity-list');
+                            if (activityList) {
+                              activityList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 100);
+                        }}
+                      />
+                    )}
 
                     {/* Sport Details Section */}
                     <div className="space-y-6">
@@ -571,15 +604,14 @@ export const Dashboard = () => {
                           sportHighlights={sportHighlights}
                         />
                       )}
-
-                      {/* Heatmap Calendar */}
-                      {activities.length > 0 && (
-                        <HeatmapCalendar year={selectedYear} activities={activities} />
-                      )}
                     </div>
 
                     {/* Activity List */}
-                    <ActivityList activities={activities} />
+                    <ActivityList
+                      activities={activities}
+                      selectedDate={selectedDate}
+                      onClearDateFilter={() => setSelectedDate(null)}
+                    />
                   </div>
                   {showStravaSettings && (
                     <StravaSettings onClose={() => setShowStravaSettings(false)} />

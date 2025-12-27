@@ -10,6 +10,8 @@ import {
 
 interface ActivityListProps {
   activities: Activity[];
+  selectedDate?: Date | null;
+  onClearDateFilter?: () => void;
 }
 
 const ACTIVITY_ICONS: Record<string, string> = {
@@ -21,7 +23,11 @@ const ACTIVITY_ICONS: Record<string, string> = {
   Hike: '🥾',
 };
 
-export const ActivityList = ({ activities }: ActivityListProps) => {
+export const ActivityList = ({
+  activities,
+  selectedDate,
+  onClearDateFilter,
+}: ActivityListProps) => {
   const [filter, setFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'date' | 'distance' | 'duration' | 'elevation'>('date');
   const [searchText, setSearchText] = useState<string>('');
@@ -34,8 +40,13 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
     .filter((activity) => {
       const matchesType = filter === 'All' || activity.type === filter;
       const matchesSearch =
-        searchText === '' || activity.name.toLowerCase().includes(searchText.toLowerCase());
-      return matchesType && matchesSearch;
+        searchText === '' ||
+        activity.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        activity.date.toLocaleDateString().toLowerCase().includes(searchText.toLowerCase());
+      const matchesDate =
+        !selectedDate ||
+        activity.date.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
+      return matchesType && matchesSearch && matchesDate;
     })
     .sort((a, b) => {
       if (sortBy === 'date') return b.date.getTime() - a.date.getTime();
@@ -46,7 +57,10 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
     });
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+    <div
+      id="activity-list"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+    >
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -81,13 +95,38 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
           </div>
         </div>
 
+        {/* Date filter badge */}
+        {selectedDate && (
+          <div className="mb-3 flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg text-sm font-medium">
+              <span>
+                📅{' '}
+                {selectedDate.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+              {onClearDateFilter && (
+                <button
+                  onClick={onClearDateFilter}
+                  className="ml-1 hover:text-blue-600 dark:hover:text-blue-100"
+                  title="Clear date filter"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Search input */}
         <div className="relative">
           <input
             type="text"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search activities by name..."
+            placeholder="Search by name or date..."
             className="w-full px-4 py-2 pl-10 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <svg
