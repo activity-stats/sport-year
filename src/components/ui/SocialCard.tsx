@@ -4,7 +4,7 @@ import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import type { StatOption } from './statsOptions';
-import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
+import { formatDuration } from '../../utils/formatters';
 
 interface SocialCardProps {
   year: number;
@@ -51,12 +51,38 @@ export function SocialCard({
     return names;
   });
 
-  // State for edited times (in minutes)
-  const [editedTimes, setEditedTimes] = useState<Record<string, number>>(() => {
-    const times: Record<string, number> = {};
-    selectedHighlights.forEach((h) => (times[h.id] = h.duration || 0));
-    selectedActivities.forEach((a) => (times[a.id] = a.movingTimeMinutes || 0));
+  // State for edited times (as formatted strings for easier editing)
+  const [editedTimes, setEditedTimes] = useState<Record<string, string>>(() => {
+    const times: Record<string, string> = {};
+    selectedHighlights.forEach((h) => {
+      const seconds = (h.duration || 0) * 60;
+      times[h.id] = formatDuration(seconds);
+    });
+    selectedActivities.forEach((a) => {
+      const seconds = (a.movingTimeMinutes || 0) * 60;
+      times[a.id] = formatDuration(seconds);
+    });
     return times;
+  });
+
+  // State for edited distances (in km)
+  const [editedDistances, setEditedDistances] = useState<Record<string, number>>(() => {
+    const distances: Record<string, number> = {};
+    selectedHighlights.forEach((h) => (distances[h.id] = h.distance || 0));
+    selectedActivities.forEach((a) => (distances[a.id] = a.distanceKm || 0));
+    return distances;
+  });
+
+  // State for edited stat values
+  const [editedStats, setEditedStats] = useState<Record<string, string>>(() => {
+    const statValues: Record<string, string> = {};
+    selectedStats.forEach((stat) => {
+      const value = stat.getValue(stats, daysActive);
+      const parts = value.match(/^([\d,.]+)\s*(.*)$/);
+      const numericValue = parts ? parts[1] : value;
+      statValues[stat.id] = numericValue;
+    });
+    return statValues;
   });
 
   const updateName = (id: string, newName: string) => {
@@ -64,22 +90,84 @@ export function SocialCard({
   };
 
   const updateTime = (id: string, timeString: string) => {
-    // Parse time string in format HH:MM:SS or MM:SS
-    const parts = timeString.split(':').map((p) => parseInt(p) || 0);
-    let minutes = 0;
+    setEditedTimes((prev) => ({ ...prev, [id]: timeString }));
+  };
 
-    if (parts.length === 3) {
-      // HH:MM:SS format
-      minutes = parts[0] * 60 + parts[1] + parts[2] / 60;
-    } else if (parts.length === 2) {
-      // MM:SS format
-      minutes = parts[0] + parts[1] / 60;
-    } else if (parts.length === 1) {
-      // Just minutes
-      minutes = parts[0];
+  const updateDistance = (id: string, distanceString: string) => {
+    const distance = parseFloat(distanceString) || 0;
+    setEditedDistances((prev) => ({ ...prev, [id]: distance }));
+  };
+
+  const updateStat = (statId: string, value: string) => {
+    setEditedStats((prev) => ({ ...prev, [statId]: value }));
+  };
+
+  const handleShare = async () => {
+    if (!cardRef.current) {
+      alert('Card element not found. Please try again.');
+      return;
     }
 
-    setEditedTimes((prev) => ({ ...prev, [id]: minutes }));
+    setIsExporting(true);
+    try {
+      const dataUrl = await domToPng(cardRef.current, {
+        quality: 1,
+        scale: 2,
+      });
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `${year}-year-in-sports.png`, { type: 'image/png' });
+
+      const shareText = `My ${year} Year in Sports! 🏃‍♂️🚴‍♂️ #YearInSports #Strava`;
+
+      // Check if Web Share API is available (works on mobile and some desktop browsers)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `${year} Year in Sports`,
+            text: shareText,
+            files: [file],
+          });
+          console.log('Shared successfully using Web Share API');
+          return;
+        } catch (err) {
+          if ((err as any).name === 'AbortError') {
+            console.log('User cancelled share');
+            return;
+          }
+          console.log('Web Share API failed, falling back:', err);
+        }
+      }
+
+      // Fallback: copy share text and download image
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareText);
+      }
+
+      // Download the image
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${year}-year-in-sports.png`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+
+      alert(
+        'Image downloaded and share text copied to clipboard! 📋\nPaste it when sharing on Strava or other platforms.'
+      );
+    } catch (error) {
+      console.error('Failed to share:', error);
+      alert('Failed to share. Please try downloading instead.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleExport = async () => {
@@ -207,8 +295,8 @@ export function SocialCard({
                 Social Media Card
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                💡 Tip: Click activity titles and times to edit them (e.g., use official race times)
-                • 1200x630px
+                💡 Tip: All fields are editable - click to customize titles, distances, times, and
+                stats • 1200x630px
               </p>
             </div>
             <button
@@ -238,9 +326,9 @@ export function SocialCard({
               </>
             )}
 
-            <div className="absolute inset-0 h-full p-12 flex flex-col text-white">
+            <div className="absolute inset-0 h-full p-8 flex flex-col text-white justify-between">
               {/* Header */}
-              <div className="flex items-start justify-between mb-auto">
+              <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-4xl font-black mb-1 drop-shadow-lg">Year in Sports</h1>
                   <p className="text-3xl font-bold opacity-90 drop-shadow">{athleteName}</p>
@@ -249,20 +337,19 @@ export function SocialCard({
               </div>
 
               {/* Bottom section with stats and highlights */}
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {/* Selected Activities */}
                 {allSelectedItems.length > 0 && (
                   <div className="grid grid-cols-3 gap-6">
                     {allSelectedItems.map((item) => {
-                      const isRaceHighlight = 'badge' in item;
                       const itemId = item.id;
 
                       return (
                         <div
                           key={itemId}
-                          className="bg-white/15 backdrop-blur-md rounded-xl p-5 border border-white/30 shadow-xl"
+                          className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/30 shadow-xl"
                         >
-                          <div className="text-lg font-bold mb-2 drop-shadow">
+                          <div className="text-xl font-bold mb-3 drop-shadow">
                             <input
                               type="text"
                               value={editedNames[itemId] || item.name}
@@ -272,20 +359,20 @@ export function SocialCard({
                               maxLength={50}
                             />
                           </div>
-                          <div className="text-sm opacity-90 font-semibold flex items-center gap-2">
-                            <span>
-                              {isRaceHighlight
-                                ? formatDistanceWithUnit(
-                                    ((item as RaceHighlight).distance || 0) * 1000
-                                  )
-                                : formatDistanceWithUnit(
-                                    ((item as Activity).distanceKm || 0) * 1000
-                                  )}
-                            </span>
+                          <div className="text-base opacity-90 font-semibold flex items-center gap-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={editedDistances[itemId] || 0}
+                              onChange={(e) => updateDistance(itemId, e.target.value)}
+                              className="w-16 bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors text-right"
+                              placeholder="0"
+                            />
+                            <span>km</span>
                             <span>•</span>
                             <input
                               type="text"
-                              value={formatDuration((editedTimes[itemId] || 0) * 60)}
+                              value={editedTimes[itemId] || '0:00'}
                               onChange={(e) => updateTime(itemId, e.target.value)}
                               className="bg-transparent border-b border-white/30 focus:border-white/60 outline-none text-white placeholder-white/60 transition-colors w-20 text-center"
                               placeholder="0:00"
@@ -311,18 +398,26 @@ export function SocialCard({
                 >
                   {selectedStats.map((stat) => {
                     const value = stat.getValue(stats, daysActive);
-                    // Extract numeric value and unit
+                    // Extract numeric value
                     const parts = value.match(/^([\d,.]+)\s*(.*)$/);
-                    const numericValue = parts ? parts[1] : value;
-                    const unit = parts ? parts[2] : '';
+                    const displayValue =
+                      editedStats[stat.id] !== undefined
+                        ? editedStats[stat.id]
+                        : parts
+                          ? parts[1]
+                          : value;
 
                     return (
                       <div key={stat.id} className="text-center">
-                        <div className="text-5xl font-black mb-2 drop-shadow-2xl">
-                          {numericValue}
-                        </div>
-                        <div className="text-lg font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
-                          {unit || stat.label}
+                        <input
+                          type="text"
+                          value={displayValue}
+                          onChange={(e) => updateStat(stat.id, e.target.value)}
+                          className="text-6xl font-black mb-3 drop-shadow-2xl bg-transparent outline-none text-white text-center w-full placeholder-white/60"
+                          placeholder="0"
+                        />
+                        <div className="text-xl font-bold opacity-90 drop-shadow-lg uppercase tracking-wide">
+                          {stat.label}
                         </div>
                       </div>
                     );
@@ -349,11 +444,18 @@ export function SocialCard({
               Cancel
             </button>
             <button
+              onClick={handleShare}
+              disabled={isExporting}
+              className="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all shadow-lg disabled:opacity-50"
+            >
+              {isExporting ? 'Preparing...' : '🚀 Share'}
+            </button>
+            <button
               onClick={handleExport}
               disabled={isExporting}
               className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
             >
-              {isExporting ? 'Exporting...' : '📥 Download Card'}
+              {isExporting ? 'Exporting...' : '📥 Download'}
             </button>
           </div>
         </div>
