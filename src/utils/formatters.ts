@@ -2,11 +2,27 @@
 
 export const formatDistance = (meters: number): string => {
   const km = meters / 1000;
-  return km < 10 ? km.toFixed(2) : km.toFixed(1);
+  const formatted = km < 10 ? km.toFixed(2) : km.toFixed(1);
+  // Use comma as decimal separator
+  return formatted.replace('.', ',');
 };
 
 export const formatDistanceWithUnit = (meters: number): string => {
   return `${formatDistance(meters)} km`;
+};
+
+// Special formatter for closing message - uses thousands separator and one decimal
+export const formatDistanceForClosing = (meters: number): string => {
+  const km = meters / 1000;
+  // Format with thousands separator (.) and one decimal (,)
+  // e.g., 13926.9 becomes 13.926,9
+  const formatted = km.toFixed(1);
+  const [whole, decimal] = formatted.split('.');
+
+  // Add thousands separator
+  const withThousands = whole.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  return `${withThousands},${decimal} km`;
 };
 
 export const formatDuration = (seconds: number): string => {
@@ -36,7 +52,7 @@ export const formatPace = (
   } else {
     // km/h for cycling and others
     const kmh = (metersPerSecond * 3.6).toFixed(1);
-    return `${kmh} km/h`;
+    return `${kmh.replace('.', ',')} km/h`;
   }
 };
 

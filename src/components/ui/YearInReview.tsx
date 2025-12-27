@@ -5,9 +5,15 @@ import type { StravaAthlete } from '../../types/strava';
 import {
   detectRaceHighlights,
   detectRaceHighlightsWithExcluded,
+  detectTriathlons,
+  getTriathlonDisplayInfo,
   type RaceHighlight,
 } from '../../utils/raceDetection';
-import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
+import {
+  formatDistanceWithUnit,
+  formatDuration,
+  formatDistanceForClosing,
+} from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
 import type { ActivityType } from '../../types';
@@ -827,6 +833,67 @@ export function YearInReview({
   const longRuns = highlights.filter((h) => h.type === 'long-run');
   const fondos = highlights.filter((h) => h.type === 'long-ride');
 
+  // Extract all race-marked activities and triathlons (workout_type === 1)
+  const raceItems = useMemo(() => {
+    const items: Array<{
+      type: 'activity' | 'triathlon';
+      data: Activity | RaceHighlight;
+      date: Date;
+      displayName?: string;
+      badge?: string;
+    }> = [];
+    const triathlonActivityIds = new Set<string>();
+
+    // Get all triathlons first to check which ones have race markers
+    const allTriathlons = detectTriathlons(activities);
+
+    // First, add triathlons if any component is marked as race
+    triathlons.forEach((tri) => {
+      if (tri.activities) {
+        const hasRaceMarker = tri.activities.some((a) => a.workoutType === 1);
+        if (hasRaceMarker) {
+          // Mark all triathlon activities to exclude them from standalone list
+          tri.activities.forEach((a) => triathlonActivityIds.add(a.id));
+
+          // Find the corresponding TriathlonRace to get the type info
+          const triathlonRace = allTriathlons.find(
+            (t) =>
+              t.date.toISOString().split('T')[0] ===
+              tri.activities![0].date.toISOString().split('T')[0]
+          );
+
+          // Get proper display name using shared algorithm
+          const { name, badge } = triathlonRace
+            ? getTriathlonDisplayInfo(triathlonRace, tri.activities)
+            : { name: tri.name, badge: tri.badge };
+
+          // Add the triathlon as a single item
+          items.push({
+            type: 'triathlon',
+            data: tri,
+            date: tri.activities[0].date,
+            displayName: name,
+            badge,
+          });
+        }
+      }
+    });
+
+    // Then add all other race-marked activities (excluding triathlon components)
+    activities
+      .filter((a) => a.workoutType === 1 && !triathlonActivityIds.has(a.id))
+      .forEach((a) => {
+        items.push({
+          type: 'activity',
+          data: a,
+          date: a.date,
+        });
+      });
+
+    // Sort by date
+    return items.sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, [activities, triathlons]);
+
   // Extract custom highlights per sport for SportDetailSection
   // Sort by distance to ensure proper ordering
   const runningCustomHighlights = highlights
@@ -962,27 +1029,7 @@ export function YearInReview({
           <HeatmapCalendar year={year} activities={activities} />
         </div>
 
-        {/* Sport Detail Sections */}
-        {sportHighlights.running && (
-          <SportDetailSection
-            highlights={sportHighlights.running}
-            customHighlights={runningCustomHighlights}
-          />
-        )}
-        {sportHighlights.cycling && (
-          <SportDetailSection
-            highlights={sportHighlights.cycling}
-            customHighlights={cyclingCustomHighlights}
-          />
-        )}
-        {sportHighlights.swimming && (
-          <SportDetailSection
-            highlights={sportHighlights.swimming}
-            customHighlights={swimmingCustomHighlights}
-          />
-        )}
-
-        {/* Race Highlights */}
+        {/* Triathlons Section - Moved to top */}
         {triathlons.length > 0 && (
           <div className="container mx-auto px-6 py-16 md:py-20">
             <div className="mb-12">
@@ -1008,6 +1055,26 @@ export function YearInReview({
           </div>
         )}
 
+        {/* Sport Detail Sections */}
+        {sportHighlights.running && (
+          <SportDetailSection
+            highlights={sportHighlights.running}
+            customHighlights={runningCustomHighlights}
+          />
+        )}
+        {sportHighlights.cycling && (
+          <SportDetailSection
+            highlights={sportHighlights.cycling}
+            customHighlights={cyclingCustomHighlights}
+          />
+        )}
+        {sportHighlights.swimming && (
+          <SportDetailSection
+            highlights={sportHighlights.swimming}
+            customHighlights={swimmingCustomHighlights}
+          />
+        )}
+
         {/* Other Achievements */}
         {(longRuns.length > 0 || fondos.length > 0) && (
           <div className="container mx-auto px-6 py-16 md:py-20">
@@ -1031,6 +1098,167 @@ export function YearInReview({
           </div>
         )}
 
+        {/* Race Overview - Timeline View */}
+        {raceItems.length > 0 && (
+          <div className="container mx-auto px-6 py-16 md:py-20">
+            <div className="mb-12">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="text-5xl">🏆</div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+                  {t('yearInReview.raceOverview')}
+                </h2>
+              </div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
+                {t(
+                  raceItems.length === 1
+                    ? 'yearInReview.racesCompleted'
+                    : 'yearInReview.racesCompletedPlural',
+                  { count: raceItems.length }
+                )}
+              </p>
+              <div className="h-1.5 w-32 bg-gradient-to-r from-yellow-500 to-red-600 mx-auto rounded-full"></div>
+            </div>
+
+            {/* Timeline View */}
+            <div className="max-w-4xl mx-auto">
+              <div className="relative">
+                {/* Vertical timeline line */}
+                <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-yellow-500 via-orange-500 to-red-600"></div>
+
+                {/* Timeline items */}
+                <div className="space-y-8">
+                  {raceItems.map((item, index) => {
+                    const isLeft = index % 2 === 0;
+
+                    if (item.type === 'triathlon') {
+                      const tri = item.data as RaceHighlight;
+                      const displayDate =
+                        tri.activities && tri.activities[0] ? tri.activities[0].date : new Date();
+                      const displayName = item.displayName || tri.name;
+                      const badge = item.badge || tri.badge;
+
+                      return (
+                        <div
+                          key={tri.id}
+                          className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+
+                          {/* Content card */}
+                          <div
+                            className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
+                          >
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-2xl">🏊🚴🏃</span>
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                      {displayDate.toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                    {displayName}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">📏</span>
+                                      <span>{formatDistanceWithUnit(tri.distance * 1000)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">⏱️</span>
+                                      <span>{formatDuration((tri.duration || 0) * 60)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs font-bold">
+                                        {badge.split(' ').slice(1).join(' ') || 'Triathlon'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                    <span className="text-2xl">🏆</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      const activity = item.data as Activity;
+                      const activityIcon =
+                        activity.type === 'Run'
+                          ? '🏃'
+                          : activity.type.includes('Ride')
+                            ? '🚴'
+                            : activity.type === 'Swim'
+                              ? '🏊'
+                              : '🏃';
+
+                      return (
+                        <div
+                          key={activity.id}
+                          className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+
+                          {/* Content card */}
+                          <div
+                            className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
+                          >
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-2xl">{activityIcon}</span>
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                      {new Date(activity.date).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                    {activity.name}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">📏</span>
+                                      <span>
+                                        {formatDistanceWithUnit(activity.distanceKm * 1000)}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">⏱️</span>
+                                      <span>{formatDuration(activity.movingTimeMinutes * 60)}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                    <span className="text-2xl">🏆</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer Message */}
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20" />
@@ -1047,7 +1275,7 @@ export function YearInReview({
               <p className="text-2xl md:text-3xl font-light leading-relaxed mb-4">
                 {t('yearInReview.crushedDistance')}{' '}
                 <span className="font-black">
-                  {formatDistanceWithUnit(stats.totalDistanceKm * 1000)}
+                  {formatDistanceForClosing(stats.totalDistanceKm * 1000)}
                 </span>{' '}
                 {t('yearInReview.across')}{' '}
                 <span className="font-black">

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   formatDistance,
   formatDistanceWithUnit,
+  formatDistanceForClosing,
   formatDuration,
   formatPace,
   formatElevation,
@@ -13,27 +14,36 @@ import {
 describe('formatters', () => {
   describe('formatDistance', () => {
     it('should format distance < 10km with 2 decimals', () => {
-      expect(formatDistance(5000)).toBe('5.00');
-      expect(formatDistance(1234)).toBe('1.23');
-      expect(formatDistance(9999)).toBe('10.00');
+      expect(formatDistance(5000)).toBe('5,00');
+      expect(formatDistance(1234)).toBe('1,23');
+      expect(formatDistance(9999)).toBe('10,00');
     });
 
     it('should format distance >= 10km with 1 decimal', () => {
-      expect(formatDistance(10000)).toBe('10.0');
-      expect(formatDistance(42195)).toBe('42.2');
-      expect(formatDistance(100000)).toBe('100.0');
+      expect(formatDistance(10000)).toBe('10,0');
+      expect(formatDistance(42195)).toBe('42,2');
+      expect(formatDistance(100000)).toBe('100,0');
     });
 
     it('should handle zero distance', () => {
-      expect(formatDistance(0)).toBe('0.00');
+      expect(formatDistance(0)).toBe('0,00');
     });
   });
 
   describe('formatDistanceWithUnit', () => {
     it('should format distance with km unit', () => {
-      expect(formatDistanceWithUnit(5000)).toBe('5.00 km');
-      expect(formatDistanceWithUnit(10000)).toBe('10.0 km');
-      expect(formatDistanceWithUnit(42195)).toBe('42.2 km');
+      expect(formatDistanceWithUnit(5000)).toBe('5,00 km');
+      expect(formatDistanceWithUnit(10000)).toBe('10,0 km');
+      expect(formatDistanceWithUnit(42195)).toBe('42,2 km');
+    });
+  });
+
+  describe('formatDistanceForClosing', () => {
+    it('should format distance with thousands separator and one decimal', () => {
+      expect(formatDistanceForClosing(13926900)).toBe('13.926,9 km');
+      expect(formatDistanceForClosing(1234500)).toBe('1.234,5 km');
+      expect(formatDistanceForClosing(5000)).toBe('5,0 km');
+      expect(formatDistanceForClosing(999999)).toBe('1.000,0 km');
     });
   });
 
@@ -73,15 +83,15 @@ describe('formatters', () => {
 
     it('should format pace as km/h for Ride', () => {
       // 8.33 m/s = 30.0 km/h
-      expect(formatPace(8.33, 'Ride')).toBe('30.0 km/h');
+      expect(formatPace(8.33, 'Ride')).toBe('30,0 km/h');
 
       // 5.55 m/s ≈ 20.0 km/h
-      expect(formatPace(5.55, 'Ride')).toBe('20.0 km/h');
+      expect(formatPace(5.55, 'Ride')).toBe('20,0 km/h');
     });
 
     it('should format pace as km/h for other activity types', () => {
-      expect(formatPace(5.0, 'Walk')).toBe('18.0 km/h');
-      expect(formatPace(10.0, 'Hike')).toBe('36.0 km/h');
+      expect(formatPace(5.0, 'Walk')).toBe('18,0 km/h');
+      expect(formatPace(10.0, 'Hike')).toBe('36,0 km/h');
     });
   });
 

@@ -71,6 +71,52 @@ function groupActivitiesByDay(activities: Activity[]): Map<string, Activity[]> {
   return grouped;
 }
 
+// Generate display name and badge for a triathlon
+export function getTriathlonDisplayInfo(tri: TriathlonRace, activities: Activity[]) {
+  // Find the best activity name that contains triathlon-related keywords
+  const triathlonKeywords = /triathlon|ironman|70\.3|t100|challenge/i;
+  const activityWithTriName = activities.find((a) => triathlonKeywords.test(a.name));
+  let bestName = activityWithTriName?.name || activities[0]?.name || 'Triathlon';
+
+  // Clean up the name - remove sport prefixes/suffixes
+  bestName = bestName
+    .replace(/^(swim|bike|run|ride|cycling|running|swimming)\s+/i, '')
+    .replace(/\s+(swim|bike|run|ride|cycling|running|swimming)$/i, '')
+    .replace(/\s*[-:]+\s*$/, '') // Remove trailing dashes and colons
+    .trim();
+
+  if (!bestName) bestName = 'Triathlon';
+
+  let badge = '🏊‍♂️🚴‍♂️🏃‍♂️';
+  let typeName = '';
+
+  if (tri.type === 'full') {
+    badge = '🏆 Full Distance Triathlon';
+    typeName = 'Full Distance Triathlon';
+  } else if (tri.type === 'half') {
+    badge = '🥈 Half Distance Triathlon';
+    typeName = 'Half Distance Triathlon';
+  } else if (tri.type === 'olympic') {
+    badge = '🥉 Olympic Triathlon';
+    typeName = 'Olympic Triathlon';
+  } else if (tri.type === 'sprint') {
+    badge = '⚡ Sprint Triathlon';
+    typeName = 'Sprint Triathlon';
+  } else {
+    typeName = 'Triathlon';
+  }
+
+  // Determine final display name
+  // If name already contains triathlon/type keywords, use as-is
+  // Otherwise use just the type name
+  const hasTypeKeyword = /triathlon|ironman|70\.3|t100|challenge|sprint|olympic|full|half/i.test(
+    bestName
+  );
+  const finalName = hasTypeKeyword ? bestName : typeName;
+
+  return { name: finalName, badge };
+}
+
 // Detect triathlons (swim + bike + run on same day)
 export function detectTriathlons(activities: Activity[]): TriathlonRace[] {
   const byDay = groupActivitiesByDay(activities);
@@ -217,6 +263,15 @@ export function detectRaceHighlights(
       // Get activities of this type
       const typeActivities = activities.filter((a) => a.type === activityFilter.activityType);
 
+      // FIRST: Remove activities that match ignore patterns
+      const filteredTypeActivities = typeActivities.filter(
+        (a) => !shouldExcludeFromHighlights(a, settings?.titleIgnorePatterns)
+      );
+
+      console.log(
+        `  [${activityFilter.activityType}] ${typeActivities.length} total, ${filteredTypeActivities.length} after ignore patterns`
+      );
+
       // Process distance filters with best-match selection PER FILTER
       const filterMatches = new Map<
         string,
@@ -228,7 +283,7 @@ export function detectRaceHighlights(
         const filterKey = `${distFilter.operator}${distFilter.value}${distFilter.unit}`;
         const candidates: { activity: Activity; diff: number }[] = [];
 
-        typeActivities.forEach((activity) => {
+        filteredTypeActivities.forEach((activity) => {
           // Skip if already matched by another filter
           if (customFilteredActivityIds.has(activity.id)) return;
 
@@ -334,12 +389,7 @@ export function detectRaceHighlights(
           continue;
         }
 
-        // Check titleIgnorePatterns - skip if activity title should be excluded from highlights
-        if (shouldExcludeFromHighlights(activity, settings?.titleIgnorePatterns)) {
-          console.log(`    ⚠️ Skipping ${activity.name} - matches title ignore pattern`);
-          continue;
-        }
-
+        // Activity has already been filtered by ignore patterns, so no need to check again here
         customFilteredActivityIds.add(activity.id);
         console.log(
           `    ✅ Adding highlight: ${activity.name} (${activity.distanceKm.toFixed(2)}km)`
@@ -410,17 +460,12 @@ export function detectRaceHighlights(
 
       // Process title patterns (these can match multiple activities)
       activityFilter.titlePatterns.forEach((pattern) => {
-        typeActivities.forEach((activity) => {
+        filteredTypeActivities.forEach((activity) => {
           // Skip if already matched
           if (customFilteredActivityIds.has(activity.id)) return;
 
           if (activity.name.toLowerCase().includes(pattern.toLowerCase())) {
-            // Check titleIgnorePatterns - skip if activity title should be excluded from highlights
-            if (shouldExcludeFromHighlights(activity, settings?.titleIgnorePatterns)) {
-              console.log(`    ⚠️ Skipping ${activity.name} - matches title ignore pattern`);
-              return;
-            }
-
+            // Activity has already been filtered by ignore patterns earlier
             customFilteredActivityIds.add(activity.id);
             const typeEmoji =
               activity.type === 'Run' ? '🏃' : activity.type.includes('Ride') ? '🚴' : '🏊';
@@ -455,67 +500,12 @@ export function detectRaceHighlights(
       Boolean
     ) as Activity[];
 
-    // Find the best name from all activities
-    // Prefer names that contain triathlon keywords
-    let bestName = '';
-    const triathlonKeywords = /triathlon|ironman|70\.3|t100|challenge/i;
-
-    for (const activity of activities) {
-      if (triathlonKeywords.test(activity.name)) {
-        bestName = activity.name;
-        break;
-      }
-    }
-
-    // If no triathlon keyword found, use first non-generic name
-    if (!bestName) {
-      const genericSportNames =
-        /^(swim|bike|run|ride|morning|afternoon|evening|lunch)\s*(swim|bike|run|ride)?$/i;
-      bestName =
-        activities.find((a) => !genericSportNames.test(a.name.trim()))?.name ||
-        activities[0]?.name ||
-        'Triathlon';
-    }
-
-    // Clean up the name - remove standalone sport words at the start or end
-    bestName = bestName
-      .replace(/^(swim|bike|run|ride|cycling|running|swimming)\s+/i, '')
-      .replace(/\s+(swim|bike|run|ride|cycling|running|swimming)$/i, '')
-      .replace(/\s*[-:]+\s*$/, '') // Remove trailing dashes and colons
-      .trim();
-
-    if (!bestName) bestName = 'Triathlon';
-
-    let badge = '🏊‍♂️🚴‍♂️🏃‍♂️';
-    let typeName = '';
-
-    if (tri.type === 'full') {
-      badge = '🏆 Full Distance Triathlon';
-      typeName = 'Full Distance Triathlon';
-    } else if (tri.type === 'half') {
-      badge = '🥈 Half Distance Triathlon';
-      typeName = 'Half Distance Triathlon';
-    } else if (tri.type === 'olympic') {
-      badge = '🥉 Olympic Triathlon';
-      typeName = 'Olympic Triathlon';
-    } else if (tri.type === 'sprint') {
-      badge = '⚡ Sprint Triathlon';
-      typeName = 'Sprint Triathlon';
-    } else {
-      typeName = 'Triathlon';
-    }
-
-    // Determine final display name
-    // If name already contains triathlon/type keywords, use as-is
-    // Otherwise use just the type name
-    const hasTypeKeyword = /triathlon|ironman|70\.3|t100|challenge|sprint|olympic|full|half/i.test(
-      bestName
-    );
-    const finalName = hasTypeKeyword ? bestName : typeName;
+    // Use shared function to get display name and badge
+    const { name, badge } = getTriathlonDisplayInfo(tri, activities);
 
     highlights.push({
       id: `tri-${tri.date.toISOString()}`,
-      name: finalName,
+      name,
       date: tri.date,
       type: 'triathlon',
       distance: tri.totalDistance,
@@ -569,6 +559,15 @@ export function detectRaceHighlightsWithExcluded(
       // Get activities of this type
       const typeActivities = activities.filter((a) => a.type === activityFilter.activityType);
 
+      // FIRST: Remove activities that match ignore patterns
+      const filteredTypeActivities = typeActivities.filter(
+        (a) => !shouldExcludeFromHighlights(a, settings?.titleIgnorePatterns)
+      );
+
+      console.log(
+        `  [${activityFilter.activityType}] ${typeActivities.length} total, ${filteredTypeActivities.length} after ignore patterns`
+      );
+
       // Collect all filter matches FIRST, then sort by proximity to pick the single best match per filter
       const allMatches: {
         distFilter: (typeof activityFilter.distanceFilters)[0];
@@ -578,7 +577,7 @@ export function detectRaceHighlightsWithExcluded(
 
       // For each distance filter, find ALL candidates
       activityFilter.distanceFilters.forEach((distFilter) => {
-        typeActivities.forEach((activity) => {
+        filteredTypeActivities.forEach((activity) => {
           // Skip if already matched by another filter
           if (customFilteredActivityIds.has(activity.id)) return;
 
@@ -697,11 +696,12 @@ export function detectRaceHighlightsWithExcluded(
 
       // Process title patterns (these can match multiple activities)
       activityFilter.titlePatterns.forEach((pattern) => {
-        typeActivities.forEach((activity) => {
+        filteredTypeActivities.forEach((activity) => {
           // Skip if already matched
           if (customFilteredActivityIds.has(activity.id)) return;
 
           if (activity.name.toLowerCase().includes(pattern.toLowerCase())) {
+            // Activity has already been filtered by ignore patterns earlier
             customFilteredActivityIds.add(activity.id);
             const typeEmoji =
               activity.type === 'Run' ? '🏃' : activity.type.includes('Ride') ? '🚴' : '🏊';
