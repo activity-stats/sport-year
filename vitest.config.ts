@@ -21,10 +21,10 @@ export default defineConfig({
       ],
       // Coverage thresholds - enforce minimum coverage
       thresholds: {
-        statements: 80,
-        branches: 70,
-        functions: 75,
-        lines: 80,
+        statements: 88.05,
+        branches: 76.72,
+        functions: 92.1,
+        lines: 88.97,
       },
     },
   },
