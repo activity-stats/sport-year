@@ -1,4 +1,7 @@
 {
+  "common": {
+    "cancel": "Annuleren"
+  },
   "app": {
     "title": "Sportjaar",
     "tagline": "Jouw Epische Sportjaar"
@@ -33,9 +36,13 @@
   "yearInReview": {
     "last365Title": "Laatste 365 Dagen",
     "share": "Delen",
+    "export": "Exporteren",
     "exportPDF": "Exporteren",
-
     "exportFailed": "PDF exporteren mislukt. Probeer opnieuw.",
+    "heroSection": "Hero Sectie",
+    "triathlonsSection": "Triathlons",
+    "customHighlights": "Race overzicht",
+    "closingSection": "Slotbericht",
     "closingMessage": "Op naar nog meer epische avonturen",
     "closingMessageYear": "in {{year}}",
     "closingMessageAhead": "vooruit",
@@ -57,6 +64,8 @@
     "otherAchievements": "Andere Prestaties",
     "morePerformances": "Nog meer ongelooflijke prestaties",
     "raceOverview": "Wedstrijd Overzicht",
+    "racesCompleted": "{{count}} wedstrijd voltooid",
+    "racesCompletedPlural": "{{count}} wedstrijden voltooid",
     "epicYear": "Wat een Episch Jaar!",
     "crushedDistance": "Je hebt",
     "across": "over",
@@ -113,6 +122,13 @@
   },
   "units": {
     "hours": "u"
+  },
+  "export": {
+    "customizeExport": "Export Aanpassen",
+    "format": "Export Formaat",
+    "sections": "Secties om op te nemen",
+    "sectionsDescription": "Selecteer en herschik de secties die je wilt opnemen in je export",
+    "exportButton": "Exporteren"
   },
   "months": {
     "short": {

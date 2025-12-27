@@ -33,7 +33,7 @@ export interface TriathlonRace {
   };
   totalDistance: number;
   totalTime: number;
-  type: 'full' | 'half' | 'olympic' | 'sprint' | 'other';
+  type: 'full' | 'half' | 'olympic' | 'sprint' | 'quarter' | 't100' | 'mountain' | 'other';
 }
 
 export interface RaceHighlight {
@@ -102,6 +102,15 @@ export function getTriathlonDisplayInfo(tri: TriathlonRace, activities: Activity
   } else if (tri.type === 'sprint') {
     badge = '⚡ Sprint Triathlon';
     typeName = 'Sprint Triathlon';
+  } else if (tri.type === 'quarter') {
+    badge = '🔸 Quarter Distance';
+    typeName = 'Quarter Distance';
+  } else if (tri.type === 't100') {
+    badge = '💯 T100';
+    typeName = 'T100';
+  } else if (tri.type === 'mountain') {
+    badge = '⛰️ Mountain Triathlon';
+    typeName = 'Mountain Triathlon';
   } else {
     typeName = 'Triathlon';
   }
@@ -214,13 +223,46 @@ export function detectTriathlons(activities: Activity[]): TriathlonRace[] {
       else if (swimKm >= 1.5 && bikeKm >= 80 && runKm >= 18) {
         type = 'half';
       }
+      // T100: 0.9-2.1km swim (above 0.9, under 2.1), 87-93km bike, 8-12km run
+      else if (
+        swimKm > 0.9 &&
+        swimKm < 2.1 &&
+        bikeKm >= 87 &&
+        bikeKm <= 93 &&
+        runKm >= 8 &&
+        runKm < 12
+      ) {
+        type = 't100';
+      }
       // Olympic: ~1.5km swim, ~40km bike, ~10km run
       else if (swimKm >= 1.0 && bikeKm >= 35 && runKm >= 8) {
         type = 'olympic';
       }
+      // Quarter Distance: 0.9-1.1km swim, 35-45km bike, 8-12km run (under 12)
+      else if (
+        swimKm >= 0.9 &&
+        swimKm <= 1.1 &&
+        bikeKm >= 35 &&
+        bikeKm <= 45 &&
+        runKm >= 8 &&
+        runKm < 12
+      ) {
+        type = 'quarter';
+      }
       // Sprint: ~0.75km swim, ~20km bike, ~5km run
       else if (swimKm >= 0.5 && bikeKm >= 15 && runKm >= 4) {
         type = 'sprint';
+      }
+
+      // Check for Mountain category: elevation gain > 1000m (only if not already full)
+      if (type !== 'full') {
+        const totalElevation =
+          (swim.elevationGainMeters || 0) +
+          (bike.elevationGainMeters || 0) +
+          (run.elevationGainMeters || 0);
+        if (totalElevation > 1000) {
+          type = 'mountain';
+        }
       }
 
       triathlons.push({

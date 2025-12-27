@@ -1,4 +1,7 @@
 {
+  "common": {
+    "cancel": "Cancel"
+  },
   "app": {
     "title": "Sport Year",
     "tagline": "Your Epic Year in Sports"
@@ -33,8 +36,13 @@
   "yearInReview": {
     "last365Title": "Last 365 Days",
     "share": "Share",
+    "export": "Export",
     "exportPDF": "Export",
     "exportFailed": "Failed to export PDF. Please try again.",
+    "heroSection": "Hero Section",
+    "triathlonsSection": "Triathlons",
+    "customHighlights": "Race Overview",
+    "closingSection": "Closing Message",
     "closingMessage": "Here's to even more epic adventures",
     "closingMessageYear": "in {{year}}",
     "closingMessageAhead": "ahead",
@@ -56,6 +64,8 @@
     "otherAchievements": "Other Achievements",
     "morePerformances": "Even more incredible performances",
     "raceOverview": "Race Overview",
+    "racesCompleted": "{{count}} race completed",
+    "racesCompletedPlural": "{{count}} races completed",
     "epicYear": "What an Epic Year!",
     "crushedDistance": "You crushed",
     "across": "across",
@@ -112,6 +122,13 @@
   },
   "units": {
     "hours": "h"
+  },
+  "export": {
+    "customizeExport": "Customize Export",
+    "format": "Export Format",
+    "sections": "Sections to Include",
+    "sectionsDescription": "Select and reorder the sections you want to include in your export",
+    "exportButton": "Export"
   },
   "months": {
     "short": {

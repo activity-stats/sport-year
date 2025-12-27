@@ -49,8 +49,34 @@ function extractKeysFromCode(content: string): string[] {
     let match;
     while ((match = pattern.exec(content)) !== null) {
       const key = match[1];
-      // Filter out invalid keys (empty, single char like '.', or whitespace)
-      if (key && key.length > 1 && key.trim() && !/^[^\w]+$/.test(key)) {
+      // Filter out invalid keys:
+      // - Empty or single character keys
+      // - Keys without word characters (like '.')
+      // - Common HTML elements (div, span, etc.)
+      const htmlElements = [
+        'div',
+        'span',
+        'p',
+        'a',
+        'button',
+        'input',
+        'form',
+        'label',
+        'section',
+        'header',
+        'footer',
+        'nav',
+        'main',
+        'article',
+        'aside',
+      ];
+      if (
+        key &&
+        key.length > 1 &&
+        key.trim() &&
+        !/^[^\w]+$/.test(key) &&
+        !htmlElements.includes(key.toLowerCase())
+      ) {
         keys.push(key);
       }
     }

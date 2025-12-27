@@ -160,13 +160,25 @@ export const Dashboard = () => {
       if (yearInReview.excludedActivityTypes.includes(activity.type)) {
         return false;
       }
+
+      // Also apply title ignore patterns for stats (not highlights)
+      for (const patternObj of yearInReview.titleIgnorePatterns) {
+        if (
+          patternObj.excludeFromStats &&
+          activity.name.toLowerCase().includes(patternObj.pattern.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
       return true;
     });
 
     const sportStats = calculateSportHighlights(
       activitiesForTotals,
       yearInReview.activityFilters,
-      excludedResult.excludedActivityIds
+      excludedResult.excludedActivityIds,
+      yearInReview.titleIgnorePatterns
     );
 
     return {
