@@ -43,9 +43,9 @@ export function ActivitySelector({
         ...(initialSelectedActivities || []).map((a) => a.id),
       ])
     : new Set([
-        ...triathlonHighlights.slice(0, 3).map((h) => h.id),
+        ...triathlonHighlights.slice(0, 6).map((h) => h.id),
         ...highlightActivities
-          .slice(0, Math.max(0, 3 - triathlonHighlights.length))
+          .slice(0, Math.max(0, 6 - triathlonHighlights.length))
           .map((a) => a.id),
       ]);
   const [selected, setSelected] = useState<Set<string>>(initialSelectedIds);
@@ -67,7 +67,7 @@ export function ActivitySelector({
     if (newSelected.has(id)) {
       newSelected.delete(id);
     } else {
-      if (newSelected.size < 3) {
+      if (newSelected.size < 6) {
         newSelected.add(id);
       } else {
         alert(t('errors.maxItemsReached'));
@@ -93,7 +93,7 @@ export function ActivitySelector({
       }
     });
 
-    // Allow 0 to 3 selections
+    // Allow 0 to 6 selections
     onConfirm(selectedRegularActivities, selectedTriathlons);
   };
 
@@ -152,7 +152,7 @@ export function ActivitySelector({
                 Select Highlights
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Choose up to 3 activities to feature on your social card
+                Choose up to 6 activities to feature on your social card
               </p>
             </div>
             <button
@@ -249,7 +249,7 @@ export function ActivitySelector({
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {selected.size} of 3 selected
+            {selected.size} of 6 selected
           </div>
           <div className="flex gap-3">
             {onBack && (

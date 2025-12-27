@@ -36,6 +36,25 @@ export function SocialCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
+  // Format options
+  type ExportFormat = 'landscape' | 'opengraph' | 'square';
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('landscape');
+  const [imageOpacity, setImageOpacity] = useState(0.6);
+  const [textShadow, setTextShadow] = useState(2);
+
+  const formats = {
+    landscape: { width: 1920, height: 1080, label: 'Landscape', description: '16:9 format' },
+    opengraph: {
+      width: 1200,
+      height: 630,
+      label: 'Open Graph',
+      description: 'LinkedIn, Facebook, Twitter',
+    },
+    square: { width: 1080, height: 1080, label: 'Square', description: 'Instagram, Strava' },
+  };
+
+  const currentFormat = formats[selectedFormat];
+
   // Close on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -118,7 +137,8 @@ export function SocialCard({
     try {
       const dataUrl = await domToPng(cardRef.current, {
         quality: 1,
-        scale: 2,
+        width: currentFormat.width,
+        height: currentFormat.height,
       });
 
       const response = await fetch(dataUrl);
@@ -192,7 +212,8 @@ export function SocialCard({
       console.log('Starting card export...');
       const dataUrl = await domToPng(cardRef.current, {
         quality: 1,
-        scale: 2,
+        width: currentFormat.width,
+        height: currentFormat.height,
       });
 
       console.log('Card exported successfully, creating download...');
@@ -272,8 +293,14 @@ export function SocialCard({
     }
   };
 
-  // Combine activities and highlights for display
-  const allSelectedItems = [...selectedHighlights, ...selectedActivities].slice(0, 3);
+  // Combine activities and highlights for display, sorted by date oldest first
+  const allSelectedItems = [...selectedHighlights, ...selectedActivities]
+    .sort((a, b) => {
+      const dateA = 'date' in a ? new Date(a.date).getTime() : 0;
+      const dateB = 'date' in b ? new Date(b.date).getTime() : 0;
+      return dateA - dateB;
+    })
+    .slice(0, 6);
 
   // Debug logging
   console.log('Social Card - Selected highlights:', selectedHighlights);
@@ -309,7 +336,10 @@ export function SocialCard({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 dark:bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-h-[95vh] overflow-y-auto"
+        style={{ maxWidth: '1296px' }}
+      >
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
@@ -319,7 +349,7 @@ export function SocialCard({
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 💡 Tip: All fields are editable - click to customize titles, distances, times, and
-                stats • 1200x630px
+                stats • Current: {currentFormat.width}×{currentFormat.height}px
               </p>
             </div>
             <button
@@ -329,128 +359,401 @@ export function SocialCard({
               ×
             </button>
           </div>
+
+          {/* Format Selector and Controls */}
+          <div className="mt-4 flex gap-4 items-start">
+            <div className="flex gap-2">
+              {(Object.keys(formats) as ExportFormat[]).map((format) => (
+                <button
+                  key={format}
+                  onClick={() => setSelectedFormat(format)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    selectedFormat === format
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <div className="text-sm font-bold">{formats[format].label}</div>
+                  <div className="text-xs opacity-75">
+                    {formats[format].width}×{formats[format].height}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Slider Controls */}
+            {backgroundImageUrl && (
+              <div className="flex-1 flex flex-col gap-3 min-w-[200px]">
+                {/* Transparency Control */}
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap w-24">
+                    Transparency:
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={imageOpacity}
+                    onChange={(e) => setImageOpacity(parseFloat(e.target.value))}
+                    className="flex-1 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400 w-12 text-right">
+                    {Math.round(imageOpacity * 100)}%
+                  </span>
+                </div>
+
+                {/* Text Shadow Control */}
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap w-24">
+                    Text Shadow:
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="5"
+                    step="0.5"
+                    value={textShadow}
+                    onChange={(e) => setTextShadow(parseFloat(e.target.value))}
+                    className="flex-1 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400 w-12 text-right">
+                    {textShadow}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Card Preview */}
-        <div className="p-6">
+        <div className="p-6 flex justify-center items-center overflow-auto">
           <div
-            ref={cardRef}
-            className="w-full aspect-[1200/630] bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 rounded-xl overflow-hidden shadow-2xl relative"
-            style={{ maxWidth: '1200px', margin: '0 auto' }}
+            style={{
+              width: `${currentFormat.width * 0.5}px`,
+              height: `${currentFormat.height * 0.5}px`,
+              position: 'relative',
+            }}
           >
-            {/* Background Image */}
-            {backgroundImageUrl && (
-              <>
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: `${currentFormat.width}px`,
+                height: `${currentFormat.height}px`,
+                transform: 'scale(0.5)',
+                transformOrigin: 'top left',
+              }}
+            >
+              <div
+                ref={cardRef}
+                className="bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 rounded-xl overflow-hidden shadow-2xl relative"
+                style={{
+                  width: `${currentFormat.width}px`,
+                  height: `${currentFormat.height}px`,
+                  fontSize: '16px',
+                }}
+              >
+                {/* Background Image */}
+                {backgroundImageUrl && (
+                  <>
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `url(${backgroundImageUrl})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition:
+                          selectedFormat === 'opengraph'
+                            ? 'center 40%'
+                            : selectedFormat === 'square'
+                              ? '70% center'
+                              : 'center center',
+                      }}
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800"
+                      style={{ opacity: imageOpacity }}
+                    />
+                  </>
+                )}
+
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/60 via-indigo-700/60 to-purple-800/60" />
-              </>
-            )}
+                  className="absolute inset-0 h-full flex flex-col text-white"
+                  style={{ padding: '32px' }}
+                >
+                  {/* Top row with header and year/activities */}
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', flex: '1 1 auto' }}
+                  >
+                    {/* Left/Center column */}
+                    <div
+                      style={{
+                        flex: '1 1 auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      {/* Header */}
+                      <div>
+                        <h1
+                          className="font-black drop-shadow-lg"
+                          style={{
+                            fontSize: selectedFormat === 'landscape' ? '67px' : '42px',
+                            marginBottom: '4px',
+                            textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                          }}
+                        >
+                          Year in Sports
+                        </h1>
+                        <p
+                          className="font-bold opacity-90 drop-shadow truncate"
+                          style={{
+                            fontSize: selectedFormat === 'landscape' ? '58px' : '36px',
+                            textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                          }}
+                        >
+                          {athleteName}
+                        </p>
+                      </div>
 
-            <div className="absolute inset-0 h-full p-8 flex flex-col text-white justify-between">
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="text-4xl font-black mb-1 drop-shadow-lg">Year in Sports</h1>
-                  <p className="text-3xl font-bold opacity-90 drop-shadow">{athleteName}</p>
-                </div>
-                <div className="text-7xl font-black drop-shadow-2xl">
-                  {year === 'last365' ? 'Last 365' : year}
-                </div>
-              </div>
+                      {/* Left Activities - Only for landscape and opengraph */}
+                      {selectedFormat !== 'square' && allSelectedItems.length > 0 && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            flex: '1 1 auto',
+                            justifyContent: 'center',
+                            maxWidth: '450px',
+                          }}
+                        >
+                          {allSelectedItems.slice(0, 3).map((item) => {
+                            const itemId = item.id;
 
-              {/* Bottom section with stats and highlights */}
-              <div className="space-y-4">
-                {/* Selected Activities - Compact 2-line format */}
-                {allSelectedItems.length > 0 && (
-                  <div className="grid grid-cols-3 gap-4">
-                    {allSelectedItems.map((item) => {
-                      const itemId = item.id;
+                            return (
+                              <div key={itemId} className="text-left">
+                                {/* Line 1: Activity title */}
+                                <div
+                                  contentEditable
+                                  suppressContentEditableWarning
+                                  onBlur={(e) =>
+                                    updateName(itemId, e.currentTarget.textContent || '')
+                                  }
+                                  className="font-bold drop-shadow outline-none text-white truncate"
+                                  style={{
+                                    fontSize: selectedFormat === 'landscape' ? '34px' : '21px',
+                                    textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                                  }}
+                                >
+                                  {editedNames[itemId] || item.name}
+                                </div>
+                                {/* Line 2: Distance - Time */}
+                                <div
+                                  className="opacity-90 font-medium flex items-center"
+                                  style={{
+                                    fontSize: selectedFormat === 'landscape' ? '29px' : '18px',
+                                    gap: '6px',
+                                    textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                                  }}
+                                >
+                                  <span
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) =>
+                                      updateDistance(itemId, e.currentTarget.textContent || '0')
+                                    }
+                                    className="outline-none text-white"
+                                  >
+                                    {(editedDistances[itemId] || 0).toFixed(2)}
+                                  </span>
+                                  <span>km</span>
+                                  <span>-</span>
+                                  <span
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) =>
+                                      updateTime(itemId, e.currentTarget.textContent || '0:00')
+                                    }
+                                    className="outline-none text-white"
+                                  >
+                                    {editedTimes[itemId] || '0:00'}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right column - Year and Activities */}
+                    <div
+                      style={{
+                        flex: '0 0 auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        width: '450px',
+                        marginLeft: '24px',
+                      }}
+                    >
+                      {/* Year at top */}
+                      <div
+                        className="font-black drop-shadow-2xl text-right"
+                        style={{
+                          fontSize: selectedFormat === 'landscape' ? '134px' : '84px',
+                          lineHeight: '1',
+                          textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                        }}
+                      >
+                        {year === 'last365' ? 'Last 365' : year}
+                      </div>
+
+                      {/* Right Activities - For square: all items, for landscape/opengraph: second half */}
+                      {allSelectedItems.length > 0 && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            flex: '1 1 auto',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {(selectedFormat === 'square'
+                            ? allSelectedItems
+                            : allSelectedItems.slice(3)
+                          ).map((item) => {
+                            const itemId = item.id;
+
+                            return (
+                              <div key={itemId} className="text-right">
+                                {/* Line 1: Activity title */}
+                                <div
+                                  contentEditable
+                                  suppressContentEditableWarning
+                                  onBlur={(e) =>
+                                    updateName(itemId, e.currentTarget.textContent || '')
+                                  }
+                                  className="font-bold drop-shadow outline-none text-white truncate"
+                                  style={{
+                                    fontSize: selectedFormat === 'landscape' ? '34px' : '21px',
+                                    textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                                  }}
+                                >
+                                  {editedNames[itemId] || item.name}
+                                </div>
+                                {/* Line 2: Distance - Time */}
+                                <div
+                                  className="opacity-90 font-medium flex items-center justify-end"
+                                  style={{
+                                    fontSize: selectedFormat === 'landscape' ? '29px' : '18px',
+                                    gap: '6px',
+                                    textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                                  }}
+                                >
+                                  <span
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) =>
+                                      updateDistance(itemId, e.currentTarget.textContent || '0')
+                                    }
+                                    className="outline-none text-white"
+                                  >
+                                    {(editedDistances[itemId] || 0).toFixed(2)}
+                                  </span>
+                                  <span>km</span>
+                                  <span>-</span>
+                                  <span
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    onBlur={(e) =>
+                                      updateTime(itemId, e.currentTarget.textContent || '0:00')
+                                    }
+                                    className="outline-none text-white"
+                                  >
+                                    {editedTimes[itemId] || '0:00'}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Spacer at bottom to balance layout */}
+                      <div></div>
+                    </div>
+                  </div>
+
+                  {/* Stats at bottom - full width */}
+                  <div
+                    className={`grid ${
+                      selectedStats.length === 1
+                        ? 'grid-cols-1'
+                        : selectedStats.length === 2
+                          ? 'grid-cols-2'
+                          : selectedStats.length === 3
+                            ? 'grid-cols-3'
+                            : 'grid-cols-4'
+                    }`}
+                    style={{ gap: '24px', width: '100%' }}
+                  >
+                    {selectedStats.map((stat) => {
+                      const value = stat.getValue(stats, daysActive);
+                      // Extract numeric value
+                      const parts = value.match(/^([\d,.]+)\s*(.*)$/);
+                      const displayValue =
+                        editedStats[stat.id] !== undefined
+                          ? editedStats[stat.id]
+                          : parts
+                            ? parts[1]
+                            : value;
 
                       return (
-                        <div key={itemId} className="text-left">
-                          {/* Line 1: Activity title */}
+                        <div key={stat.id} className="text-center">
+                          <input
+                            type="text"
+                            value={displayValue}
+                            onChange={(e) => updateStat(stat.id, e.target.value)}
+                            className="font-black drop-shadow-2xl bg-transparent outline-none text-white text-center w-full placeholder-white/60"
+                            style={{
+                              fontSize:
+                                selectedFormat === 'landscape'
+                                  ? selectedStats.length >= 3
+                                    ? '77px'
+                                    : '102px'
+                                  : selectedStats.length >= 3
+                                    ? '48px'
+                                    : '64px',
+                              marginBottom: '8px',
+                              textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                            }}
+                            placeholder="0"
+                          />
                           <div
-                            contentEditable
-                            suppressContentEditableWarning
-                            onBlur={(e) => updateName(itemId, e.currentTarget.textContent || '')}
-                            className="text-base font-bold drop-shadow outline-none text-white truncate"
+                            className="font-bold opacity-90 drop-shadow-lg uppercase tracking-wide"
+                            style={{
+                              fontSize:
+                                selectedFormat === 'landscape'
+                                  ? selectedStats.length >= 3
+                                    ? '27px'
+                                    : '32px'
+                                  : selectedStats.length >= 3
+                                    ? '17px'
+                                    : '20px',
+                              textShadow: `0 ${textShadow}px ${textShadow * 4}px rgba(0, 0, 0, 0.8)`,
+                            }}
                           >
-                            {editedNames[itemId] || item.name}
-                          </div>
-                          {/* Line 2: Distance - Time */}
-                          <div className="text-sm opacity-90 font-medium flex items-center gap-1.5">
-                            <span
-                              contentEditable
-                              suppressContentEditableWarning
-                              onBlur={(e) =>
-                                updateDistance(itemId, e.currentTarget.textContent || '0')
-                              }
-                              className="outline-none text-white"
-                            >
-                              {(editedDistances[itemId] || 0).toFixed(2)}
-                            </span>
-                            <span>km</span>
-                            <span>-</span>
-                            <span
-                              contentEditable
-                              suppressContentEditableWarning
-                              onBlur={(e) =>
-                                updateTime(itemId, e.currentTarget.textContent || '0:00')
-                              }
-                              className="outline-none text-white"
-                            >
-                              {editedTimes[itemId] || '0:00'}
-                            </span>
+                            {stat.label}
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                )}
-
-                {/* Stats - Dynamic based on selection */}
-                <div
-                  className={`grid gap-6 ${
-                    selectedStats.length === 1
-                      ? 'grid-cols-1'
-                      : selectedStats.length === 2
-                        ? 'grid-cols-2'
-                        : selectedStats.length === 3
-                          ? 'grid-cols-3'
-                          : 'grid-cols-4'
-                  }`}
-                >
-                  {selectedStats.map((stat) => {
-                    const value = stat.getValue(stats, daysActive);
-                    // Extract numeric value
-                    const parts = value.match(/^([\d,.]+)\s*(.*)$/);
-                    const displayValue =
-                      editedStats[stat.id] !== undefined
-                        ? editedStats[stat.id]
-                        : parts
-                          ? parts[1]
-                          : value;
-
-                    return (
-                      <div key={stat.id} className="text-center">
-                        <input
-                          type="text"
-                          value={displayValue}
-                          onChange={(e) => updateStat(stat.id, e.target.value)}
-                          className={`${selectedStats.length === 4 ? 'text-4xl' : 'text-6xl'} font-black mb-3 drop-shadow-2xl bg-transparent outline-none text-white text-center w-full placeholder-white/60`}
-                          placeholder="0"
-                        />
-                        <div
-                          className={`${selectedStats.length === 4 ? 'text-base' : 'text-xl'} font-bold opacity-90 drop-shadow-lg uppercase tracking-wide`}
-                        >
-                          {stat.label}
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             </div>
