@@ -947,6 +947,265 @@ Before marking work complete:
 - [ ] Security considerations addressed
 - [ ] Follows existing patterns
 
+## 📊 Test Quality Assessment
+
+### Current Test Coverage (Updated: Dec 2025)
+
+**Overall: 42.85% statement coverage**
+
+```
+File Category          | Coverage | Status
+-----------------------|----------|--------
+Configuration (SOLID)  | 100%     | ✅ Excellent
+Setup Components       | 100%     | ✅ Excellent
+UI Components (tested) | 87.69%   | ✅ Good
+Settings Components    | 58.18%   | ⚠️  Moderate
+Hooks                  | 11.53%   | ❌ Critical Gap
+API Client             | 8.13%    | ❌ Critical Gap
+Utils/Business Logic   | 7.14%    | ❌ Critical Gap
+```
+
+### Test Files Analysis
+
+**6 Test Files | 85 Tests Total**
+
+#### ✅ Well-Tested Areas
+
+**1. Configuration System (16 tests)**
+
+- File: `services/__tests__/stravaConfigProvider.test.ts`
+- Coverage: 100% statements, 94.11% branches
+- Quality: ⭐⭐⭐⭐⭐ Excellent
+- Tests all SOLID principles:
+  - EnvConfigProvider (3 tests)
+  - StorageConfigProvider (7 tests)
+  - CompositeConfigProvider (5 tests)
+  - ConfigProviderFactory (2 tests)
+- Edge cases: corrupted storage, whitespace, empty providers
+- Security: special characters in credentials
+
+**2. Config Store (13 tests)**
+
+- File: `stores/__tests__/stravaConfigStore.test.ts`
+- Coverage: 78.57% statements, 100% branches
+- Quality: ⭐⭐⭐⭐ Very Good
+- Comprehensive store testing:
+  - Initial state verification
+  - setConfig edge cases (empty, whitespace, partial)
+  - clearConfig idempotency
+  - localStorage persistence
+  - Security considerations
+- Missing: Provider integration tests
+
+**3. Setup Wizard (21 tests)**
+
+- File: `components/setup/__tests__/SetupWizard.test.tsx`
+- Coverage: 100% statements, 80% branches
+- Quality: ⭐⭐⭐⭐⭐ Excellent
+- User flow testing:
+  - Initial render and navigation
+  - Form validation (6 tests)
+  - Accessibility (3 tests)
+  - Edge cases (whitespace, trim)
+- Best practices: mocks, user interactions, accessibility
+
+**4. Strava Settings (23 tests)**
+
+- File: `components/settings/__tests__/StravaSettings.test.tsx`
+- Coverage: 58.18% statements, 62.5% branches
+- Quality: ⭐⭐⭐⭐ Very Good
+- Modal interaction testing:
+  - Modal open/close scenarios (4 tests)
+  - Form handling (7 tests)
+  - Clear credentials flow (3 tests)
+  - UI elements and accessibility (6 tests)
+
+**5. Loading Progress (5 tests)**
+
+- File: `components/ui/__tests__/LoadingProgress.test.tsx`
+- Coverage: 100% statements, 94.44% branches
+- Quality: ⭐⭐⭐⭐ Very Good
+- Progress calculation testing
+- All step statuses (complete, active, pending, error)
+- i18n integration
+
+**6. Stats Selector (7 tests)**
+
+- File: `components/ui/__tests__/StatsSelector.test.tsx`
+- Coverage: 82.14% statements, 57.14% branches
+- Quality: ⭐⭐⭐ Good
+- Selection logic testing
+- Constraint validation (max 4 stats)
+- Callback testing
+
+### ❌ Critical Gaps Requiring Tests
+
+**1. Hooks (11.53% coverage) - URGENT**
+
+- `useActivities.ts` - **0 tests**
+  - Missing: Data fetching, caching, incremental updates
+  - Missing: Error handling, loading states
+  - Missing: React Query integration
+  - Risk: Core data fetching can fail silently
+
+**2. API Client (8.13% coverage) - URGENT**
+
+- `api/strava/client.ts` - **0 tests**
+  - Missing: Authentication flow
+  - Missing: Activity fetching (getActivitiesForYear, getActivitiesIncremental)
+  - Missing: Rate limit handling
+  - Missing: Token refresh logic
+  - Risk: Strava integration can break
+
+**3. Utils/Business Logic (7.14% coverage) - HIGH PRIORITY**
+
+- `utils/aggregations.ts` - **0 tests**
+  - Missing: Stats calculation logic
+  - Missing: Data transformation
+- `utils/sportHighlights.ts` - **0 tests**
+  - Missing: Highlight detection algorithms
+- `utils/raceDetection.ts` - **0 tests**
+  - Missing: Race detection logic
+- Risk: Incorrect calculations displayed to users
+
+**4. Other Stores - MEDIUM PRIORITY**
+
+- `authStore.ts` - **0 tests**
+  - Missing: Authentication state management
+  - Missing: Token storage/retrieval
+- `settingsStore.ts` - **0 tests**
+  - Missing: Settings persistence
+  - Missing: Filter management
+- `dataSyncStore.ts` - **0 tests**
+  - Missing: Sync timestamp tracking
+
+### Test Quality Observations
+
+**✅ Strengths:**
+
+1. **SOLID Principles**: Config system demonstrates excellent architectural testing
+2. **User-Centric**: Setup and settings tests focus on user interactions
+3. **Accessibility**: Multiple tests verify ARIA labels and keyboard navigation
+4. **Edge Cases**: Good coverage of whitespace, empty values, special characters
+5. **Mocking Strategy**: Consistent use of vi.mock() for dependencies
+6. **i18n Integration**: Tests wrapped with I18nextProvider
+
+**⚠️ Weaknesses:**
+
+1. **Integration Tests**: Missing tests for component + hook + API integration
+2. **Async Operations**: Limited testing of loading states and error scenarios
+3. **Business Logic**: Core calculation utils completely untested
+4. **Hook Testing**: No custom hook testing (useActivities, useAuth, useYearStats)
+5. **API Mocking**: No tests with mocked Strava API responses
+6. **E2E Flows**: No tests for complete user journeys
+
+### Recommended Test Additions
+
+**Priority 1 - Critical (Add Immediately):**
+
+```typescript
+// hooks/__tests__/useActivities.test.ts
+describe('useActivities', () => {
+  it('should fetch activities for a year');
+  it('should handle incremental updates');
+  it('should cache results properly');
+  it('should handle API errors');
+  it('should track last sync time');
+});
+
+// api/strava/__tests__/client.test.ts
+describe('StravaClient', () => {
+  it('should fetch activities with pagination');
+  it('should handle rate limit errors');
+  it('should refresh expired tokens');
+  it('should fetch incremental activities');
+});
+
+// utils/__tests__/aggregations.test.ts
+describe('aggregations', () => {
+  it('should calculate total distance correctly');
+  it('should aggregate by month');
+  it('should calculate averages');
+});
+```
+
+**Priority 2 - High (Add Soon):**
+
+```typescript
+// stores/__tests__/authStore.test.ts
+describe('authStore', () => {
+  it('should store auth tokens');
+  it('should detect expired tokens');
+  it('should clear on logout');
+});
+
+// utils/__tests__/sportHighlights.test.ts
+describe('sportHighlights', () => {
+  it('should detect longest run');
+  it('should find highest elevation');
+  it('should calculate fastest pace');
+});
+```
+
+**Priority 3 - Medium (Improve Coverage):**
+
+- Integration tests combining components + hooks + API
+- More chart component tests
+- Error boundary tests
+- Responsive design tests
+
+### Test Quality Metrics
+
+**Current State:**
+
+- Total Tests: 85
+- Test Files: 6
+- Average Tests per File: 14.2
+- Coverage: 42.85% (Below 80% target)
+
+**Target State:**
+
+- Total Tests: 150+ (add 65 tests)
+- Test Files: 12+ (add 6 test files)
+- Coverage: 80%+ statements
+- Critical Path Coverage: 100%
+
+### Testing Best Practices to Maintain
+
+1. ✅ Follow TDD for new features
+2. ✅ Use descriptive test names
+3. ✅ Group related tests in describe blocks
+4. ✅ Mock external dependencies
+5. ✅ Test edge cases and error states
+6. ✅ Use React Testing Library best practices
+7. ✅ Include accessibility tests
+8. ✅ Test user interactions, not implementation
+
+### Action Items for Developers
+
+**Before Any New Feature:**
+
+1. Write failing tests first (TDD)
+2. Ensure tests cover happy path + edge cases
+3. Verify coverage doesn't decrease
+4. Run `npm run test:coverage` to validate
+
+**For Existing Code:**
+
+1. Prioritize testing hooks (useActivities, useAuth)
+2. Add API client tests with mocked responses
+3. Test business logic in utils/
+4. Add integration tests for critical flows
+5. Target 80% overall coverage
+
+**Code Review Checklist:**
+
+- [ ] New code has corresponding tests
+- [ ] Tests follow existing patterns
+- [ ] Edge cases are covered
+- [ ] Mocks are properly configured
+- [ ] Tests are readable and maintainable
+
 ## 🤝 Collaboration
 
 When working with humans:
