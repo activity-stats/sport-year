@@ -4,6 +4,7 @@ import { Login, Callback, Dashboard } from './pages/index.ts';
 import { useAuth } from './hooks/useAuth.ts';
 import { useStravaConfigStore } from './stores/stravaConfigStore';
 import { SetupWizard } from './components/setup/SetupWizard';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,26 +25,32 @@ function App() {
 
   // Show setup wizard if not configured
   if (!isConfigured) {
-    return <SetupWizard />;
+    return (
+      <ErrorBoundary>
+        <SetupWizard />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/callback" element={<Callback />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/callback" element={<Callback />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
