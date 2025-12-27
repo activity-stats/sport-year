@@ -15,9 +15,9 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage --run",
     "type-check": "tsc --noEmit",
-    "validate": "npm run type-check && npm run lint && npm run format:check && npm run test -- --run",
+    "validate": "npm run i18n:check && npm run type-check && npm run lint && npm run format:check && npm run test -- --run",
     "ci:local": "./scripts/ci-check.sh",
-    "i18n:check": "tsx scripts/check-i18n.ts",
+    "i18n:check": "npx tsx scripts/check-i18n.ts",
     "prepare": "husky"
   },
   "lint-staged": {

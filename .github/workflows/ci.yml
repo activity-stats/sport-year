@@ -43,6 +43,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: i18n validation
+        run: npm run i18n:check
+
       - name: Type check
         run: npm run type-check
 

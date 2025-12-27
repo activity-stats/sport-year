@@ -1,5 +1,9 @@
 npx lint-staged
 
+# Run i18n validation
+echo "Running i18n validation..."
+npm run i18n:check || exit 1
+
 # Run type checking
 echo "Running type check..."
 npm run type-check || exit 1
