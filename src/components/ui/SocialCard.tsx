@@ -7,7 +7,7 @@ import type { StatOption } from './statsOptions';
 import { formatDuration } from '../../utils/formatters';
 
 interface SocialCardProps {
-  year: number;
+  year: number | 'last365';
   stats: YearStats;
   athlete: StravaAthlete | null;
   daysActive: number;
@@ -333,7 +333,9 @@ export function SocialCard({
                   <h1 className="text-4xl font-black mb-1 drop-shadow-lg">Year in Sports</h1>
                   <p className="text-3xl font-bold opacity-90 drop-shadow">{athleteName}</p>
                 </div>
-                <div className="text-7xl font-black drop-shadow-2xl">{year}</div>
+                <div className="text-7xl font-black drop-shadow-2xl">
+                  {year === 'last365' ? 'Last 365' : year}
+                </div>
               </div>
 
               {/* Bottom section with stats and highlights */}

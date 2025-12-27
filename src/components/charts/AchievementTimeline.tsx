@@ -5,7 +5,7 @@ import type { RaceHighlight } from '../../utils/raceDetection';
 import type { SportHighlights } from '../../utils/sportHighlights';
 
 interface AchievementTimelineProps {
-  year: number;
+  year: number | 'last365';
   highlights: RaceHighlight[];
   sportHighlights: {
     running?: SportHighlights;

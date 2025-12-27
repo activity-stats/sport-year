@@ -186,6 +186,40 @@ class StravaClient {
     return allActivities;
   }
 
+  /**
+   * Fetch activities from the last 365 days (rolling window)
+   */
+  async getActivitiesLast365Days(lastActivityTimestamp?: number): Promise<StravaActivity[]> {
+    const now = Date.now();
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    const after = Math.floor((now - 365 * oneDayInMs) / 1000);
+
+    // If we have a last activity timestamp, fetch from 1 day before it for incremental update
+    const actualAfter = lastActivityTimestamp
+      ? Math.max(lastActivityTimestamp - 24 * 60 * 60, after)
+      : after;
+
+    let allActivities: StravaActivity[] = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const activities = await this.getActivities({
+        after: actualAfter,
+        page,
+        per_page: 200,
+      });
+
+      allActivities = [...allActivities, ...activities];
+
+      // If we got less than 200, we've reached the end
+      hasMore = activities.length === 200;
+      page++;
+    }
+
+    return allActivities;
+  }
+
   async getActivity(id: number): Promise<StravaActivity> {
     const response = await this.axiosInstance.get<StravaActivity>(`/activities/${id}`);
     return response.data;

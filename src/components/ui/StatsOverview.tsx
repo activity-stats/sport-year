@@ -35,25 +35,25 @@ export const StatsOverview = ({ stats }: StatsOverviewProps) => {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-3 sm:px-0">
         {stats.year} Overview 🏆
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 px-3 sm:px-0">
         {statCards.map((card) => (
           <div
             key={card.label}
             className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 opacity-10 dark:opacity-20 rounded-bl-full"></div>
-            <div className="relative p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl">{card.icon}</span>
+            <div className="absolute top-0 right-0 w-16 sm:w-24 h-16 sm:h-24 bg-gradient-to-br from-blue-500 to-purple-500 opacity-10 dark:opacity-20 rounded-bl-full"></div>
+            <div className="relative p-3 sm:p-6">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <span className="text-2xl sm:text-4xl">{card.icon}</span>
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 break-words">
                 {card.value}
               </div>
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
                 {card.label}
               </div>
             </div>

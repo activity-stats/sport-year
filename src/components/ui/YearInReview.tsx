@@ -41,7 +41,7 @@ interface HighlightFilters {
 }
 
 interface YearInReviewProps {
-  year: number;
+  year: number | 'last365';
   stats: YearStats;
   activities: Activity[];
   athlete: StravaAthlete | null;
@@ -97,20 +97,20 @@ function SportDetailSection({
   };
 
   return (
-    <div className="container mx-auto px-6 py-16 md:py-20">
-      <div className="text-center mb-12">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <div className="text-5xl">{config.emoji}</div>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
+    <div className="container mx-auto px-3 sm:px-6 py-8 sm:py-16 md:py-20">
+      <div className="text-center mb-8 sm:mb-12">
+        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="text-3xl sm:text-5xl">{config.emoji}</div>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
             {config.title} Highlights
           </h2>
         </div>
         <div
-          className={`h-1.5 w-32 bg-gradient-to-r ${config.gradient} mx-auto rounded-full mb-6`}
+          className={`h-1.5 w-24 sm:w-32 bg-gradient-to-r ${config.gradient} mx-auto rounded-full mb-4 sm:mb-6`}
         ></div>
 
         {/* Overview stats */}
-        <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-600 dark:text-gray-400">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-sm sm:text-lg text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(highlights.totalDistance * 1000)}
@@ -134,7 +134,7 @@ function SportDetailSection({
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Custom Highlights - activities matching custom filters */}
         {customHighlights.map((highlight) => {
           // Check if this is the longest activity
@@ -396,12 +396,6 @@ function SportDetailSection({
       </div>
     </div>
   );
-}
-
-interface YearInReviewProps {
-  year: number;
-  stats: YearStats;
-  activities: Activity[];
 }
 
 function RaceCard({ highlight }: { highlight: RaceHighlight }) {
@@ -864,7 +858,7 @@ export function YearInReview({
         {/* Social Card Button - Fixed bottom right */}
         <button
           onClick={handleCreateSocialCard}
-          className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 print:hidden"
+          className="fixed bottom-24 md:bottom-6 right-6 z-40 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 print:hidden"
           title="Create Social Card"
         >
           <span className="text-2xl">📱</span>
@@ -918,7 +912,7 @@ export function YearInReview({
             <div className="text-center">
               <div className="inline-block">
                 <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tight drop-shadow-2xl">
-                  {year}
+                  {year === 'last365' ? 'Last 365 Days' : year}
                 </h1>
                 <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8 rounded-full"></div>
                 <p className="text-3xl md:text-4xl font-light mb-4 text-white/90 tracking-wide">
@@ -1055,8 +1049,13 @@ export function YearInReview({
                 passion.
               </p>
               <p className="text-xl md:text-2xl font-light">
-                Here's to even more epic adventures in{' '}
-                <span className="font-black text-3xl">{year + 1}</span>! 🚀
+                Here's to even more epic adventures{year === 'last365' ? '' : ' in'}{' '}
+                {year === 'last365' ? (
+                  'ahead'
+                ) : (
+                  <span className="font-black text-3xl">{year + 1}</span>
+                )}
+                ! 🚀
               </p>
             </div>
           </div>

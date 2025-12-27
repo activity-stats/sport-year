@@ -3,7 +3,7 @@ import { useActivities } from './useActivities.ts';
 import { aggregateYearStats } from '../utils/index.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
 
-export const useYearStats = (year: number) => {
+export const useYearStats = (year: number | 'last365') => {
   const { data: activities, isLoading, error } = useActivities(year);
   const setLoadingStage = useLoadingStore((state) => state.setStage);
   const reset = useLoadingStore((state) => state.reset);
@@ -13,7 +13,8 @@ export const useYearStats = (year: number) => {
 
     // Stage 4: Aggregating statistics
     setLoadingStage('aggregating');
-    const result = aggregateYearStats(activities, year);
+    const actualYear = year === 'last365' ? new Date().getFullYear() : year;
+    const result = aggregateYearStats(activities, actualYear);
 
     // Stage 5: Complete
     setLoadingStage('complete');
