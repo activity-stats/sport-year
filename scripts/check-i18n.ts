@@ -13,11 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 interface TranslationKeys {
-  [key: string]: any;
+  [key: string]: string | TranslationKeys;
 }
 
 // Flatten nested JSON keys into dot notation
-function flattenKeys(obj: any, prefix = ''): string[] {
+function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   const keys: string[] = [];
 
   for (const [key, value] of Object.entries(obj)) {

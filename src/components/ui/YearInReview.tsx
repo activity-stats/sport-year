@@ -23,6 +23,7 @@ import { SocialCard } from './SocialCard';
 import { StatsSelector } from './StatsSelector';
 import type { StatOption } from './statsOptions';
 import { HeatmapCalendar } from '../charts/HeatmapCalendar';
+import { usePDFExport } from '../../hooks/usePDFExport';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
@@ -565,6 +566,31 @@ export function YearInReview({
   const [selectedActivities, setSelectedActivities] = useState<Activity[]>([]);
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
+  const { exportToPDF, isExporting, progress } = usePDFExport();
+
+  const handleExportPDF = async () => {
+    try {
+      console.log('Starting PDF export...');
+      // Create filename with athlete name if available
+      const athleteName =
+        athlete?.firstname || athlete?.lastname
+          ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
+          : '';
+      const filename = athleteName
+        ? `${athleteName}-sport-year-${year}.pdf`
+        : `sport-year-${year}.pdf`;
+      await exportToPDF('year-in-review-content', {
+        filename,
+        quality: 0.95,
+        scale: 2,
+      });
+      console.log('PDF export completed successfully');
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
+    }
+  };
 
   // Filter activities to exclude virtual rides if disabled and respect title patterns for highlight cards
   useMemo(() => filterActivities(activities, highlightFilters), [activities, highlightFilters]);
@@ -923,17 +949,41 @@ export function YearInReview({
     <>
       <div
         ref={containerRef}
-        className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
+        id="year-in-review-content"
+        className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
       >
-        {/* Social Card Button - Fixed bottom right */}
-        <button
-          onClick={handleCreateSocialCard}
-          className="fixed bottom-24 md:bottom-6 right-6 z-40 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 print:hidden"
-          title="Create Social Card"
-        >
-          <span className="text-2xl">📱</span>
-          <span className="text-lg">{t('yearInReview.share')}</span>
-        </button>
+        {/* Action Buttons - Fixed bottom right */}
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-40 flex flex-col gap-3 print:hidden">
+          {/* Export PDF Button */}
+          <button
+            onClick={handleExportPDF}
+            disabled={isExporting}
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={t('yearInReview.exportPDF')}
+          >
+            {isExporting ? (
+              <>
+                <span className="text-2xl animate-spin">⏳</span>
+                <span className="text-lg">{progress}%</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl">📄</span>
+                <span className="text-lg">{t('yearInReview.exportPDF')}</span>
+              </>
+            )}
+          </button>
+
+          {/* Social Card Button */}
+          <button
+            onClick={handleCreateSocialCard}
+            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
+            title="Create Social Card"
+          >
+            <span className="text-2xl">📱</span>
+            <span className="text-lg">{t('yearInReview.share')}</span>
+          </button>
+        </div>
 
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white">

@@ -33,6 +33,9 @@
   "yearInReview": {
     "last365Title": "Laatste 365 Dagen",
     "share": "Delen",
+    "exportPDF": "Exporteren",
+
+    "exportFailed": "PDF exporteren mislukt. Probeer opnieuw.",
     "closingMessage": "Op naar nog meer epische avonturen",
     "closingMessageYear": "in {{year}}",
     "closingMessageAhead": "vooruit",
@@ -54,9 +57,6 @@
     "otherAchievements": "Andere Prestaties",
     "morePerformances": "Nog meer ongelooflijke prestaties",
     "raceOverview": "Wedstrijd Overzicht",
-    "racesCompleted": "{{count}} wedstrijd voltooid",
-    "racesCompletedPlural": "{{count}} wedstrijden voltooid",
-    "partOfTriathlon": "Onderdeel van Triathlon",
     "epicYear": "Wat een Episch Jaar!",
     "crushedDistance": "Je hebt",
     "across": "over",
