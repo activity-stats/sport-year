@@ -1127,78 +1127,6 @@ export function YearInReview({
           <HeatmapCalendar year={year} activities={activities} onDateClick={onDateClick} />
         </div>
 
-        {/* Triathlons Section - Moved to top */}
-        {triathlons.length > 0 && (
-          <div id="triathlons" className="container mx-auto px-6 py-16 md:py-20">
-            <div className="mb-12">
-              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
-                <div className="text-5xl">🏊🚴🏃</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
-                  {t('yearInReview.triathlons')}
-                </h2>
-              </div>
-              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
-              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
-                {triathlons.length}{' '}
-                {triathlons.length === 1
-                  ? t('yearInReview.epicMultiSport')
-                  : t('yearInReview.epicMultiSportPlural')}
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {triathlons.map((highlight) => (
-                <RaceCard key={highlight.id} highlight={highlight} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Sport Detail Sections */}
-        {sportHighlights.running && (
-          <SportDetailSection
-            sectionId="running"
-            highlights={sportHighlights.running}
-            customHighlights={runningCustomHighlights}
-          />
-        )}
-        {sportHighlights.cycling && (
-          <SportDetailSection
-            sectionId="cycling"
-            highlights={sportHighlights.cycling}
-            customHighlights={cyclingCustomHighlights}
-          />
-        )}
-        {sportHighlights.swimming && (
-          <SportDetailSection
-            sectionId="swimming"
-            highlights={sportHighlights.swimming}
-            customHighlights={swimmingCustomHighlights}
-          />
-        )}
-
-        {/* Other Achievements */}
-        {(longRuns.length > 0 || fondos.length > 0) && (
-          <div id="custom-highlights" className="container mx-auto px-6 py-16 md:py-20">
-            <div className="mb-12">
-              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
-                <div className="text-5xl">🌟</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
-                  {t('yearInReview.otherAchievements')}
-                </h2>
-              </div>
-              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
-              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
-                {t('yearInReview.morePerformances')}
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[...longRuns, ...fondos].map((highlight) => (
-                <RaceCard key={highlight.id} highlight={highlight} />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Race Overview - Timeline View */}
         {raceItems.length > 0 && (
           <div className="container mx-auto px-6 py-16 md:py-20">
@@ -1356,6 +1284,78 @@ export function YearInReview({
                   })}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Triathlons Section - Moved to top */}
+        {triathlons.length > 0 && (
+          <div id="triathlons" className="container mx-auto px-6 py-16 md:py-20">
+            <div className="mb-12">
+              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                <div className="text-5xl">🏊🚴🏃</div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                  {t('yearInReview.triathlons')}
+                </h2>
+              </div>
+              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
+                {triathlons.length}{' '}
+                {triathlons.length === 1
+                  ? t('yearInReview.epicMultiSport')
+                  : t('yearInReview.epicMultiSportPlural')}
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {triathlons.map((highlight) => (
+                <RaceCard key={highlight.id} highlight={highlight} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sport Detail Sections */}
+        {sportHighlights.running && (
+          <SportDetailSection
+            sectionId="running"
+            highlights={sportHighlights.running}
+            customHighlights={runningCustomHighlights}
+          />
+        )}
+        {sportHighlights.cycling && (
+          <SportDetailSection
+            sectionId="cycling"
+            highlights={sportHighlights.cycling}
+            customHighlights={cyclingCustomHighlights}
+          />
+        )}
+        {sportHighlights.swimming && (
+          <SportDetailSection
+            sectionId="swimming"
+            highlights={sportHighlights.swimming}
+            customHighlights={swimmingCustomHighlights}
+          />
+        )}
+
+        {/* Other Achievements */}
+        {(longRuns.length > 0 || fondos.length > 0) && (
+          <div id="custom-highlights" className="container mx-auto px-6 py-16 md:py-20">
+            <div className="mb-12">
+              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                <div className="text-5xl">🌟</div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                  {t('yearInReview.otherAchievements')}
+                </h2>
+              </div>
+              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
+                {t('yearInReview.morePerformances')}
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {[...longRuns, ...fondos].map((highlight) => (
+                <RaceCard key={highlight.id} highlight={highlight} />
+              ))}
             </div>
           </div>
         )}
