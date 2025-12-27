@@ -17,9 +17,10 @@ interface AchievementTimelineProps {
 
 interface Achievement {
   date: Date;
-  type: 'custom-highlight' | 'longest' | 'biggest-climb';
+  type: 'race' | 'triathlon' | 'custom-highlight' | 'longest' | 'biggest-climb';
   activity: Activity;
-  label: string;
+  activityName: string; // First line: activity name
+  achievementLabel: string; // Second line: achievement description (e.g., "🏆 Full Distance Triathlon")
   value: string;
   icon: string;
   color: string;
@@ -34,114 +35,108 @@ export function AchievementTimeline({
   const achievements = useMemo(() => {
     const results: Achievement[] = [];
 
-    // Add custom highlights (from distance filters)
-    highlights
-      .filter((h) => h.type === 'custom-highlight')
-      .forEach((highlight) => {
-        // For custom highlights, we need to construct an activity object from the highlight data
-        // or use the first activity from the activities array (if available)
-        const activity =
-          highlight.activities?.[0] ||
-          ({
-            id: highlight.id,
-            name: highlight.name,
-            date: highlight.date,
-            distanceKm: highlight.distance,
-            movingTimeMinutes: highlight.duration,
-            type: highlight.activityType || 'Run',
-          } as Activity);
+    // Add ALL race highlights (including triathlons, half marathons, 10Ks, etc.)
+    highlights.forEach((highlight) => {
+      const activity = highlight.activities?.[0];
+      if (!activity) return;
 
-        const distanceLabel = highlight.badge || `${Math.round(highlight.distance)}km`;
+      let icon = '🏃';
+      let color = 'bg-gradient-to-r from-orange-500 to-red-600';
 
-        results.push({
-          date: activity.date,
-          type: 'custom-highlight',
-          activity,
-          label: distanceLabel,
-          value:
-            highlight.distance > 0
-              ? (() => {
-                  const pace = highlight.duration / (highlight.distance / 1000);
-                  let minutes = Math.floor(pace);
-                  let seconds = Math.round((pace % 1) * 60);
-                  if (seconds >= 60) {
-                    minutes += 1;
-                    seconds = 0;
-                  }
-                  return `${minutes}:${seconds.toString().padStart(2, '0')} min/km`;
-                })()
-              : formatDuration(highlight.duration * 60),
-          icon: '⚡',
-          color: 'bg-gradient-to-r from-blue-500 to-indigo-600',
+      // Determine icon and color based on type
+      if (highlight.type === 'triathlon') {
+        icon = '🏊🚴🏃';
+        color = 'bg-gradient-to-r from-cyan-500 via-green-500 to-orange-500';
+      } else if (highlight.activityType === 'Ride') {
+        icon = '🚴';
+        color = 'bg-gradient-to-r from-blue-500 to-cyan-600';
+      } else if (highlight.activityType === 'Swim') {
+        icon = '🏊';
+        color = 'bg-gradient-to-r from-teal-500 to-blue-600';
+      }
+
+      results.push({
+        date: highlight.date,
+        type: highlight.type === 'triathlon' ? 'triathlon' : 'race',
+        activity,
+        // For triathlons, use the processed name from highlight.name (from getTriathlonDisplayInfo)
+        // For other activities, use the raw activity name
+        activityName: highlight.type === 'triathlon' ? highlight.name : activity.name,
+        achievementLabel: highlight.badge ? `${highlight.badge}` : highlight.name,
+        value: `${highlight.distance.toFixed(1)} km`,
+        icon,
+        color,
+      });
+    });
+
+    // Add sport highlights - distance records, longest activities, and biggest climbs
+    [sportHighlights.running, sportHighlights.cycling, sportHighlights.swimming]
+      .filter((sh): sh is SportHighlights => sh !== undefined)
+      .forEach((sportHighlight) => {
+        let icon = '🏃';
+        let color = 'bg-gradient-to-r from-orange-500 to-red-600';
+
+        if (sportHighlight.sport === 'cycling') {
+          icon = '🚴';
+          color = 'bg-gradient-to-r from-blue-500 to-cyan-600';
+        } else if (sportHighlight.sport === 'swimming') {
+          icon = '🏊';
+          color = 'bg-gradient-to-r from-teal-500 to-blue-600';
+        }
+
+        // Add all distance records (e.g., marathons, half marathons, 5Ks, 10Ks, etc.)
+        sportHighlight.distanceRecords.forEach((record) => {
+          results.push({
+            date: record.activity.date,
+            type: 'race',
+            activity: record.activity,
+            activityName: record.activity.name,
+            achievementLabel: record.distance,
+            value: `${record.activity.distanceKm.toFixed(1)} km`,
+            icon,
+            color,
+          });
         });
-      });
 
-    // Add longest activities
-    if (sportHighlights.running?.longestActivity) {
-      const activity = sportHighlights.running.longestActivity;
-      results.push({
-        date: activity.date,
-        type: 'longest',
-        activity,
-        label: t('achievements.longestRun'),
-        value: formatDistanceWithUnit(activity.distanceKm * 1000),
-        icon: '🏆',
-        color: 'bg-gradient-to-r from-blue-400 to-blue-600',
-      });
-    }
+        // Add longest activity (if not already in distance records)
+        const longestInRecords = sportHighlight.distanceRecords.some(
+          (r) => r.activity.id === sportHighlight.longestActivity.id
+        );
+        if (!longestInRecords) {
+          const activity = sportHighlight.longestActivity;
+          let longestLabel = t('achievements.longestRun');
+          if (sportHighlight.sport === 'cycling') {
+            longestLabel = t('achievements.longestRide');
+          } else if (sportHighlight.sport === 'swimming') {
+            longestLabel = t('achievements.longestSwim');
+          }
 
-    if (sportHighlights.cycling?.longestActivity) {
-      const activity = sportHighlights.cycling.longestActivity;
-      results.push({
-        date: activity.date,
-        type: 'longest',
-        activity,
-        label: t('achievements.longestRide'),
-        value: formatDistanceWithUnit(activity.distanceKm * 1000),
-        icon: '🏆',
-        color: 'bg-gradient-to-r from-emerald-400 to-emerald-600',
-      });
-    }
+          results.push({
+            date: activity.date,
+            type: 'longest',
+            activity,
+            activityName: activity.name,
+            achievementLabel: longestLabel,
+            value: formatDistanceWithUnit(activity.distanceKm * 1000),
+            icon: '🏆',
+            color,
+          });
+        }
 
-    if (sportHighlights.swimming?.longestActivity) {
-      const activity = sportHighlights.swimming.longestActivity;
-      results.push({
-        date: activity.date,
-        type: 'longest',
-        activity,
-        label: t('achievements.longestSwim'),
-        value: formatDistanceWithUnit(activity.distanceKm * 1000),
-        icon: '🏆',
-        color: 'bg-gradient-to-r from-cyan-400 to-cyan-600',
+        // Add biggest climb
+        if (sportHighlight.biggestClimb) {
+          results.push({
+            date: sportHighlight.biggestClimb.date,
+            type: 'biggest-climb',
+            activity: sportHighlight.biggestClimb,
+            activityName: sportHighlight.biggestClimb.name,
+            achievementLabel: t('achievements.biggestClimb'),
+            value: `${Math.round(sportHighlight.biggestClimb.elevationGainMeters || 0)}m`,
+            icon: '⛰️',
+            color,
+          });
+        }
       });
-    }
-
-    // Add biggest climbs
-    if (sportHighlights.running?.biggestClimb) {
-      const activity = sportHighlights.running.biggestClimb;
-      results.push({
-        date: activity.date,
-        type: 'biggest-climb',
-        activity,
-        label: t('achievements.biggestClimb'),
-        value: `${Math.round(activity.elevationGainMeters || 0)}m`,
-        icon: '⛰️',
-        color: 'bg-gradient-to-r from-green-500 to-emerald-600',
-      });
-    }
-
-    if (sportHighlights.cycling?.biggestClimb) {
-      const activity = sportHighlights.cycling.biggestClimb;
-      results.push({
-        date: activity.date,
-        type: 'biggest-climb',
-        activity,
-        label: t('achievements.biggestClimb'),
-        value: `${Math.round(activity.elevationGainMeters || 0)}m`,
-        icon: '⛰️',
-        color: 'bg-gradient-to-r from-green-500 to-emerald-600',
-      });
-    }
 
     // Remove duplicates (same activity ID)
     const seen = new Set<string>();
@@ -153,10 +148,6 @@ export function AchievementTimeline({
 
     return unique.sort((a, b) => a.date.getTime() - b.date.getTime());
   }, [highlights, sportHighlights, t]);
-
-  const getAchievementLabel = (achievement: Achievement): string => {
-    return achievement.label;
-  };
 
   const formatMonth = (date: Date): string => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -207,17 +198,20 @@ export function AchievementTimeline({
               <div className="flex-1 min-w-0 pt-1">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
+                    {/* Activity name - first line */}
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors">
-                        {getAchievementLabel(achievement)}
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 transition-colors truncate">
+                        {achievement.activityName}
                       </h4>
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 flex-shrink-0">
                         {formatMonth(achievement.date)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate mb-1">
-                      {achievement.activity.name}
+                    {/* Achievement label - second line */}
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
+                      {achievement.achievementLabel}
                     </p>
+                    {/* Stats - third line */}
                     <div className="flex items-center gap-3 text-sm">
                       <span className="font-bold text-blue-600">{achievement.value}</span>
                       <span className="text-gray-500 dark:text-gray-400">
