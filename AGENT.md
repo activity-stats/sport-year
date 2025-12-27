@@ -787,14 +787,6 @@ npm run preview         # Preview production build locally
 
 **Build output**: `dist/` directory with optimized assets
 
-### Development Server
-
-```bash
-npm run dev             # Start dev server (http://localhost:5173)
-```
-
-**Hot Module Replacement (HMR)** enabled for instant updates
-
 ### Complete Validation
 
 ```bash
@@ -803,6 +795,52 @@ npm run ci:local        # Simulate CI pipeline locally
 ```
 
 **Before pushing**: Always run `npm run validate` to catch issues early
+
+### Pre-Commit Validation Workflow
+
+**CRITICAL**: Always validate the full build before committing changes:
+
+```bash
+# Full validation sequence (run these in order):
+npm run type-check      # 1. TypeScript compilation check
+npm run lint            # 2. ESLint check
+npm run format:check    # 3. Prettier formatting check
+npm test                # 4. Run all tests
+npm run build           # 5. Production build (most comprehensive check)
+```
+
+**Why this matters:**
+
+- ✅ Tests passing ≠ Build passing
+- TypeScript build uses stricter checks than test runtime
+- Build validates all type definitions, imports, and exports
+- Prevents broken builds in CI/CD pipeline
+
+**Quick validation:**
+
+```bash
+npm run validate && npm run build
+```
+
+**What each command checks:**
+
+| Command                | What it validates                    | Catches                               |
+| ---------------------- | ------------------------------------ | ------------------------------------- |
+| `npm run type-check`   | TypeScript types (no build output)   | Type errors, missing imports          |
+| `npm run lint`         | Code quality, best practices         | ESLint violations, unused vars        |
+| `npm run format:check` | Code formatting consistency          | Formatting inconsistencies            |
+| `npm test`             | Test suite execution                 | Runtime errors, logic bugs            |
+| `npm run build`        | Full TypeScript compile + Vite build | All type errors + build configuration |
+
+**Pre-commit checklist:**
+
+1. ✅ All tests pass (`npm test`)
+2. ✅ No type errors (`npm run type-check`)
+3. ✅ No lint errors (`npm run lint`)
+4. ✅ Code formatted (`npm run format:check`)
+5. ✅ **Build succeeds (`npm run build`)**
+
+**Note**: The automated pre-commit hook (Husky + lint-staged) runs formatting and linting on staged files. However, it does NOT run type checking or build validation. You MUST manually verify the build passes before committing.
 
 ## 📝 Code Patterns
 
