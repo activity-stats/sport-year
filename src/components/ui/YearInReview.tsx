@@ -13,6 +13,7 @@ import {
   formatDistanceWithUnit,
   formatDuration,
   formatDistanceForClosing,
+  formatAthleteSlug,
 } from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
@@ -578,10 +579,7 @@ export function YearInReview({
   const handleAdvancedExport = async (sections: ExportSection[], format: ExportFormat) => {
     try {
       // Create filename with athlete name if available
-      const athleteName =
-        athlete?.firstname || athlete?.lastname
-          ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
-          : 'athlete';
+      const athleteName = formatAthleteSlug(athlete);
       const filename = `${athleteName}-year-in-sports-review-${year}`;
 
       await exportWithOptions(sections, format, {
