@@ -64,8 +64,6 @@
     "otherAchievements": "Andere Prestaties",
     "morePerformances": "Nog meer ongelooflijke prestaties",
     "raceOverview": "Wedstrijd Overzicht",
-    "racesCompleted": "{{count}} wedstrijd voltooid",
-    "racesCompletedPlural": "{{count}} wedstrijden voltooid",
     "epicYear": "Wat een Episch Jaar!",
     "crushedDistance": "Je hebt",
     "across": "over",
@@ -130,13 +128,7 @@
     "sectionsDescription": "Selecteer en herschik de secties die je wilt opnemen in je export",
     "exportButton": "Exporteren"
   },
-  "months": {
-    "short": {
-      "mrt": "Mrt",
-      "mei": "Mei",
-      "okt": "Okt"
-    }
-  },
+  "months": {},
   "statsOverview": {
     "title": "{{year}} Overzicht",
     "totalDistance": "Totale Afstand",

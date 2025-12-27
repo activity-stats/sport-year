@@ -64,8 +64,6 @@
     "otherAchievements": "Other Achievements",
     "morePerformances": "Even more incredible performances",
     "raceOverview": "Race Overview",
-    "racesCompleted": "{{count}} race completed",
-    "racesCompletedPlural": "{{count}} races completed",
     "epicYear": "What an Epic Year!",
     "crushedDistance": "You crushed",
     "across": "across",
@@ -130,13 +128,7 @@
     "sectionsDescription": "Select and reorder the sections you want to include in your export",
     "exportButton": "Export"
   },
-  "months": {
-    "short": {
-      "mrt": "Mar",
-      "mei": "May",
-      "okt": "Oct"
-    }
-  },
+  "months": {},
   "statsOverview": {
     "title": "{{year}} Overview",
     "totalDistance": "Total Distance",
