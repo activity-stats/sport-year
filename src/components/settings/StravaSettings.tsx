@@ -46,21 +46,13 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
   };
 
   const handleClear = () => {
-    if (
-      confirm(
-        'Are you sure you want to clear your Strava credentials? You will need to set them up again.'
-      )
-    ) {
+    if (confirm(t('stravaSettings.clearCredentialsConfirm'))) {
       clearConfig();
     }
   };
 
   const handleClearData = async () => {
-    if (
-      !confirm(
-        'Are you sure you want to clear all cached activity data? This will force a full refresh on the next sync. This does NOT delete your Strava data, only the local cache.'
-      )
-    ) {
+    if (!confirm(t('stravaSettings.dataManagement.clearConfirm'))) {
       return;
     }
 
@@ -82,7 +74,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
   };
 
   const handleSync = async () => {
-    if (!confirm('Sync activities from Strava? This will check for new or updated activities.')) {
+    if (!confirm(t('stravaSettings.dataManagement.syncConfirm'))) {
       return;
     }
 
@@ -112,8 +104,8 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
         {/* Header */}
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white flex justify-between items-center flex-shrink-0">
           <div>
-            <h2 className="text-2xl font-black">Strava Settings</h2>
-            <p className="text-orange-100 text-sm mt-1">Manage your Strava app credentials</p>
+            <h2 className="text-2xl font-black">{t('stravaSettings.title')}</h2>
+            <p className="text-orange-100 text-sm mt-1">{t('stravaSettings.subtitle')}</p>
           </div>
           <button
             onClick={onClose}
@@ -130,15 +122,17 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
             <div className="flex gap-2">
               <span className="text-purple-600 text-xl">🔧</span>
               <div className="text-sm text-purple-900">
-                <strong>Technical Setup Required:</strong> This process requires creating a Strava
-                API application. Please follow these steps carefully.
+                <strong>{t('stravaSettings.technicalNotice')}</strong>{' '}
+                {t('stravaSettings.technicalDescription')}
               </div>
             </div>
           </div>
 
           {/* Step-by-step Guide */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">Setup Instructions</h3>
+            <h3 className="text-lg font-bold text-gray-900">
+              {t('stravaSettings.setupInstructions')}
+            </h3>
 
             {/* Step 1 */}
             <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
@@ -148,11 +142,10 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                    Go to Strava's API Settings
+                    {t('stravaSettings.step1.title')}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Click the button below. It will open Strava's API settings page in a new tab so
-                    you can easily switch back here to copy your credentials.
+                    {t('stravaSettings.step1.description')}
                   </p>
                   <a
                     href="https://www.strava.com/settings/api"
@@ -160,12 +153,10 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-orange-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm"
                   >
-                    <span>Open Strava API Settings</span>
+                    <span>{t('stravaSettings.step1.button')}</span>
                     <span className="text-lg">→</span>
                   </a>
-                  <p className="text-xs text-gray-500 mt-2">
-                    This will open in a new tab so you can easily copy your credentials.
-                  </p>
+                  <p className="text-xs text-gray-500 mt-2">{t('stravaSettings.step1.note')}</p>
                 </div>
               </div>
             </div>
@@ -178,39 +169,37 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                    Configure Your Application
+                    {t('stravaSettings.step2.title')}
                   </p>
                   <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                     <div>
                       <p className="font-semibold text-gray-700 dark:text-gray-300">
-                        Application Name:
+                        {t('stravaSettings.step2.applicationName')}
                       </p>
-                      <p>Choose any name you like (e.g., "My Sport Year")</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-700 dark:text-gray-300">Category:</p>
-                      <p>Select any category that fits</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-700 dark:text-gray-300">Website:</p>
-                      <p>
-                        Enter any website URL (e.g., your personal site or just use a placeholder
-                        like https://example.com)
-                      </p>
+                      <p>{t('stravaSettings.step2.applicationNameDesc')}</p>
                     </div>
                     <div>
                       <p className="font-semibold text-gray-700 dark:text-gray-300">
-                        Authorization Callback Domain:
+                        {t('stravaSettings.step2.category')}
                       </p>
-                      <p className="mb-2">
-                        ⚠️ <strong>Important:</strong> Enter ONLY the domain without port number:
+                      <p>{t('stravaSettings.step2.categoryDesc')}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">
+                        {t('stravaSettings.step2.website')}
                       </p>
+                      <p>{t('stravaSettings.step2.websiteDesc')}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-700 dark:text-gray-300">
+                        {t('stravaSettings.step2.callbackDomain')}
+                      </p>
+                      <p className="mb-2">{t('stravaSettings.step2.callbackImportant')}</p>
                       <div className="bg-gray-900 text-white px-3 py-2 rounded font-mono text-xs break-all">
                         {callbackDomain}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        Copy this value exactly. Do not include "http://", "https://", or port
-                        numbers.
+                        {t('stravaSettings.step2.callbackNote')}
                       </p>
                     </div>
                   </div>
@@ -226,11 +215,10 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                    Copy Your Credentials
+                    {t('stravaSettings.step3.title')}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    After creating your app, Strava will show you a <strong>Client ID</strong> and{' '}
-                    <strong>Client Secret</strong>. Copy these values and enter them below.
+                    {t('stravaSettings.step3.description')}
                   </p>
                 </div>
               </div>
@@ -240,7 +228,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
           {/* Credentials Input */}
           <div className="pt-4 border-t space-y-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              Enter Your Credentials
+              {t('stravaSettings.credentials.title')}
             </h3>
 
             <div>
@@ -248,14 +236,14 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 htmlFor="settings-clientId"
                 className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
               >
-                Client ID
+                {t('stravaSettings.credentials.clientId')}
               </label>
               <input
                 id="settings-clientId"
                 type="text"
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
-                placeholder="e.g., 123456"
+                placeholder={t('stravaSettings.credentials.clientIdPlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono"
               />
             </div>
@@ -265,7 +253,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                 htmlFor="settings-clientSecret"
                 className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2"
               >
-                Client Secret
+                {t('stravaSettings.credentials.clientSecret')}
               </label>
               <div className="relative">
                 <input
@@ -273,7 +261,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                   type={showSecret ? 'text' : 'password'}
                   value={clientSecret}
                   onChange={(e) => setClientSecret(e.target.value)}
-                  placeholder="Enter your client secret"
+                  placeholder={t('stravaSettings.credentials.clientSecretPlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono pr-20"
                 />
                 <button
@@ -281,7 +269,9 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                   onClick={() => setShowSecret(!showSecret)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-900 font-semibold"
                 >
-                  {showSecret ? 'Hide' : 'Show'}
+                  {showSecret
+                    ? t('stravaSettings.credentials.hide')
+                    : t('stravaSettings.credentials.show')}
                 </button>
               </div>
             </div>
@@ -290,8 +280,8 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
               <div className="flex gap-2">
                 <span className="text-yellow-600">⚠️</span>
                 <div className="text-sm text-yellow-900">
-                  <strong>Security Note:</strong> Your credentials are stored locally in your
-                  browser only. They never leave your device.
+                  <strong>{t('stravaSettings.securityNote')}</strong>{' '}
+                  {t('stravaSettings.securityDescription')}
                 </div>
               </div>
             </div>
@@ -303,20 +293,20 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                   disabled={!clientId.trim() || !clientSecret.trim()}
                   className="flex-1 bg-orange-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Save Changes
+                  {t('stravaSettings.saveChanges')}
                 </button>
                 <button
                   onClick={onClose}
                   className="px-6 py-3 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold"
                 >
-                  Cancel
+                  {t('stravaSettings.cancel')}
                 </button>
               </div>
 
               {/* Data Management Section */}
               <div className="border-t pt-4 mt-2 space-y-3">
                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                  Data Management
+                  {t('stravaSettings.dataManagement.title')}
                 </h4>
 
                 <button
@@ -327,12 +317,12 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                   {isSyncing ? (
                     <>
                       <span className="animate-spin">🔄</span>
-                      <span>Syncing...</span>
+                      <span>{t('stravaSettings.dataManagement.syncing')}</span>
                     </>
                   ) : (
                     <>
                       <span>🔄</span>
-                      <span>Sync Activities</span>
+                      <span>{t('stravaSettings.dataManagement.syncButton')}</span>
                     </>
                   )}
                 </button>
@@ -342,19 +332,19 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
                   disabled={isClearing}
                   className="w-full bg-yellow-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isClearing ? 'Clearing...' : '🗑️ Clear Cached Data'}
+                  {isClearing
+                    ? t('stravaSettings.dataManagement.clearing')
+                    : `🗑️ ${t('stravaSettings.dataManagement.clearCacheButton')}`}
                 </button>
 
-                <p className="text-xs text-gray-500">
-                  Sync checks for new activities. Clear cache to force a full refresh.
-                </p>
+                <p className="text-xs text-gray-500">{t('stravaSettings.dataManagement.note')}</p>
               </div>
 
               <button
                 onClick={handleClear}
                 className="w-full text-red-600 hover:text-red-700 font-semibold py-2 text-sm border-t pt-3 mt-2"
               >
-                Clear Credentials
+                {t('stravaSettings.clearCredentials')}
               </button>
             </div>
           </div>

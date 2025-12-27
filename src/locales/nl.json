@@ -219,5 +219,98 @@
     "biggestClimb": "Grootste Klim",
     "longestRide": "Langste Rit",
     "longestSwim": "Langste Zwempartij"
+  },
+  "stravaSettings": {
+    "title": "Strava Instellingen",
+    "subtitle": "Beheer je Strava app inloggegevens",
+    "technicalNotice": "Technische Installatie Vereist:",
+    "technicalDescription": "Dit proces vereist het aanmaken van een Strava API applicatie. Volg deze stappen zorgvuldig.",
+    "setupInstructions": "Installatie Instructies",
+    "step1": {
+      "title": "Ga naar Strava API Instellingen",
+      "description": "Klik op de knop hieronder. Het opent Strava's API instellingenpagina in een nieuw tabblad zodat je gemakkelijk terug kunt schakelen om je inloggegevens te kopiëren.",
+      "button": "Open Strava API Instellingen",
+      "note": "Dit opent in een nieuw tabblad zodat je gemakkelijk je inloggegevens kunt kopiëren."
+    },
+    "step2": {
+      "title": "Configureer Je Applicatie",
+      "applicationName": "Applicatie Naam:",
+      "applicationNameDesc": "Kies een naam die je leuk vindt (bijv. \"Mijn Sportjaar\")",
+      "category": "Categorie:",
+      "categoryDesc": "Selecteer een categorie die past",
+      "website": "Website:",
+      "websiteDesc": "Voer een website URL in (bijv. je persoonlijke site of gebruik een placeholder zoals https://example.com)",
+      "callbackDomain": "Autorisatie Callback Domein:",
+      "callbackImportant": "⚠️ Belangrijk: Voer ALLEEN het domein in zonder poortnummer:",
+      "callbackNote": "Kopieer deze waarde exact. Voeg geen \"http://\", \"https://\" of poortnummers toe."
+    },
+    "step3": {
+      "title": "Kopieer Je Inloggegevens",
+      "description": "Na het aanmaken van je app toont Strava een Client ID en Client Secret. Kopieer deze waarden en voer ze hieronder in."
+    },
+    "credentials": {
+      "title": "Voer Je Inloggegevens In",
+      "clientId": "Client ID",
+      "clientIdPlaceholder": "bijv. 123456",
+      "clientSecret": "Client Secret",
+      "clientSecretPlaceholder": "Voer je client secret in",
+      "show": "Tonen",
+      "hide": "Verbergen"
+    },
+    "securityNote": "Beveiligingsnotitie:",
+    "securityDescription": "Je inloggegevens worden alleen lokaal in je browser opgeslagen. Ze verlaten nooit je apparaat.",
+    "saveChanges": "Wijzigingen Opslaan",
+    "cancel": "Annuleren",
+    "dataManagement": {
+      "title": "Gegevensbeheer",
+      "syncButton": "Activiteiten Synchroniseren",
+      "syncing": "Synchroniseren...",
+      "clearCacheButton": "Gecachte Gegevens Wissen",
+      "clearing": "Wissen...",
+      "note": "Synchronisatie controleert op nieuwe activiteiten. Cache wissen forceert een volledige verversing.",
+      "syncConfirm": "Activiteiten synchroniseren van Strava? Dit controleert op nieuwe of bijgewerkte activiteiten.",
+      "clearConfirm": "Weet je zeker dat je alle gecachte activiteitengegevens wilt wissen? Dit forceert een volledige verversing bij de volgende synchronisatie. Dit verwijdert NIET je Strava-gegevens, alleen de lokale cache."
+    },
+    "clearCredentials": "Inloggegevens Wissen",
+    "clearCredentialsConfirm": "Weet je zeker dat je je Strava-inloggegevens wilt wissen? Je moet ze opnieuw instellen."
+  },
+  "onboardingGuide": {
+    "step1": {
+      "title": "Welkom bij Sportjaar!",
+      "description": "Creëer prachtige Jaaroverzichten van je sportprestaties. Laten we beginnen!"
+    },
+    "step2": {
+      "title": "Voeg een Achtergrondafbeelding Toe",
+      "description": "Personaliseer je Jaaroverzicht met een aangepaste hero achtergrond. Upload je favoriete foto of gebruik een URL.",
+      "action": "Achtergrond Toevoegen"
+    },
+    "step3": {
+      "title": "Configureer Filters",
+      "description": "Pas aan welke activiteiten verschijnen in je overzicht. Sluit activiteittypes uit, filter virtuele activiteiten, of verberg specifieke trainingen.",
+      "action": "Filters Instellen"
+    },
+    "step4": {
+      "title": "Je Bent Helemaal Klaar!",
+      "description": "Je Jaaroverzicht is klaar! Klik op de \"📱 Social Card\" knop om een deelbare afbeelding voor sociale media te maken.",
+      "action": "Aan de Slag"
+    },
+    "alreadyConfigured": "Al Geconfigureerd",
+    "features": {
+      "charts": {
+        "title": "Interactieve Grafieken",
+        "description": "Bekijk je voortgang met gedetailleerde statistieken"
+      },
+      "map": {
+        "title": "Activiteiten Kaart",
+        "description": "Zie waar je het hele jaar hebt getraind"
+      },
+      "social": {
+        "title": "Sociaal Delen",
+        "description": "Creëer prachtige afbeeldingen om te delen"
+      }
+    },
+    "skip": "Overslaan",
+    "next": "Volgende",
+    "stepIndicator": "Stap {{current}} van {{total}}"
   }
 }

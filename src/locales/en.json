@@ -219,5 +219,98 @@
     "biggestClimb": "Biggest Climb",
     "longestRide": "Longest Ride",
     "longestSwim": "Longest Swim"
+  },
+  "stravaSettings": {
+    "title": "Strava Settings",
+    "subtitle": "Manage your Strava app credentials",
+    "technicalNotice": "Technical Setup Required:",
+    "technicalDescription": "This process requires creating a Strava API application. Please follow these steps carefully.",
+    "setupInstructions": "Setup Instructions",
+    "step1": {
+      "title": "Go to Strava's API Settings",
+      "description": "Click the button below. It will open Strava's API settings page in a new tab so you can easily switch back here to copy your credentials.",
+      "button": "Open Strava API Settings",
+      "note": "This will open in a new tab so you can easily copy your credentials."
+    },
+    "step2": {
+      "title": "Configure Your Application",
+      "applicationName": "Application Name:",
+      "applicationNameDesc": "Choose any name you like (e.g., \"My Sport Year\")",
+      "category": "Category:",
+      "categoryDesc": "Select any category that fits",
+      "website": "Website:",
+      "websiteDesc": "Enter any website URL (e.g., your personal site or just use a placeholder like https://example.com)",
+      "callbackDomain": "Authorization Callback Domain:",
+      "callbackImportant": "⚠️ Important: Enter ONLY the domain without port number:",
+      "callbackNote": "Copy this value exactly. Do not include \"http://\", \"https://\", or port numbers."
+    },
+    "step3": {
+      "title": "Copy Your Credentials",
+      "description": "After creating your app, Strava will show you a Client ID and Client Secret. Copy these values and enter them below."
+    },
+    "credentials": {
+      "title": "Enter Your Credentials",
+      "clientId": "Client ID",
+      "clientIdPlaceholder": "e.g., 123456",
+      "clientSecret": "Client Secret",
+      "clientSecretPlaceholder": "Enter your client secret",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "securityNote": "Security Note:",
+    "securityDescription": "Your credentials are stored locally in your browser only. They never leave your device.",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "dataManagement": {
+      "title": "Data Management",
+      "syncButton": "Sync Activities",
+      "syncing": "Syncing...",
+      "clearCacheButton": "Clear Cached Data",
+      "clearing": "Clearing...",
+      "note": "Sync checks for new activities. Clear cache to force a full refresh.",
+      "syncConfirm": "Sync activities from Strava? This will check for new or updated activities.",
+      "clearConfirm": "Are you sure you want to clear all cached activity data? This will force a full refresh on the next sync. This does NOT delete your Strava data, only the local cache."
+    },
+    "clearCredentials": "Clear Credentials",
+    "clearCredentialsConfirm": "Are you sure you want to clear your Strava credentials? You will need to set them up again."
+  },
+  "onboardingGuide": {
+    "step1": {
+      "title": "Welcome to Sport Year!",
+      "description": "Create beautiful Year in Review summaries of your athletic achievements. Let's get you started!"
+    },
+    "step2": {
+      "title": "Add a Background Image",
+      "description": "Personalize your Year in Review with a custom hero background. Upload your favorite photo or use a URL.",
+      "action": "Add Background"
+    },
+    "step3": {
+      "title": "Configure Filters",
+      "description": "Customize which activities appear in your review. Exclude activity types, filter virtual activities, or hide specific workouts.",
+      "action": "Set Filters"
+    },
+    "step4": {
+      "title": "You're All Set!",
+      "description": "Your Year in Review is ready! Click the \"📱 Social Card\" button to create a shareable image for social media.",
+      "action": "Get Started"
+    },
+    "alreadyConfigured": "Already Configured",
+    "features": {
+      "charts": {
+        "title": "Interactive Charts",
+        "description": "View your progress with detailed stats"
+      },
+      "map": {
+        "title": "Activity Map",
+        "description": "See where you trained throughout the year"
+      },
+      "social": {
+        "title": "Social Sharing",
+        "description": "Create beautiful images to share"
+      }
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "stepIndicator": "Step {{current}} of {{total}}"
   }
 }
