@@ -134,7 +134,7 @@ export function SocialCard({
           console.log('Shared successfully using Web Share API');
           return;
         } catch (err) {
-          if ((err as any).name === 'AbortError') {
+          if ((err as Error & { name: string }).name === 'AbortError') {
             console.log('User cancelled share');
             return;
           }
@@ -197,7 +197,19 @@ export function SocialCard({
       // Try File System Access API first (Chrome/Edge)
       if ('showSaveFilePicker' in window) {
         try {
-          const handle = await (window as any).showSaveFilePicker({
+          const handle = await (
+            window as Window & {
+              showSaveFilePicker: (options: {
+                suggestedName: string;
+                types: Array<{ description: string; accept: Record<string, string[]> }>;
+              }) => Promise<{
+                createWritable: () => Promise<{
+                  write: (data: Blob) => Promise<void>;
+                  close: () => Promise<void>;
+                }>;
+              }>;
+            }
+          ).showSaveFilePicker({
             suggestedName: filename,
             types: [
               {
@@ -215,7 +227,7 @@ export function SocialCard({
           console.log('File saved successfully using File System Access API');
           return;
         } catch (err) {
-          if ((err as any).name === 'AbortError') {
+          if ((err as Error & { name: string }).name === 'AbortError') {
             console.log('User cancelled save dialog');
             return;
           }
@@ -269,15 +281,15 @@ export function SocialCard({
         hasBadge: 'badge' in item,
         distance:
           'distance' in item
-            ? (item as any).distance
+            ? (item as { distance: number }).distance
             : 'distanceKm' in item
-              ? (item as any).distanceKm
+              ? (item as { distanceKm: number }).distanceKm
               : 'MISSING',
         duration:
           'duration' in item
-            ? (item as any).duration
+            ? (item as { duration: number }).duration
             : 'movingTimeMinutes' in item
-              ? (item as any).movingTimeMinutes
+              ? (item as { movingTimeMinutes: number }).movingTimeMinutes
               : 'MISSING',
         rawItem: item,
       };

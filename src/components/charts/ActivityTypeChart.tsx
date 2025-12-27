@@ -86,6 +86,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             cx="50%"
             cy="50%"
             labelLine={false}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             label={(props: any) =>
               `${props.translatedName} ${((props.percent ?? 0) * 100).toFixed(0)}%`
             }
@@ -100,6 +101,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             ))}
           </Pie>
           <Tooltip
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(val: number | undefined, _name: string | undefined, props: any) => {
               if (val === undefined) return ['', ''];
               const translatedName = props?.payload?.translatedName || _name;
@@ -112,6 +114,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Legend formatter={(_value: string, entry: any) => entry.payload.translatedName} />
         </PieChart>
       </ResponsiveContainer>

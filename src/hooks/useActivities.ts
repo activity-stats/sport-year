@@ -3,7 +3,7 @@ import { stravaClient } from '../api/strava/index.ts';
 import { transformActivities } from '../utils/index.ts';
 import { useDataSyncStore } from '../stores/dataSyncStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
-
+import type { Activity } from '../types/activity.ts';
 export const useActivities = (year: number | 'last365') => {
   const { getLastActivityTimestamp, setLastActivityTimestamp, setLastSyncTime } =
     useDataSyncStore();
@@ -26,7 +26,7 @@ export const useActivities = (year: number | 'last365') => {
         const lastTimestamp = getLastActivityTimestamp(queryYear);
 
         // Get existing cached activities (will be empty on first load)
-        const existingActivities = queryClient.getQueryData<any[]>(['activities', year]) || [];
+        const existingActivities = queryClient.getQueryData<Activity[]>(['activities', year]) || [];
 
         // Only do incremental fetch if we have BOTH lastTimestamp AND existing cached data
         // This ensures first load always gets all activities
@@ -43,7 +43,7 @@ export const useActivities = (year: number | 'last365') => {
           const newTransformed = transformActivities(newStravaActivities);
 
           // Merge new activities with existing ones, avoiding duplicates
-          const existingIds = new Set(existingActivities.map((a: any) => a.id));
+          const existingIds = new Set(existingActivities.map((a: Activity) => a.id));
           const uniqueNewActivities = newTransformed.filter((a) => !existingIds.has(a.id));
 
           transformed = [...existingActivities, ...uniqueNewActivities];

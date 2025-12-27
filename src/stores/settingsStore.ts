@@ -690,8 +690,9 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: 'sport-year-settings',
       version: 5,
-      migrate: (persistedState: any, version: number) => {
-        let state = persistedState;
+      migrate: (persistedState: unknown, version: number) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let state = persistedState as any;
         if (version < 2) {
           state = {
             ...state,
@@ -774,11 +775,14 @@ export const useSettingsStore = create<SettingsState>()(
             },
             sportBreakdown: {
               ...state.sportBreakdown,
-              activities: state.sportBreakdown.activities.map((a: any) => ({
-                ...a,
-                includeInStats: a.includeInStats ?? true,
-                includeInHighlights: a.includeInHighlights ?? true,
-              })),
+              activities: state.sportBreakdown.activities.map(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (a: any) => ({
+                  ...a,
+                  includeInStats: a.includeInStats ?? true,
+                  includeInHighlights: a.includeInHighlights ?? true,
+                })
+              ),
             },
           };
         }

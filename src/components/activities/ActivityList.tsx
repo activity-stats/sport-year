@@ -68,7 +68,9 @@ export const ActivityList = ({ activities }: ActivityListProps) => {
 
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) =>
+                setSortBy(e.target.value as 'date' | 'distance' | 'duration' | 'elevation')
+              }
               className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="date">Sort: Date</option>
