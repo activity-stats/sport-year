@@ -13,6 +13,7 @@ import {
   formatDistanceWithUnit,
   formatDuration,
   formatDistanceForClosing,
+  formatAthleteSlug,
 } from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
@@ -25,6 +26,7 @@ import type { StatOption } from './statsOptions';
 import { HeatmapCalendar } from '../charts/HeatmapCalendar';
 import { useAdvancedExport } from '../../hooks/useAdvancedExport';
 import { ExportDialog, type ExportSection, type ExportFormat } from './ExportDialog';
+import { showError } from '../../utils/toast';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
@@ -577,12 +579,8 @@ export function YearInReview({
 
   const handleAdvancedExport = async (sections: ExportSection[], format: ExportFormat) => {
     try {
-      console.log(`Starting ${format.toUpperCase()} export with ${sections.length} sections...`);
       // Create filename with athlete name if available
-      const athleteName =
-        athlete?.firstname || athlete?.lastname
-          ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
-          : 'athlete';
+      const athleteName = formatAthleteSlug(athlete);
       const filename = `${athleteName}-year-in-sports-review-${year}`;
 
       await exportWithOptions(sections, format, {
@@ -590,13 +588,11 @@ export function YearInReview({
         quality: 0.95,
         scale: 2,
       });
-      console.log('Export completed successfully');
       // Close the dialog after successful export
       setShowExportDialog(false);
     } catch (error) {
-      console.error('Export failed:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
-      alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
+      showError(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
       // Close the dialog even on error so user can try again
       setShowExportDialog(false);
     }

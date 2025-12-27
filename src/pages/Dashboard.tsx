@@ -67,8 +67,6 @@ export const Dashboard = () => {
         : 'light'
       : theme;
 
-  console.log('[Dashboard] Current theme:', theme, '→ effective:', currentTheme);
-
   // Build loading steps based on current stage
   const loadingSteps: LoadingStep[] = useMemo(() => {
     const steps = [
@@ -134,8 +132,6 @@ export const Dashboard = () => {
     const result = sportBreakdown.activities
       .filter((a) => a.enabled)
       .sort((a, b) => a.order - b.order);
-    console.log('[Dashboard] enabledSportActivities:', result);
-    console.log('[Dashboard] sportBreakdown:', sportBreakdown);
     return result;
   }, [sportBreakdown]);
 

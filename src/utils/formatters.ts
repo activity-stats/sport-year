@@ -78,3 +78,19 @@ export const formatTime = (date: Date): string => {
     minute: '2-digit',
   });
 };
+
+/**
+ * Format athlete name as URL-friendly slug
+ * Used for generating filenames with athlete names
+ * @param athlete - Strava athlete object (can be null)
+ * @returns Lowercase slug with hyphens, or 'athlete' if no athlete data
+ * @example formatAthleteSlug({firstname: 'John', lastname: 'Doe'}) => 'john-doe'
+ */
+export const formatAthleteSlug = (
+  athlete: { firstname: string; lastname: string } | null | undefined
+): string => {
+  if (!athlete?.firstname && !athlete?.lastname) {
+    return 'athlete';
+  }
+  return `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-');
+};

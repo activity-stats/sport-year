@@ -70,7 +70,7 @@ interface SportBreakdownSettings {
   activities: SportBreakdownActivity[];
 }
 
-interface YearInReviewSettings {
+export interface YearInReviewSettings {
   backgroundImageUrl: string | null;
   backgroundImagePosition: { x: number; y: number; scale: number };
   excludedActivityTypes: ActivityType[];

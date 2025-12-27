@@ -162,6 +162,7 @@ export const ActivityMap = ({ activities, height = '600px' }: ActivityMapProps) 
         latlngs.forEach((latlng) => bounds.extend(latlng));
         validActivityCount++;
       } catch (error) {
+        // Warn about invalid polyline data (may indicate data quality issues)
         console.warn(`Failed to decode polyline for activity ${activity.id}:`, error);
       }
     });

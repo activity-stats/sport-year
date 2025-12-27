@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TIMING } from '../../constants/timing';
 import { useStravaConfigStore } from '../../stores/stravaConfigStore';
 import { useDataSyncStore } from '../../stores/dataSyncStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRefreshActivities } from '../../hooks/useActivities';
+import { showSuccess, showError, showInfo } from '../../utils/toast';
 
 interface StravaSettingsProps {
   onClose: () => void;
@@ -64,10 +66,11 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
       queryClient.clear();
       // Force a fresh fetch for current year
       await queryClient.refetchQueries({ queryKey: ['activities', currentYear] });
-      alert(t('errors.cacheClearSuccess'));
+      showSuccess(t('errors.cacheClearSuccess'));
     } catch (error) {
+      // Log critical cache clear error for debugging
       console.error('Failed to clear data:', error);
-      alert(t('errors.cacheClearFailed'));
+      showError(t('errors.cacheClearFailed'));
     } finally {
       setIsClearing(false);
     }
@@ -82,11 +85,12 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
     try {
       refreshActivities(currentYear);
       // Wait a bit for the query to start
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(t('errors.syncStarted'));
+      await new Promise((resolve) => setTimeout(resolve, TIMING.RETRY_DELAY_MS));
+      showInfo(t('errors.syncStarted'));
     } catch (error) {
+      // Log critical sync error for debugging
       console.error('Failed to sync:', error);
-      alert(t('errors.syncFailed'));
+      showError(t('errors.syncFailed'));
     } finally {
       setIsSyncing(false);
     }

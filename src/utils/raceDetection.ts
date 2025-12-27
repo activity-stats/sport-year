@@ -289,17 +289,6 @@ export function detectRaceHighlights(
 
   // Process custom filters FIRST (before standard detection) so they take precedence
   if (settings?.activityFilters && settings.activityFilters.length > 0) {
-    console.log('========================================');
-    console.log('[Race Detection] Processing custom filters FIRST');
-    console.log(
-      '[Race Detection] Filters:',
-      settings.activityFilters.map(
-        (f) =>
-          `${f.activityType}: ${f.distanceFilters.length} distance filters, ${f.titlePatterns.length} title patterns`
-      )
-    );
-    console.log('========================================');
-
     // Process each activity type filter separately
     settings.activityFilters.forEach((activityFilter) => {
       // Get activities of this type
@@ -308,10 +297,6 @@ export function detectRaceHighlights(
       // FIRST: Remove activities that match ignore patterns
       const filteredTypeActivities = typeActivities.filter(
         (a) => !shouldExcludeFromHighlights(a, settings?.titleIgnorePatterns)
-      );
-
-      console.log(
-        `  [${activityFilter.activityType}] ${typeActivities.length} total, ${filteredTypeActivities.length} after ignore patterns`
       );
 
       // Process distance filters with best-match selection PER FILTER
@@ -375,7 +360,6 @@ export function detectRaceHighlights(
         // Select the SINGLE BEST match from candidates for this filter
         // Priority: 1) Fastest pace, 2) Closest distance, 3) Most recent
         if (candidates.length > 0) {
-          console.log(`  [${filterKey}] Found ${candidates.length} candidates`);
           let bestMatch = candidates[0];
 
           for (let i = 1; i < candidates.length; i++) {
@@ -414,28 +398,20 @@ export function detectRaceHighlights(
             activity: bestMatch.activity,
             diff: bestMatch.diff,
           });
-          const pace = bestMatch.activity.movingTimeMinutes / bestMatch.activity.distanceKm;
-          console.log(
-            `    ✅ Best match: ${bestMatch.activity.name} (${bestMatch.activity.distanceKm.toFixed(2)}km, pace: ${pace.toFixed(2)} min/km)`
-          );
         }
       });
 
       // Now process the best matches and mark activities as used
       for (const match of filterMatches.values()) {
-        const { distFilter, activity, diff } = match;
+        const { distFilter, activity, diff: _diff } = match;
 
         // Double-check: skip if already added by another filter
         if (customFilteredActivityIds.has(activity.id)) {
-          console.log(`    ⚠️ Skipping ${activity.name} - already matched by another filter`);
           continue;
         }
 
         // Activity has already been filtered by ignore patterns, so no need to check again here
         customFilteredActivityIds.add(activity.id);
-        console.log(
-          `    ✅ Adding highlight: ${activity.name} (${activity.distanceKm.toFixed(2)}km)`
-        );
 
         // Create a descriptive badge based on the filter and activity type
         let badgeLabel = '';
@@ -484,10 +460,6 @@ export function detectRaceHighlights(
           badgeLabel = `≤${Math.round(distFilter.value)}${distFilter.unit}`;
         }
 
-        const matchedFilter = `${distFilter.operator} ${distFilter.value}${distFilter.unit}`;
-        console.log(
-          `  ✅ Custom filter (${matchedFilter}): ${activity.name} (${activity.distanceKm.toFixed(2)}km, diff: ${diff.toFixed(2)}km)`
-        );
         highlights.push({
           id: activity.id,
           name: activity.name,
@@ -511,9 +483,6 @@ export function detectRaceHighlights(
             customFilteredActivityIds.add(activity.id);
             const typeEmoji =
               activity.type === 'Run' ? '🏃' : activity.type.includes('Ride') ? '🚴' : '🏊';
-            console.log(
-              `  ✅ Custom filter (title: ${pattern}): ${activity.name} (${activity.distanceKm.toFixed(2)}km)`
-            );
             highlights.push({
               id: activity.id,
               name: activity.name,
@@ -528,11 +497,6 @@ export function detectRaceHighlights(
         });
       });
     });
-
-    console.log(
-      `[Race Detection] ${customFilteredActivityIds.size} activities matched custom filters`
-    );
-    console.log('========================================');
   }
 
   // Detect triathlons
@@ -585,17 +549,6 @@ export function detectRaceHighlightsWithExcluded(
 
   // Process custom filters FIRST (before standard detection) so they take precedence
   if (settings?.activityFilters && settings.activityFilters.length > 0) {
-    console.log('========================================');
-    console.log('[Race Detection] Processing custom filters FIRST');
-    console.log(
-      '[Race Detection] Filters:',
-      settings.activityFilters.map(
-        (f) =>
-          `${f.activityType}: ${f.distanceFilters.length} distance filters, ${f.titlePatterns.length} title patterns`
-      )
-    );
-    console.log('========================================');
-
     // Process each activity type filter separately
     settings.activityFilters.forEach((activityFilter) => {
       // Get activities of this type
@@ -604,10 +557,6 @@ export function detectRaceHighlightsWithExcluded(
       // FIRST: Remove activities that match ignore patterns
       const filteredTypeActivities = typeActivities.filter(
         (a) => !shouldExcludeFromHighlights(a, settings?.titleIgnorePatterns)
-      );
-
-      console.log(
-        `  [${activityFilter.activityType}] ${typeActivities.length} total, ${filteredTypeActivities.length} after ignore patterns`
       );
 
       // Collect all filter matches FIRST, then sort by proximity to pick the single best match per filter
@@ -761,11 +710,6 @@ export function detectRaceHighlightsWithExcluded(
         });
       });
     });
-
-    console.log(
-      `[Race Detection] ${customFilteredActivityIds.size} activities matched custom filters`
-    );
-    console.log('========================================');
   }
 
   // Detect triathlons
