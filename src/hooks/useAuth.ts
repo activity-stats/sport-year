@@ -26,8 +26,6 @@ export const useAuth = () => {
 
   const login = () => {
     const authUrl = stravaClient.getAuthUrl();
-    console.log('Initiating login with auth URL:', authUrl);
-    console.log('Expected callback URL:', `${window.location.origin}/callback`);
     window.location.href = authUrl;
   };
 
@@ -38,6 +36,7 @@ export const useAuth = () => {
       setAthlete(tokenResponse.athlete);
       navigate('/');
     } catch (error) {
+      // Log critical auth error for debugging
       console.error('Failed to exchange token:', error);
       throw error;
     }

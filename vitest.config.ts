@@ -19,6 +19,13 @@ export default defineConfig({
         'dist/',
         'src/locales/*.json',
       ],
+      // Coverage thresholds - enforce minimum coverage
+      thresholds: {
+        statements: 80,
+        branches: 70,
+        functions: 75,
+        lines: 80,
+      },
     },
   },
 });

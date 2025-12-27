@@ -35,11 +35,8 @@ export function useAdvancedExport() {
         throw new Error('No sections selected for export');
       }
 
-      console.log(`Exporting ${enabledSections.length} sections to ${format.toUpperCase()}`);
-
       // Hide fixed positioned elements (buttons, etc.) during export
       fixedElements = document.querySelectorAll('.print\\:hidden');
-      console.log(`Found ${fixedElements.length} fixed elements to hide`);
       fixedElements.forEach((el, index) => {
         const htmlEl = el as HTMLElement;
         originalDisplays[index] = htmlEl.style.display;
@@ -47,8 +44,6 @@ export function useAdvancedExport() {
       });
 
       setProgress(20);
-
-      console.log('Preparing sections for export...');
 
       // Get the main container
       const mainContainer = document.getElementById('year-in-review-content');
@@ -90,8 +85,6 @@ export function useAdvancedExport() {
 
       setProgress(40);
 
-      console.log('Starting capture...');
-
       // Wait for layout to settle
       await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -99,8 +92,6 @@ export function useAdvancedExport() {
         scale,
         backgroundColor: '#ffffff',
       });
-
-      console.log(`Canvas created: ${canvas.width}x${canvas.height}`);
 
       // Restore main container styles
       mainContainer.style.overflow = originalOverflow;
@@ -124,10 +115,6 @@ export function useAdvancedExport() {
       }
 
       setProgress(100);
-      console.log(`Export completed successfully as ${format.toUpperCase()}`);
-    } catch (error) {
-      console.error('Failed to export:', error);
-      throw error;
     } finally {
       // Always restore fixed elements
       if (fixedElements) {
@@ -153,8 +140,6 @@ export function useAdvancedExport() {
     const imgWidth = 210; // A4 width in mm
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    console.log(`PDF dimensions: ${imgWidth}x${imgHeight}mm`);
-
     // Create PDF with custom page size to fit all content on one page
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -163,17 +148,12 @@ export function useAdvancedExport() {
       compress: true,
     });
 
-    console.log('Converting canvas to data URL...');
     const imgData = canvas.toDataURL('image/jpeg', quality);
-    console.log('Data URL created, adding to PDF...');
 
     // Add the entire image as a single page (no page breaks!)
     pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
 
-    console.log('PDF created as single continuous page');
-
     // Save the PDF
-    console.log(`Saving PDF as ${filename}...`);
     pdf.save(filename);
   };
 
@@ -183,8 +163,6 @@ export function useAdvancedExport() {
     mimeType: string,
     quality = 0.95
   ): Promise<void> => {
-    console.log(`Converting canvas to ${mimeType}...`);
-
     // Convert canvas to blob
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
@@ -213,8 +191,6 @@ export function useAdvancedExport() {
     // Cleanup
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    console.log(`Saved image as ${filename}`);
   };
 
   return {

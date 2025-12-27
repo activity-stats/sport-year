@@ -160,14 +160,11 @@ export function SocialCard({
             text: shareText,
             files: [file],
           });
-          console.log('Shared successfully using Web Share API');
           return;
         } catch (err) {
           if ((err as Error & { name: string }).name === 'AbortError') {
-            console.log('User cancelled share');
             return;
           }
-          console.log('Web Share API failed, falling back:', err);
         }
       }
 
@@ -209,14 +206,11 @@ export function SocialCard({
 
     setIsExporting(true);
     try {
-      console.log('Starting card export...');
       const dataUrl = await domToPng(cardRef.current, {
         quality: 1,
         width: currentFormat.width,
         height: currentFormat.height,
       });
-
-      console.log('Card exported successfully, creating download...');
 
       // Create filename with athlete name and year
       const athleteSlug = athlete
@@ -254,14 +248,11 @@ export function SocialCard({
           const blob = await response.blob();
           await writable.write(blob);
           await writable.close();
-          console.log('File saved successfully using File System Access API');
           return;
         } catch (err) {
           if ((err as Error & { name: string }).name === 'AbortError') {
-            console.log('User cancelled save dialog');
             return;
           }
-          console.log('File System Access API failed, falling back to download link:', err);
         }
       }
 
@@ -280,7 +271,6 @@ export function SocialCard({
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        console.log('Download triggered successfully');
       }, 100);
     } catch (error) {
       console.error('Failed to export card:', error);
@@ -301,36 +291,6 @@ export function SocialCard({
       return dateA - dateB;
     })
     .slice(0, 6);
-
-  // Debug logging
-  console.log('Social Card - Selected highlights:', selectedHighlights);
-  console.log('Social Card - Selected activities:', selectedActivities);
-  console.log(
-    'Social Card - Combined items:',
-    allSelectedItems.map((item) => {
-      const isTriathlon = 'badge' in item && 'activities' in item;
-      return {
-        id: item.id,
-        name: item.name,
-        isTriathlon,
-        hasActivities: 'activities' in item,
-        hasBadge: 'badge' in item,
-        distance:
-          'distance' in item
-            ? (item as { distance: number }).distance
-            : 'distanceKm' in item
-              ? (item as { distanceKm: number }).distanceKm
-              : 'MISSING',
-        duration:
-          'duration' in item
-            ? (item as { duration: number }).duration
-            : 'movingTimeMinutes' in item
-              ? (item as { movingTimeMinutes: number }).movingTimeMinutes
-              : 'MISSING',
-        rawItem: item,
-      };
-    })
-  );
 
   const athleteName = athlete ? `${athlete.firstname} ${athlete.lastname}` : 'Athlete';
 

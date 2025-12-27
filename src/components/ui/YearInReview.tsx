@@ -577,7 +577,6 @@ export function YearInReview({
 
   const handleAdvancedExport = async (sections: ExportSection[], format: ExportFormat) => {
     try {
-      console.log(`Starting ${format.toUpperCase()} export with ${sections.length} sections...`);
       // Create filename with athlete name if available
       const athleteName =
         athlete?.firstname || athlete?.lastname
@@ -590,11 +589,9 @@ export function YearInReview({
         quality: 0.95,
         scale: 2,
       });
-      console.log('Export completed successfully');
       // Close the dialog after successful export
       setShowExportDialog(false);
     } catch (error) {
-      console.error('Export failed:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
       // Close the dialog even on error so user can try again

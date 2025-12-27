@@ -66,6 +66,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
       await queryClient.refetchQueries({ queryKey: ['activities', currentYear] });
       alert(t('errors.cacheClearSuccess'));
     } catch (error) {
+      // Log critical cache clear error for debugging
       console.error('Failed to clear data:', error);
       alert(t('errors.cacheClearFailed'));
     } finally {
@@ -85,6 +86,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert(t('errors.syncStarted'));
     } catch (error) {
+      // Log critical sync error for debugging
       console.error('Failed to sync:', error);
       alert(t('errors.syncFailed'));
     } finally {
