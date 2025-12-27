@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../../i18n';
 import { StravaSettings } from '../StravaSettings';
 import { useStravaConfigStore } from '../../../stores/stravaConfigStore';
 
@@ -19,7 +21,7 @@ vi.mock('../../../stores/dataSyncStore', () => ({
 // Mock window.confirm
 window.confirm = vi.fn();
 
-// Test wrapper with QueryClient
+// Test wrapper with QueryClient and I18n
 const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -29,7 +31,9 @@ const createWrapper = () => {
     },
   });
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+    </QueryClientProvider>
   );
 };
 
@@ -280,6 +284,68 @@ describe('StravaSettings', () => {
       await user.click(clearButton);
 
       expect(mockClearConfig).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('keyboard shortcuts', () => {
+    it('should close modal on ESC key press', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      window.dispatchEvent(escapeEvent);
+
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not close on other key presses', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+      window.dispatchEvent(enterEvent);
+
+      expect(mockOnClose).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('data management', () => {
+    it('should show Sync Activities button', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      expect(screen.getByRole('button', { name: /Sync Activities/i })).toBeInTheDocument();
+    });
+
+    it('should show Clear Cached Data button', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      expect(screen.getByRole('button', { name: /Clear Cached Data/i })).toBeInTheDocument();
+    });
+
+    it('should not sync when confirmation is cancelled', async () => {
+      const user = userEvent.setup();
+      (window.confirm as any).mockReturnValue(false);
+
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const syncButton = screen.getByRole('button', { name: /Sync Activities/i });
+      await user.click(syncButton);
+
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('Sync activities from Strava?')
+      );
+    });
+
+    it('should not clear data when confirmation is cancelled', async () => {
+      const user = userEvent.setup();
+      (window.confirm as any).mockReturnValue(false);
+
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const clearButton = screen.getByRole('button', { name: /Clear Cached Data/i });
+      await user.click(clearButton);
+
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('Are you sure you want to clear all cached activity data?')
+      );
     });
   });
 

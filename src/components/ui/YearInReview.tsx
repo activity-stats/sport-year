@@ -1,12 +1,19 @@
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import {
   detectRaceHighlights,
   detectRaceHighlightsWithExcluded,
+  detectTriathlons,
+  getTriathlonDisplayInfo,
   type RaceHighlight,
 } from '../../utils/raceDetection';
-import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
+import {
+  formatDistanceWithUnit,
+  formatDuration,
+  formatDistanceForClosing,
+} from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
 import type { ActivityType } from '../../types';
@@ -16,6 +23,8 @@ import { SocialCard } from './SocialCard';
 import { StatsSelector } from './StatsSelector';
 import type { StatOption } from './statsOptions';
 import { HeatmapCalendar } from '../charts/HeatmapCalendar';
+import { useAdvancedExport } from '../../hooks/useAdvancedExport';
+import { ExportDialog, type ExportSection, type ExportFormat } from './ExportDialog';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
@@ -41,41 +50,45 @@ interface HighlightFilters {
 }
 
 interface YearInReviewProps {
-  year: number;
+  year: number | 'last365';
   stats: YearStats;
   activities: Activity[];
   athlete: StravaAthlete | null;
   highlightFilters: HighlightFilters;
   backgroundImageUrl?: string | null;
+  onDateClick?: (date: Date) => void;
 }
 
 function SportDetailSection({
   highlights,
   customHighlights = [],
+  sectionId,
 }: {
   highlights: SportHighlights;
   customHighlights?: RaceHighlight[];
+  sectionId?: string;
 }) {
+  const { t } = useTranslation();
   const sportConfig = {
     running: {
       emoji: '🏃',
-      title: 'Running',
+      title: t('activityTypes.Run'),
       gradient: 'from-orange-500 to-red-600',
-      paceLabel: 'Avg Pace',
+      paceLabel: t('yearInReview.avgPace'),
       paceUnit: 'min/km',
     },
     cycling: {
       emoji: '🚴',
-      title: 'Cycling',
+      title: t('activityTypes.Ride'),
       gradient: 'from-blue-500 to-cyan-600',
-      paceLabel: 'Avg Speed',
+      paceLabel: t('yearInReview.avgSpeed'),
       paceUnit: 'km/h',
     },
     swimming: {
       emoji: '🏊',
-      title: 'Swimming',
+      title: t('activityTypes.Swim'),
       gradient: 'from-teal-500 to-blue-600',
-      paceLabel: 'Avg Pace',
+      paceLabel: t('yearInReview.avgPace'),
       paceUnit: 'min/100m',
     },
   };
@@ -97,25 +110,25 @@ function SportDetailSection({
   };
 
   return (
-    <div className="container mx-auto px-6 py-16 md:py-20">
-      <div className="text-center mb-12">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <div className="text-5xl">{config.emoji}</div>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-            {config.title} Highlights
+    <div id={sectionId} className="container mx-auto px-3 sm:px-6 py-8 sm:py-16 md:py-20">
+      <div className="text-center mb-8 sm:mb-12">
+        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3 sm:mb-4 flex-wrap">
+          <div className="text-3xl sm:text-5xl">{config.emoji}</div>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+            {config.title} {t('yearInReview.highlights')}
           </h2>
         </div>
         <div
-          className={`h-1.5 w-32 bg-gradient-to-r ${config.gradient} mx-auto rounded-full mb-6`}
+          className={`h-1.5 w-24 sm:w-32 bg-gradient-to-r ${config.gradient} mx-auto rounded-full mb-4 sm:mb-6`}
         ></div>
 
         {/* Overview stats */}
-        <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-600 dark:text-gray-400">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-sm sm:text-lg text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-gray-900 dark:text-white">
               {formatDistanceWithUnit(highlights.totalDistance * 1000)}
             </span>
-            <span>total</span>
+            <span>{t('yearInReview.total')}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-gray-900 dark:text-white">{config.paceLabel}:</span>
@@ -128,13 +141,13 @@ function SportDetailSection({
               <span className="font-bold text-gray-900 dark:text-white">
                 ⛰️ {Math.round(highlights.totalElevation).toLocaleString('de-DE')}m
               </span>
-              <span>elevation</span>
+              <span>{t('yearInReview.elevation')}</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Custom Highlights - activities matching custom filters */}
         {customHighlights.map((highlight) => {
           // Check if this is the longest activity
@@ -152,7 +165,7 @@ function SportDetailSection({
               href={`https://www.strava.com/activities/${highlight.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
+              className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex gap-2 flex-wrap">
@@ -163,7 +176,7 @@ function SportDetailSection({
                   </div>
                   {isLongest && (
                     <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
-                      🏆 Longest
+                      🏆 {t('yearInReview.longest')}
                     </div>
                   )}
                 </div>
@@ -174,39 +187,39 @@ function SportDetailSection({
                   })}
                 </div>
               </div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg flex-grow">
                 {highlight.name}
               </h4>
 
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              {/* Stats grid - 2x2 layout */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Distance
+                    {t('yearInReview.distance')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
-                    {formatDistanceWithUnit(highlight.distance * 1000)}
+                    📏 {formatDistanceWithUnit(highlight.distance * 1000)}
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Time
+                    {t('yearInReview.time')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
-                    {formatDuration((highlight.duration || 0) * 60)}
+                    ⏱️ {formatDuration((highlight.duration || 0) * 60)}
                   </div>
                 </div>
+                {paceSpeed && highlight.type !== 'triathlon' && (
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      {t('yearInReview.pace')}
+                    </div>
+                    <div className="text-lg font-black text-gray-900 dark:text-white whitespace-nowrap">
+                      ⚡ {paceSpeed}
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Pace row */}
-              {paceSpeed && highlight.type !== 'triathlon' && (
-                <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
-                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Pace
-                  </div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
-                </div>
-              )}
             </a>
           );
         })}
@@ -245,11 +258,11 @@ function SportDetailSection({
               href={`https://www.strava.com/activities/${highlights.longestActivity.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
+              className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
-                  🏆 Longest
+                  🏆 {t('yearInReview.longest')}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                   {highlights.longestActivity.date.toLocaleDateString('en-US', {
@@ -258,50 +271,50 @@ function SportDetailSection({
                   })}
                 </div>
               </div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+              <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg flex-grow">
                 {highlights.longestActivity.name}
               </h4>
 
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              {/* Stats grid - 2x2 layout */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Distance
+                    {t('yearInReview.distance')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
-                    {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
+                    📏 {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Time
+                    {t('yearInReview.time')}
                   </div>
                   <div className="text-xl font-black text-gray-900 dark:text-white">
-                    {formatDuration(highlights.longestActivity.movingTimeMinutes * 60)}
+                    ⏱️ {formatDuration(highlights.longestActivity.movingTimeMinutes * 60)}
                   </div>
                 </div>
-              </div>
-
-              {/* Pace and Elevation */}
-              {paceSpeed && (
-                <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-3">
-                  <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Pace
-                  </div>
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">{paceSpeed}</div>
-                </div>
-              )}
-              {highlights.longestActivity.elevationGainMeters &&
-                highlights.longestActivity.elevationGainMeters > 50 && (
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                {paceSpeed && (
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Elevation
+                      {t('yearInReview.pace')}
                     </div>
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">
-                      ⛰️ {Math.round(highlights.longestActivity.elevationGainMeters)}m
+                    <div className="text-lg font-black text-gray-900 dark:text-white whitespace-nowrap">
+                      ⚡ {paceSpeed}
                     </div>
                   </div>
                 )}
+                {highlights.longestActivity.elevationGainMeters &&
+                  highlights.longestActivity.elevationGainMeters > 50 && (
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                        {t('yearInReview.elevation')}
+                      </div>
+                      <div className="text-xl font-black text-gray-900 dark:text-white">
+                        ⛰️ {Math.round(highlights.longestActivity.elevationGainMeters)}m
+                      </div>
+                    </div>
+                  )}
+              </div>
             </a>
           );
         })()}
@@ -333,11 +346,11 @@ function SportDetailSection({
                 href={`https://www.strava.com/activities/${highlights.biggestClimb.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
+                className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-sm">
-                    ⛰️ Biggest Climb
+                    ⛰️ {t('yearInReview.biggestClimb')}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                     {highlights.biggestClimb.date.toLocaleDateString('en-US', {
@@ -346,49 +359,46 @@ function SportDetailSection({
                     })}
                   </div>
                 </div>
-                <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg">
+                <h4 className="font-bold text-gray-900 dark:text-white mb-4 line-clamp-2 text-lg flex-grow">
                   {highlights.biggestClimb.name}
                 </h4>
 
-                {/* Stats grid */}
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
-                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Elevation
-                    </div>
-                    <div className="text-xl font-black text-gray-900 dark:text-white">
-                      {Math.round(highlights.biggestClimb.elevationGainMeters)}m
-                    </div>
-                  </div>
+                {/* Stats grid - 2x2 layout */}
+                <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Distance
+                      {t('yearInReview.distance')}
                     </div>
                     <div className="text-xl font-black text-gray-900 dark:text-white">
-                      {formatDistanceWithUnit(highlights.biggestClimb.distanceKm * 1000)}
+                      📏 {formatDistanceWithUnit(highlights.biggestClimb.distanceKm * 1000)}
                     </div>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                      Time
+                      {t('yearInReview.time')}
                     </div>
                     <div className="text-xl font-black text-gray-900 dark:text-white">
-                      {formatDuration(highlights.biggestClimb.movingTimeMinutes * 60)}
+                      ⏱️ {formatDuration(highlights.biggestClimb.movingTimeMinutes * 60)}
                     </div>
                   </div>
                   {paceSpeed && (
                     <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                       <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-                        Pace
+                        {t('yearInReview.pace')}
                       </div>
-                      <div className="text-xl font-black text-gray-900 dark:text-white">
-                        {paceSpeed}
+                      <div className="text-lg font-black text-gray-900 dark:text-white whitespace-nowrap">
+                        ⚡ {paceSpeed}
                       </div>
                     </div>
                   )}
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      {t('yearInReview.elevation')}
+                    </div>
+                    <div className="text-xl font-black text-gray-900 dark:text-white">
+                      ⛰️ {Math.round(highlights.biggestClimb.elevationGainMeters)}m
+                    </div>
+                  </div>
                 </div>
               </a>
             );
@@ -396,12 +406,6 @@ function SportDetailSection({
       </div>
     </div>
   );
-}
-
-interface YearInReviewProps {
-  year: number;
-  stats: YearStats;
-  activities: Activity[];
 }
 
 function RaceCard({ highlight }: { highlight: RaceHighlight }) {
@@ -554,7 +558,9 @@ export function YearInReview({
   athlete,
   highlightFilters,
   backgroundImageUrl,
+  onDateClick,
 }: YearInReviewProps) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showStatsSelector, setShowStatsSelector] = useState(false);
   const [showActivitySelector, setShowActivitySelector] = useState(false);
@@ -562,6 +568,51 @@ export function YearInReview({
   const [selectedActivities, setSelectedActivities] = useState<Activity[]>([]);
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const {
+    exportWithOptions,
+    isExporting: isAdvancedExporting,
+    progress: advancedProgress,
+  } = useAdvancedExport();
+
+  const handleAdvancedExport = async (sections: ExportSection[], format: ExportFormat) => {
+    try {
+      console.log(`Starting ${format.toUpperCase()} export with ${sections.length} sections...`);
+      // Create filename with athlete name if available
+      const athleteName =
+        athlete?.firstname || athlete?.lastname
+          ? `${athlete.firstname}-${athlete.lastname}`.toLowerCase().replace(/\s+/g, '-')
+          : 'athlete';
+      const filename = `${athleteName}-year-in-sports-review-${year}`;
+
+      await exportWithOptions(sections, format, {
+        filename,
+        quality: 0.95,
+        scale: 2,
+      });
+      console.log('Export completed successfully');
+      // Close the dialog after successful export
+      setShowExportDialog(false);
+    } catch (error) {
+      console.error('Export failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`${t('yearInReview.exportFailed')}\n\n${errorMessage}`);
+      // Close the dialog even on error so user can try again
+      setShowExportDialog(false);
+    }
+  };
+
+  // Define available sections for export
+  const availableSections: Omit<ExportSection, 'enabled' | 'order'>[] = [
+    { id: 'hero', name: t('yearInReview.heroSection') },
+    { id: 'calendar', name: t('yearInReview.activityCalendar') },
+    { id: 'triathlons', name: t('yearInReview.triathlonsSection') },
+    { id: 'running', name: t('activityTypes.Run') },
+    { id: 'cycling', name: t('activityTypes.Ride') },
+    { id: 'swimming', name: t('activityTypes.Swim') },
+    { id: 'custom-highlights', name: t('yearInReview.customHighlights') },
+    { id: 'closing', name: t('yearInReview.closingSection') },
+  ];
 
   // Filter activities to exclude virtual rides if disabled and respect title patterns for highlight cards
   useMemo(() => filterActivities(activities, highlightFilters), [activities, highlightFilters]);
@@ -575,9 +626,20 @@ export function YearInReview({
       if (highlightFilters.excludedActivityTypes.includes(activity.type)) {
         return false;
       }
+
+      // Also apply title ignore patterns for stats (not highlights)
+      for (const patternObj of highlightFilters.titleIgnorePatterns) {
+        if (
+          patternObj.excludeFromStats &&
+          activity.name.toLowerCase().includes(patternObj.pattern.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [activities, highlightFilters.excludedActivityTypes]);
+  }, [activities, highlightFilters.excludedActivityTypes, highlightFilters.titleIgnorePatterns]);
 
   const highlights = useMemo(
     () =>
@@ -604,9 +666,15 @@ export function YearInReview({
       calculateSportHighlights(
         activitiesForTotals,
         highlightFilters.activityFilters,
-        excludedActivityIds
+        excludedActivityIds,
+        highlightFilters.titleIgnorePatterns
       ),
-    [activitiesForTotals, highlightFilters.activityFilters, excludedActivityIds]
+    [
+      activitiesForTotals,
+      highlightFilters.activityFilters,
+      excludedActivityIds,
+      highlightFilters.titleIgnorePatterns,
+    ]
   );
 
   // Convert highlights to activities for selection, including triathlon activities
@@ -639,6 +707,16 @@ export function YearInReview({
     setSelectedHighlights(selectedHighlightItems);
     setShowActivitySelector(false);
     setShowSocialCard(true);
+  };
+
+  const handleBackToStats = () => {
+    setShowActivitySelector(false);
+    setShowStatsSelector(true);
+  };
+
+  const handleBackToActivities = () => {
+    setShowSocialCard(false);
+    setShowActivitySelector(true);
   };
 
   // Calculate days with activities
@@ -696,42 +774,42 @@ export function YearInReview({
         case 'daysActive':
           cards.push({
             value: daysActive.toString(),
-            label: 'Days Active',
+            label: t('stats.daysActive'),
             colorClass: 'hover:shadow-purple-500/50',
           });
           break;
         case 'hours':
           cards.push({
             value: Math.round(stats.totalTimeHours).toLocaleString('de-DE'),
-            label: 'Active Hours',
+            label: t('stats.activeHours'),
             colorClass: 'hover:shadow-blue-500/50',
           });
           break;
         case 'distance':
           cards.push({
             value: Math.round(stats.totalDistanceKm).toLocaleString('de-DE'),
-            label: 'km Distance',
+            label: t('stats.kmDistance'),
             colorClass: 'hover:shadow-pink-500/50',
           });
           break;
         case 'elevation':
           cards.push({
             value: Math.round(stats.totalElevationMeters).toLocaleString('de-DE'),
-            label: 'm Elevation',
+            label: t('stats.mElevation'),
             colorClass: 'hover:shadow-green-500/50',
           });
           break;
         case 'activities':
           cards.push({
             value: stats.activityCount.toLocaleString('de-DE'),
-            label: 'Activities',
+            label: t('stats.activities'),
             colorClass: 'hover:shadow-orange-500/50',
           });
           break;
         case 'avgSpeed':
           cards.push({
             value: Math.round(additionalStats.avgSpeed).toLocaleString('de-DE'),
-            label: 'Avg Speed (km/h)',
+            label: t('stats.avgSpeedKmh'),
             colorClass: 'hover:shadow-cyan-500/50',
           });
           break;
@@ -739,7 +817,7 @@ export function YearInReview({
           if (stats.longestActivity) {
             cards.push({
               value: Math.round(stats.longestActivity.distanceKm).toLocaleString('de-DE'),
-              label: 'Longest (km)',
+              label: t('stats.longestKm'),
               colorClass: 'hover:shadow-indigo-500/50',
             });
           }
@@ -748,7 +826,7 @@ export function YearInReview({
           if (stats.highestElevation) {
             cards.push({
               value: Math.round(stats.highestElevation.elevationGainMeters).toLocaleString('de-DE'),
-              label: 'Biggest Climb (m)',
+              label: t('stats.biggestClimbM'),
               colorClass: 'hover:shadow-emerald-500/50',
             });
           }
@@ -757,7 +835,7 @@ export function YearInReview({
           if (additionalStats.avgHeartRate > 0) {
             cards.push({
               value: additionalStats.avgHeartRate.toString(),
-              label: 'Avg Heart Rate',
+              label: t('stats.avgHeartRate'),
               colorClass: 'hover:shadow-red-500/50',
             });
           }
@@ -766,7 +844,7 @@ export function YearInReview({
           if (additionalStats.maxSpeed > 0) {
             cards.push({
               value: additionalStats.maxSpeed.toLocaleString('de-DE'),
-              label: 'Max Speed (km/h)',
+              label: t('stats.maxSpeedKmh'),
               colorClass: 'hover:shadow-yellow-500/50',
             });
           }
@@ -775,7 +853,7 @@ export function YearInReview({
           if (additionalStats.totalCalories > 0) {
             cards.push({
               value: additionalStats.totalCalories.toLocaleString('de-DE'),
-              label: 'Calories Burned',
+              label: t('stats.caloriesBurned'),
               colorClass: 'hover:shadow-amber-500/50',
             });
           }
@@ -783,7 +861,7 @@ export function YearInReview({
         case 'kudos':
           cards.push({
             value: stats.totalKudos.toLocaleString('de-DE'),
-            label: 'Kudos',
+            label: t('stats.kudos'),
             colorClass: 'hover:shadow-rose-500/50',
           });
           break;
@@ -791,7 +869,7 @@ export function YearInReview({
     });
 
     return cards;
-  }, [stats, daysActive, additionalStats, highlightFilters.highlightStats]);
+  }, [stats, daysActive, additionalStats, highlightFilters.highlightStats, t]);
 
   // Generate monthly duration data for background chart
   const monthlyDurations = useMemo(() => {
@@ -830,6 +908,67 @@ export function YearInReview({
   const longRuns = highlights.filter((h) => h.type === 'long-run');
   const fondos = highlights.filter((h) => h.type === 'long-ride');
 
+  // Extract all race-marked activities and triathlons (workout_type === 1)
+  const raceItems = useMemo(() => {
+    const items: Array<{
+      type: 'activity' | 'triathlon';
+      data: Activity | RaceHighlight;
+      date: Date;
+      displayName?: string;
+      badge?: string;
+    }> = [];
+    const triathlonActivityIds = new Set<string>();
+
+    // Get all triathlons first to check which ones have race markers
+    const allTriathlons = detectTriathlons(activities);
+
+    // First, add triathlons if any component is marked as race
+    triathlons.forEach((tri) => {
+      if (tri.activities) {
+        const hasRaceMarker = tri.activities.some((a) => a.workoutType === 1);
+        if (hasRaceMarker) {
+          // Mark all triathlon activities to exclude them from standalone list
+          tri.activities.forEach((a) => triathlonActivityIds.add(a.id));
+
+          // Find the corresponding TriathlonRace to get the type info
+          const triathlonRace = allTriathlons.find(
+            (t) =>
+              t.date.toISOString().split('T')[0] ===
+              tri.activities![0].date.toISOString().split('T')[0]
+          );
+
+          // Get proper display name using shared algorithm
+          const { name, badge } = triathlonRace
+            ? getTriathlonDisplayInfo(triathlonRace, tri.activities)
+            : { name: tri.name, badge: tri.badge };
+
+          // Add the triathlon as a single item
+          items.push({
+            type: 'triathlon',
+            data: tri,
+            date: tri.activities[0].date,
+            displayName: name,
+            badge,
+          });
+        }
+      }
+    });
+
+    // Then add all other race-marked activities (excluding triathlon components)
+    activities
+      .filter((a) => a.workoutType === 1 && !triathlonActivityIds.has(a.id))
+      .forEach((a) => {
+        items.push({
+          type: 'activity',
+          data: a,
+          date: a.date,
+        });
+      });
+
+    // Sort by date
+    return items.sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, [activities, triathlons]);
+
   // Extract custom highlights per sport for SportDetailSection
   // Sort by distance to ensure proper ordering
   const runningCustomHighlights = highlights
@@ -859,20 +998,47 @@ export function YearInReview({
     <>
       <div
         ref={containerRef}
-        className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
+        id="year-in-review-content"
+        className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
       >
-        {/* Social Card Button - Fixed bottom right */}
-        <button
-          onClick={handleCreateSocialCard}
-          className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 print:hidden"
-          title="Create Social Card"
-        >
-          <span className="text-2xl">📱</span>
-          <span className="text-lg">Share</span>
-        </button>
+        {/* Action Buttons - Fixed bottom right */}
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-40 flex flex-col gap-3 print:hidden">
+          {/* Export PDF Button */}
+          <button
+            onClick={() => setShowExportDialog(true)}
+            disabled={isAdvancedExporting}
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={t('yearInReview.exportPDF')}
+          >
+            {isAdvancedExporting ? (
+              <>
+                <span className="text-2xl animate-spin">⏳</span>
+                <span className="text-lg">{advancedProgress}%</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl">📄</span>
+                <span className="text-lg">{t('yearInReview.export')}</span>
+              </>
+            )}
+          </button>
+
+          {/* Social Card Button */}
+          <button
+            onClick={handleCreateSocialCard}
+            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
+            title="Create Social Card"
+          >
+            <span className="text-2xl">📱</span>
+            <span className="text-lg">{t('yearInReview.share')}</span>
+          </button>
+        </div>
 
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white">
+        <div
+          id="hero"
+          className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white"
+        >
           {/* Background image or pattern */}
           {backgroundImageUrl ? (
             <>
@@ -918,11 +1084,11 @@ export function YearInReview({
             <div className="text-center">
               <div className="inline-block">
                 <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tight drop-shadow-2xl">
-                  {year}
+                  {year === 'last365' ? t('yearInReview.last365Title') : year}
                 </h1>
                 <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8 rounded-full"></div>
                 <p className="text-3xl md:text-4xl font-light mb-4 text-white/90 tracking-wide">
-                  Your Epic Year in Sports
+                  {t('app.tagline')}
                 </p>
               </div>
 
@@ -949,56 +1115,200 @@ export function YearInReview({
         </div>
 
         {/* Heatmap Calendar */}
-        <div className="container mx-auto px-6 py-16 md:py-20">
+        <div id="calendar" className="container mx-auto px-6 py-16 md:py-20">
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
               <div className="text-5xl">📅</div>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                Activity Calendar
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                {t('yearInReview.activityCalendar')}
               </h2>
             </div>
             <div className="h-1.5 w-32 bg-gradient-to-r from-emerald-500 to-teal-600 mx-auto rounded-full mb-6"></div>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-semibold">
-              Your training consistency throughout the year
+              {t('yearInReview.trainingConsistency')}
             </p>
           </div>
-          <HeatmapCalendar year={year} activities={activities} />
+          <HeatmapCalendar year={year} activities={activities} onDateClick={onDateClick} />
         </div>
 
-        {/* Sport Detail Sections */}
-        {sportHighlights.running && (
-          <SportDetailSection
-            highlights={sportHighlights.running}
-            customHighlights={runningCustomHighlights}
-          />
-        )}
-        {sportHighlights.cycling && (
-          <SportDetailSection
-            highlights={sportHighlights.cycling}
-            customHighlights={cyclingCustomHighlights}
-          />
-        )}
-        {sportHighlights.swimming && (
-          <SportDetailSection
-            highlights={sportHighlights.swimming}
-            customHighlights={swimmingCustomHighlights}
-          />
-        )}
-
-        {/* Race Highlights */}
-        {triathlons.length > 0 && (
+        {/* Race Overview - Timeline View */}
+        {raceItems.length > 0 && (
           <div className="container mx-auto px-6 py-16 md:py-20">
             <div className="mb-12">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="text-5xl">🏊🚴🏃</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                  Triathlons
+              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                <div className="text-5xl">🏆</div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                  {t('yearInReview.raceOverview')}
                 </h2>
               </div>
-              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
-                {triathlons.length} epic multi-sport adventure{triathlons.length !== 1 ? 's' : ''}
+              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-red-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
+                {t(
+                  raceItems.length === 1
+                    ? 'yearInReview.racesCompleted'
+                    : 'yearInReview.racesCompletedPlural',
+                  { count: raceItems.length }
+                )}
               </p>
-              <div className="h-1.5 w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+            </div>
+
+            {/* Timeline View */}
+            <div className="max-w-4xl mx-auto">
+              <div className="relative">
+                {/* Vertical timeline line */}
+                <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-yellow-500 via-orange-500 to-red-600"></div>
+
+                {/* Timeline items */}
+                <div className="space-y-8">
+                  {raceItems.map((item, index) => {
+                    const isLeft = index % 2 === 0;
+
+                    if (item.type === 'triathlon') {
+                      const tri = item.data as RaceHighlight;
+                      const displayDate =
+                        tri.activities && tri.activities[0] ? tri.activities[0].date : new Date();
+                      const displayName = item.displayName || tri.name;
+                      const badge = item.badge || tri.badge;
+
+                      return (
+                        <div
+                          key={tri.id}
+                          className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+
+                          {/* Content card */}
+                          <div
+                            className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
+                          >
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-2xl">🏊🚴🏃</span>
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                      {displayDate.toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                    {displayName}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">📏</span>
+                                      <span>{formatDistanceWithUnit(tri.distance * 1000)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">⏱️</span>
+                                      <span>{formatDuration((tri.duration || 0) * 60)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-xs font-bold">
+                                        {badge.split(' ').slice(1).join(' ') || 'Triathlon'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                    <span className="text-2xl">🏆</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      const activity = item.data as Activity;
+                      const activityIcon =
+                        activity.type === 'Run'
+                          ? '🏃'
+                          : activity.type.includes('Ride')
+                            ? '🚴'
+                            : activity.type === 'Swim'
+                              ? '🏊'
+                              : '🏃';
+
+                      return (
+                        <div
+                          key={activity.id}
+                          className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+
+                          {/* Content card */}
+                          <div
+                            className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
+                          >
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-2xl">{activityIcon}</span>
+                                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                      {new Date(activity.date).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                    {activity.name}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">📏</span>
+                                      <span>
+                                        {formatDistanceWithUnit(activity.distanceKm * 1000)}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-semibold">⏱️</span>
+                                      <span>{formatDuration(activity.movingTimeMinutes * 60)}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                    <span className="text-2xl">🏆</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Triathlons Section - Moved to top */}
+        {triathlons.length > 0 && (
+          <div id="triathlons" className="container mx-auto px-6 py-16 md:py-20">
+            <div className="mb-12">
+              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                <div className="text-5xl">🏊🚴🏃</div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                  {t('yearInReview.triathlons')}
+                </h2>
+              </div>
+              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
+                {triathlons.length}{' '}
+                {triathlons.length === 1
+                  ? t('yearInReview.epicMultiSport')
+                  : t('yearInReview.epicMultiSportPlural')}
+              </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {triathlons.map((highlight) => (
@@ -1008,20 +1318,43 @@ export function YearInReview({
           </div>
         )}
 
+        {/* Sport Detail Sections */}
+        {sportHighlights.running && (
+          <SportDetailSection
+            sectionId="running"
+            highlights={sportHighlights.running}
+            customHighlights={runningCustomHighlights}
+          />
+        )}
+        {sportHighlights.cycling && (
+          <SportDetailSection
+            sectionId="cycling"
+            highlights={sportHighlights.cycling}
+            customHighlights={cyclingCustomHighlights}
+          />
+        )}
+        {sportHighlights.swimming && (
+          <SportDetailSection
+            sectionId="swimming"
+            highlights={sportHighlights.swimming}
+            customHighlights={swimmingCustomHighlights}
+          />
+        )}
+
         {/* Other Achievements */}
         {(longRuns.length > 0 || fondos.length > 0) && (
-          <div className="container mx-auto px-6 py-16 md:py-20">
+          <div id="custom-highlights" className="container mx-auto px-6 py-16 md:py-20">
             <div className="mb-12">
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
                 <div className="text-5xl">🌟</div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">
-                  Other Achievements
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white whitespace-nowrap">
+                  {t('yearInReview.otherAchievements')}
                 </h2>
               </div>
-              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold mb-4">
-                Even more incredible performances
+              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
+                {t('yearInReview.morePerformances')}
               </p>
-              <div className="h-1.5 w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full"></div>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {[...longRuns, ...fondos].map((highlight) => (
@@ -1032,31 +1365,47 @@ export function YearInReview({
         )}
 
         {/* Footer Message */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16">
+        <div
+          id="closing"
+          className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16"
+        >
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20" />
           <div className="container mx-auto px-6 text-center relative">
             <div className="inline-block mb-8">
               <div className="text-7xl mb-6">🎉</div>
               <h2 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-2xl">
-                What an Epic Year!
+                {t('yearInReview.epicYear')}
               </h2>
               <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto rounded-full mb-8"></div>
             </div>
 
             <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 md:p-10 border border-white/20 shadow-2xl max-w-4xl mx-auto">
               <p className="text-2xl md:text-3xl font-light leading-relaxed mb-4">
-                You crushed{' '}
+                {t('yearInReview.crushedDistance')}{' '}
                 <span className="font-black">
-                  {formatDistanceWithUnit(stats.totalDistanceKm * 1000)}
+                  {formatDistanceForClosing(stats.totalDistanceKm * 1000)}
                 </span>{' '}
-                across <span className="font-black">{stats.activityCount} activities</span>,
-                dedicating{' '}
-                <span className="font-black">{Math.round(stats.totalTimeHours)} hours</span> to your
-                passion.
+                {t('yearInReview.across')}{' '}
+                <span className="font-black">
+                  {stats.activityCount} {t('stats.activities').toLowerCase()}
+                </span>
+                , {t('yearInReview.dedicating')}{' '}
+                <span className="font-black">
+                  {Math.round(stats.totalTimeHours)} {t('units.hours')}
+                </span>{' '}
+                {t('yearInReview.toYourPassion')}.
               </p>
               <p className="text-xl md:text-2xl font-light">
-                Here's to even more epic adventures in{' '}
-                <span className="font-black text-3xl">{year + 1}</span>! 🚀
+                {t('yearInReview.closingMessage')}
+                {year === 'last365' ? (
+                  ` ${t('yearInReview.closingMessageAhead')}`
+                ) : (
+                  <span className="font-black text-3xl">
+                    {' '}
+                    {t('yearInReview.closingMessageYear', { year: year + 1 })}
+                  </span>
+                )}
+                ! 🚀
               </p>
             </div>
           </div>
@@ -1068,6 +1417,7 @@ export function YearInReview({
         <StatsSelector
           stats={stats}
           daysActive={daysActive}
+          initialSelectedStats={selectedStats}
           onConfirm={handleStatsSelected}
           onClose={() => setShowStatsSelector(false)}
         />
@@ -1079,7 +1429,10 @@ export function YearInReview({
           activities={activities}
           highlightActivities={highlightActivities}
           highlights={highlights}
+          initialSelectedActivities={selectedActivities}
+          initialSelectedHighlights={selectedHighlights}
           onConfirm={handleActivitiesSelected}
+          onBack={handleBackToStats}
           onClose={() => setShowActivitySelector(false)}
         />
       )}
@@ -1095,13 +1448,20 @@ export function YearInReview({
           selectedHighlights={selectedHighlights}
           selectedStats={selectedStats}
           backgroundImageUrl={backgroundImageUrl || null}
-          onClose={() => {
-            setShowSocialCard(false);
-            setSelectedActivities([]);
-            setSelectedHighlights([]);
-          }}
+          onBack={handleBackToActivities}
+          onClose={() => setShowSocialCard(false)}
         />
       )}
+
+      {/* Export Dialog */}
+      <ExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        onExport={handleAdvancedExport}
+        availableSections={availableSections}
+        isExporting={isAdvancedExporting}
+        exportProgress={advancedProgress}
+      />
     </>
   );
 }

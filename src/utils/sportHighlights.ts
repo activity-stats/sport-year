@@ -1,5 +1,5 @@
 import type { Activity } from '../types';
-import type { ActivityTypeFilter } from '../stores/settingsStore';
+import type { ActivityTypeFilter, TitlePattern } from '../stores/settingsStore';
 
 export interface DistanceRecord {
   distance: string;
@@ -84,12 +84,24 @@ function findBestForDistance(
 export function calculateSportHighlights(
   activities: Activity[],
   activityFilters?: ActivityTypeFilter[],
-  excludeActivityIds?: Set<string>
+  excludeActivityIds?: Set<string>,
+  titleIgnorePatterns?: TitlePattern[]
 ): {
   running?: SportHighlights;
   cycling?: SportHighlights;
   swimming?: SportHighlights;
 } {
+  // Helper to check if activity should be excluded from highlights based on title patterns
+  const shouldExcludeFromHighlights = (activity: Activity): boolean => {
+    if (!titleIgnorePatterns || titleIgnorePatterns.length === 0) return false;
+
+    return titleIgnorePatterns.some(
+      (pattern) =>
+        pattern.excludeFromHighlights &&
+        activity.name.toLowerCase().includes(pattern.pattern.toLowerCase())
+    );
+  };
+
   // Keep all activities for longest and biggest climb calculation
   const allRunning = activities.filter((a) => a.type === 'Run');
   const allCycling = activities.filter((a) => ['Ride', 'VirtualRide'].includes(a.type));
@@ -158,14 +170,17 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(running, d, 'running'))
       .filter(Boolean) as DistanceRecord[];
 
-    const longestActivity = allRunning.reduce((longest, current) =>
+    // Filter out activities excluded from highlights for longest and biggest climb
+    const runningForHighlights = allRunning.filter((a) => !shouldExcludeFromHighlights(a));
+
+    const longestActivity = runningForHighlights.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
     // Find activity with biggest elevation gain
     const biggestClimb =
-      allRunning.length > 0
-        ? allRunning.reduce((biggest, current) => {
+      runningForHighlights.length > 0
+        ? runningForHighlights.reduce((biggest, current) => {
             const currentElevation = current.elevationGainMeters || 0;
             const biggestElevation = biggest.elevationGainMeters || 0;
             return currentElevation > biggestElevation ? current : biggest;
@@ -229,14 +244,17 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(cyclingForRecords, d, 'cycling'))
       .filter(Boolean) as DistanceRecord[];
 
-    const longestActivity = allCycling.reduce((longest, current) =>
+    // Filter out activities excluded from highlights for longest and biggest climb
+    const cyclingForHighlights = allCycling.filter((a) => !shouldExcludeFromHighlights(a));
+
+    const longestActivity = cyclingForHighlights.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
     // Find activity with biggest elevation gain
     const biggestClimb =
-      allCycling.length > 0
-        ? allCycling.reduce((biggest, current) => {
+      cyclingForHighlights.length > 0
+        ? cyclingForHighlights.reduce((biggest, current) => {
             const currentElevation = current.elevationGainMeters || 0;
             const biggestElevation = biggest.elevationGainMeters || 0;
             return currentElevation > biggestElevation ? current : biggest;
@@ -302,14 +320,17 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(swimming, d, 'swimming'))
       .filter(Boolean) as DistanceRecord[];
 
-    const longestActivity = allSwimming.reduce((longest, current) =>
+    // Filter out activities excluded from highlights for longest and biggest climb
+    const swimmingForHighlights = allSwimming.filter((a) => !shouldExcludeFromHighlights(a));
+
+    const longestActivity = swimmingForHighlights.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
     // Swimming rarely has elevation, but include for completeness
     const biggestClimb =
-      allSwimming.length > 0
-        ? allSwimming.reduce((biggest, current) => {
+      swimmingForHighlights.length > 0
+        ? swimmingForHighlights.reduce((biggest, current) => {
             const currentElevation = current.elevationGainMeters || 0;
             const biggestElevation = biggest.elevationGainMeters || 0;
             return currentElevation > biggestElevation ? current : biggest;

@@ -10,6 +10,8 @@ import {
 
 interface ActivityListProps {
   activities: Activity[];
+  selectedDate?: Date | null;
+  onClearDateFilter?: () => void;
 }
 
 const ACTIVITY_ICONS: Record<string, string> = {
@@ -21,52 +23,140 @@ const ACTIVITY_ICONS: Record<string, string> = {
   Hike: '🥾',
 };
 
-export const ActivityList = ({ activities }: ActivityListProps) => {
+export const ActivityList = ({
+  activities,
+  selectedDate,
+  onClearDateFilter,
+}: ActivityListProps) => {
   const [filter, setFilter] = useState<string>('All');
-  const [sortBy, setSortBy] = useState<'date' | 'distance' | 'duration'>('date');
+  const [sortBy, setSortBy] = useState<'date' | 'distance' | 'duration' | 'elevation'>('date');
+  const [searchText, setSearchText] = useState<string>('');
 
   // Get unique activity types
   const activityTypes = ['All', ...Array.from(new Set(activities.map((a) => a.type)))];
 
   // Filter and sort activities
   const filteredActivities = activities
-    .filter((activity) => filter === 'All' || activity.type === filter)
+    .filter((activity) => {
+      const matchesType = filter === 'All' || activity.type === filter;
+      const matchesSearch =
+        searchText === '' ||
+        activity.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        activity.date.toLocaleDateString().toLowerCase().includes(searchText.toLowerCase());
+      const matchesDate =
+        !selectedDate ||
+        activity.date.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
+      return matchesType && matchesSearch && matchesDate;
+    })
     .sort((a, b) => {
       if (sortBy === 'date') return b.date.getTime() - a.date.getTime();
       if (sortBy === 'distance') return b.distanceKm - a.distanceKm;
       if (sortBy === 'duration') return b.durationMinutes - a.durationMinutes;
+      if (sortBy === 'elevation') return b.elevationGainMeters - a.elevationGainMeters;
       return 0;
     });
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Activities ({filteredActivities.length})
-        </h3>
+    <div
+      id="activity-list"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+    >
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Activities ({filteredActivities.length})
+          </h3>
 
-        <div className="flex gap-3">
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {activityTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-3">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {activityTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(e.target.value as 'date' | 'distance' | 'duration' | 'elevation')
+              }
+              className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="date">Sort: Date</option>
+              <option value="distance">Sort: Distance</option>
+              <option value="duration">Sort: Time</option>
+              <option value="elevation">Sort: Elevation</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Date filter badge */}
+        {selectedDate && (
+          <div className="mb-3 flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg text-sm font-medium">
+              <span>
+                📅{' '}
+                {selectedDate.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+              {onClearDateFilter && (
+                <button
+                  onClick={onClearDateFilter}
+                  className="ml-1 hover:text-blue-600 dark:hover:text-blue-100"
+                  title="Clear date filter"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Search input */}
+        <div className="relative">
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search by name or date..."
+            className="w-full px-4 py-2 pl-10 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <svg
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <option value="date">Date</option>
-            <option value="distance">Distance</option>
-            <option value="duration">Duration</option>
-          </select>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          {searchText && (
+            <button
+              onClick={() => setSearchText('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 

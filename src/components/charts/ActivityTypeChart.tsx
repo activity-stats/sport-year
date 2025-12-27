@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import type { ActivityType } from '../../types/strava.ts';
 import type { TypeStats } from '../../types/activity.ts';
@@ -19,6 +20,7 @@ const COLORS: Record<string, string> = {
 type MetricType = 'distance' | 'time' | 'count';
 
 export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
+  const { t } = useTranslation();
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('distance');
 
   const getChartData = () => {
@@ -26,6 +28,7 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
       .filter(([_, stats]) => stats.count > 0)
       .map(([type, stats]) => ({
         name: type,
+        translatedName: t(`activityTypes.${type}`, type),
         distance: Math.round(stats.distanceKm),
         time: Math.round(stats.timeHours * 10) / 10,
         count: stats.count,
@@ -38,16 +41,18 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
   if (chartData.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Activity Types</h3>
-        <p className="text-gray-600 dark:text-gray-400">No activities yet</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          {t('charts.activityTypes')}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400">{t('charts.noActivitiesYet')}</p>
       </div>
     );
   }
 
   const metrics = {
-    distance: { label: 'Distance', unit: 'km' },
-    time: { label: 'Time', unit: 'hours' },
-    count: { label: 'Count', unit: 'activities' },
+    distance: { label: t('charts.metrics.distance'), unit: t('charts.units.km') },
+    time: { label: t('charts.metrics.time'), unit: t('charts.units.hours') },
+    count: { label: t('charts.metrics.count'), unit: t('charts.units.activities') },
   };
 
   const currentMetric = metrics[selectedMetric];
@@ -55,7 +60,9 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">By Activity Type</h3>
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {t('charts.byActivityType')}
+        </h3>
         <div className="flex gap-2">
           {(Object.keys(metrics) as MetricType[]).map((metric) => (
             <button
@@ -79,7 +86,10 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            label={(props: any) =>
+              `${props.translatedName} ${((props.percent ?? 0) * 100).toFixed(0)}%`
+            }
             outerRadius={100}
             fill="#8884d8"
             dataKey={selectedMetric}
@@ -91,9 +101,11 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number | undefined, name: string | undefined) => {
-              if (value === undefined) return ['', ''];
-              return [`${value} ${currentMetric.unit}`, name ?? ''];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            formatter={(val: number | undefined, _name: string | undefined, props: any) => {
+              if (val === undefined) return ['', ''];
+              const translatedName = props?.payload?.translatedName || _name;
+              return [`${val} ${currentMetric.unit}`, translatedName ?? ''];
             }}
             contentStyle={{
               backgroundColor: '#fff',
@@ -102,7 +114,8 @@ export const ActivityTypeChart = ({ data }: ActivityTypeChartProps) => {
               boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           />
-          <Legend />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <Legend formatter={(_value: string, entry: any) => entry.payload.translatedName} />
         </PieChart>
       </ResponsiveContainer>
     </div>

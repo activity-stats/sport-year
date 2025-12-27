@@ -1,0 +1,308 @@
+{
+  "common": {
+    "cancel": "Cancel"
+  },
+  "app": {
+    "title": "Sport Year",
+    "tagline": "Your Epic Year in Sports"
+  },
+  "navigation": {
+    "review": "Review",
+    "yearReview": "Year Review",
+    "stats": "Stats",
+    "map": "Map",
+    "customize": "Customize",
+    "more": "More",
+    "guide": "Guide",
+    "strava": "Strava",
+    "light": "Light",
+    "dark": "Dark",
+    "github": "GitHub",
+    "support": "Support",
+    "logout": "Logout"
+  },
+  "moreMenu": {
+    "title": "More Options",
+    "github": "GitHub",
+    "support": "Support",
+    "settings": "Settings",
+    "customize": "Customize",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "yearSelector": {
+    "last365Days": "Last 365 Days"
+  },
+  "yearInReview": {
+    "last365Title": "Last 365 Days",
+    "share": "Share",
+    "export": "Export",
+    "exportPDF": "Export",
+    "exportFailed": "Failed to export PDF. Please try again.",
+    "heroSection": "Hero Section",
+    "triathlonsSection": "Triathlons",
+    "customHighlights": "Race Overview",
+    "closingSection": "Closing Message",
+    "closingMessage": "Here's to even more epic adventures",
+    "closingMessageYear": "in {{year}}",
+    "closingMessageAhead": "ahead",
+    "highlights": "Highlights",
+    "total": "total",
+    "elevation": "elevation",
+    "longest": "Longest",
+    "distance": "Distance",
+    "time": "Time",
+    "pace": "Pace",
+    "avgPace": "Avg Pace",
+    "avgSpeed": "Avg Speed",
+    "activityCalendar": "Activity Calendar",
+    "trainingConsistency": "Your training consistency throughout the year",
+    "biggestClimb": "Biggest Climb",
+    "triathlons": "Triathlons",
+    "epicMultiSport": "epic multi-sport adventure",
+    "epicMultiSportPlural": "epic multi-sport adventures",
+    "otherAchievements": "Other Achievements",
+    "morePerformances": "Even more incredible performances",
+    "raceOverview": "Race Overview",
+    "epicYear": "What an Epic Year!",
+    "crushedDistance": "You crushed",
+    "across": "across",
+    "dedicating": "dedicating",
+    "toYourPassion": "to your passion"
+  },
+  "stats": {
+    "activeHours": "Active Hours",
+    "activities": "Activities",
+    "kudos": "Kudos",
+    "daysActive": "Days Active",
+    "kmDistance": "km Distance",
+    "mElevation": "m Elevation",
+    "avgSpeedKmh": "Avg Speed (km/h)",
+    "longestKm": "Longest (km)",
+    "biggestClimbM": "Biggest Climb (m)",
+    "avgHeartRate": "Avg Heart Rate",
+    "maxSpeedKmh": "Max Speed (km/h)",
+    "caloriesBurned": "Calories Burned"
+  },
+  "socialCard": {
+    "cancel": "Cancel",
+    "preparing": "Preparing...",
+    "exporting": "Exporting...",
+    "shareButton": "🚀 Share",
+    "downloadButton": "📥 Download",
+    "shareText": "My {{year}} Year in Sports! 🏃‍♂️🚴‍♂️ #YearInSports #Strava",
+    "stats": "stat",
+    "statsPlural": "stats",
+    "noHighlights": "No highlights",
+    "highlight": "highlight",
+    "highlightsPlural": "highlights",
+    "shareFailed": "Failed to share. Please try downloading instead."
+  },
+  "loading": {
+    "title": "Loading Your Activities",
+    "subtitle": "Please wait while we prepare your data...",
+    "complete": "{{progress}}% Complete",
+    "helpText": "This may take a few moments depending on the amount of data...",
+    "stages": {
+      "checking": "Checking Strava connection",
+      "fetching": "Fetching your activities from Strava",
+      "transforming": "Transforming activity data",
+      "aggregating": "Building your statistics model"
+    }
+  },
+  "errors": {
+    "cacheClearSuccess": "Local cache cleared successfully. Data will be refreshed.",
+    "cacheClearFailed": "Failed to clear data. Please try again.",
+    "syncStarted": "Sync started! Your activities are being updated.",
+    "syncFailed": "Failed to sync. Please try again.",
+    "cardNotFound": "Card element not found. Please try again.",
+    "maxItemsReached": "You can select up to 3 items"
+  },
+  "units": {
+    "hours": "h"
+  },
+  "export": {
+    "customizeExport": "Customize Export",
+    "format": "Export Format",
+    "sections": "Sections to Include",
+    "sectionsDescription": "Select and reorder the sections you want to include in your export",
+    "exportButton": "Export"
+  },
+  "months": {},
+  "statsOverview": {
+    "title": "{{year}} Overview",
+    "totalDistance": "Total Distance",
+    "totalElevation": "Total Elevation",
+    "totalTime": "Total Time",
+    "activities": "Activities",
+    "longestActivity": "Longest Activity",
+    "mostElevation": "Most Elevation"
+  },
+  "statsSelector": {
+    "title": "Select Stats",
+    "subtitle": "Choose 1-4 stats to display on your social card",
+    "selectOne": "You must select at least 1 stat",
+    "maxFour": "You can select up to 4 stats",
+    "selected": "{{count}} of 4 selected",
+    "ready": "Ready",
+    "selectAtLeastOne": "Select at least 1",
+    "cancel": "Cancel",
+    "nextSelectHighlights": "Next: Select Highlights"
+  },
+  "activityBreakdown": {
+    "activities": "activities",
+    "totalDistance": "Total Distance",
+    "totalTime": "Total Time",
+    "avgDistance": "Avg Distance",
+    "avgSpeed": "Avg Speed",
+    "avgPace": "Avg Pace",
+    "longestActivity": "Longest Activity",
+    "totalElevation": "Total Elevation",
+    "avgPerActivity": "Avg {{value}} m per activity"
+  },
+  "yearInReviewSettings": {
+    "background": {
+      "sizeLimit": "Image size must be less than 5MB",
+      "uploadFailed": "Failed to read file. Please try again."
+    }
+  },
+  "dashboard": {
+    "activityTrends": "Activity Trends",
+    "sportBreakdown": "Sport Breakdown",
+    "activityMap": "Activity Map",
+    "customize": "Customize",
+    "noActivitiesSelected": "No activities selected for Sport Breakdown.",
+    "configureActivities": "Configure Activities",
+    "allActivitiesFor": "All your activities for {{year}} visualized on a map. Click any route to see details."
+  },
+  "charts": {
+    "monthlyTrends": "Monthly Trends",
+    "weeklyTrends": "Weekly Trends",
+    "byActivityType": "By Activity Type",
+    "activityTypes": "Activity Types",
+    "noActivitiesYet": "No activities yet",
+    "view": "View",
+    "sport": "Sport",
+    "allSports": "All Sports",
+    "month": "Month",
+    "week": "Week",
+    "metrics": {
+      "distance": "Distance",
+      "time": "Time",
+      "elevation": "Elevation",
+      "activities": "Activities",
+      "count": "Count"
+    },
+    "units": {
+      "km": "km",
+      "hours": "hours",
+      "activities": "activities"
+    }
+  },
+  "activityTypes": {
+    "Run": "Running",
+    "Ride": "Cycling",
+    "Swim": "Swimming"
+  },
+  "achievements": {
+    "title": "Achievement Timeline",
+    "subtitle": "Your biggest accomplishments throughout the year",
+    "longestRun": "Longest Run",
+    "biggestClimb": "Biggest Climb",
+    "longestRide": "Longest Ride",
+    "longestSwim": "Longest Swim"
+  },
+  "stravaSettings": {
+    "title": "Strava Settings",
+    "subtitle": "Manage your Strava app credentials",
+    "technicalNotice": "Technical Setup Required:",
+    "technicalDescription": "This process requires creating a Strava API application. Please follow these steps carefully.",
+    "setupInstructions": "Setup Instructions",
+    "step1": {
+      "title": "Go to Strava's API Settings",
+      "description": "Click the button below. It will open Strava's API settings page in a new tab so you can easily switch back here to copy your credentials.",
+      "button": "Open Strava API Settings",
+      "note": "This will open in a new tab so you can easily copy your credentials."
+    },
+    "step2": {
+      "title": "Configure Your Application",
+      "applicationName": "Application Name:",
+      "applicationNameDesc": "Choose any name you like (e.g., \"My Sport Year\")",
+      "category": "Category:",
+      "categoryDesc": "Select any category that fits",
+      "website": "Website:",
+      "websiteDesc": "Enter any website URL (e.g., your personal site or just use a placeholder like https://example.com)",
+      "callbackDomain": "Authorization Callback Domain:",
+      "callbackImportant": "⚠️ Important: Enter ONLY the domain without port number:",
+      "callbackNote": "Copy this value exactly. Do not include \"http://\", \"https://\", or port numbers."
+    },
+    "step3": {
+      "title": "Copy Your Credentials",
+      "description": "After creating your app, Strava will show you a Client ID and Client Secret. Copy these values and enter them below."
+    },
+    "credentials": {
+      "title": "Enter Your Credentials",
+      "clientId": "Client ID",
+      "clientIdPlaceholder": "e.g., 123456",
+      "clientSecret": "Client Secret",
+      "clientSecretPlaceholder": "Enter your client secret",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "securityNote": "Security Note:",
+    "securityDescription": "Your credentials are stored locally in your browser only. They never leave your device.",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "dataManagement": {
+      "title": "Data Management",
+      "syncButton": "Sync Activities",
+      "syncing": "Syncing...",
+      "clearCacheButton": "Clear Cached Data",
+      "clearing": "Clearing...",
+      "note": "Sync checks for new activities. Clear cache to force a full refresh.",
+      "syncConfirm": "Sync activities from Strava? This will check for new or updated activities.",
+      "clearConfirm": "Are you sure you want to clear all cached activity data? This will force a full refresh on the next sync. This does NOT delete your Strava data, only the local cache."
+    },
+    "clearCredentials": "Clear Credentials",
+    "clearCredentialsConfirm": "Are you sure you want to clear your Strava credentials? You will need to set them up again."
+  },
+  "onboardingGuide": {
+    "step1": {
+      "title": "Welcome to Sport Year!",
+      "description": "Create beautiful Year in Review summaries of your athletic achievements. Let's get you started!"
+    },
+    "step2": {
+      "title": "Add a Background Image",
+      "description": "Personalize your Year in Review with a custom hero background. Upload your favorite photo or use a URL.",
+      "action": "Add Background"
+    },
+    "step3": {
+      "title": "Configure Filters",
+      "description": "Customize which activities appear in your review. Exclude activity types, filter virtual activities, or hide specific workouts.",
+      "action": "Set Filters"
+    },
+    "step4": {
+      "title": "You're All Set!",
+      "description": "Your Year in Review is ready! Click the \"📱 Social Card\" button to create a shareable image for social media.",
+      "action": "Get Started"
+    },
+    "alreadyConfigured": "Already Configured",
+    "features": {
+      "charts": {
+        "title": "Interactive Charts",
+        "description": "View your progress with detailed stats"
+      },
+      "map": {
+        "title": "Activity Map",
+        "description": "See where you trained throughout the year"
+      },
+      "social": {
+        "title": "Social Sharing",
+        "description": "Create beautiful images to share"
+      }
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "stepIndicator": "Step {{current}} of {{total}}"
+  }
+}

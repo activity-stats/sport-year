@@ -1,0 +1,308 @@
+{
+  "common": {
+    "cancel": "Annuleren"
+  },
+  "app": {
+    "title": "Sportjaar",
+    "tagline": "Jouw Epische Sportjaar"
+  },
+  "navigation": {
+    "review": "Overzicht",
+    "yearReview": "Jaaroverzicht",
+    "stats": "Statistieken",
+    "map": "Kaart",
+    "customize": "Aanpassen",
+    "more": "Meer",
+    "guide": "Gids",
+    "strava": "Strava",
+    "light": "Licht",
+    "dark": "Donker",
+    "github": "GitHub",
+    "support": "Ondersteuning",
+    "logout": "Uitloggen"
+  },
+  "moreMenu": {
+    "title": "Meer Opties",
+    "github": "GitHub",
+    "support": "Support",
+    "settings": "Instellingen",
+    "customize": "Aanpassen",
+    "logout": "Uitloggen",
+    "language": "Taal"
+  },
+  "yearSelector": {
+    "last365Days": "Laatste 365 Dagen"
+  },
+  "yearInReview": {
+    "last365Title": "Laatste 365 Dagen",
+    "share": "Delen",
+    "export": "Exporteren",
+    "exportPDF": "Exporteren",
+    "exportFailed": "PDF exporteren mislukt. Probeer opnieuw.",
+    "heroSection": "Hero Sectie",
+    "triathlonsSection": "Triathlons",
+    "customHighlights": "Race overzicht",
+    "closingSection": "Slotbericht",
+    "closingMessage": "Op naar nog meer epische avonturen",
+    "closingMessageYear": "in {{year}}",
+    "closingMessageAhead": "vooruit",
+    "highlights": "Hoogtepunten",
+    "total": "totaal",
+    "elevation": "hoogtemeters",
+    "longest": "Langste",
+    "distance": "Afstand",
+    "time": "Tijd",
+    "pace": "Tempo",
+    "avgPace": "Gem. Tempo",
+    "avgSpeed": "Gem. Snelheid",
+    "activityCalendar": "Activiteitenkalender",
+    "trainingConsistency": "Je trainingsconsistentie gedurende het jaar",
+    "biggestClimb": "Grootste Klim",
+    "triathlons": "Triathlons",
+    "epicMultiSport": "episch multi-sport avontuur",
+    "epicMultiSportPlural": "epische multi-sport avonturen",
+    "otherAchievements": "Andere Prestaties",
+    "morePerformances": "Nog meer ongelooflijke prestaties",
+    "raceOverview": "Wedstrijd Overzicht",
+    "epicYear": "Wat een Episch Jaar!",
+    "crushedDistance": "Je hebt",
+    "across": "over",
+    "dedicating": "en besteedde",
+    "toYourPassion": "aan je passie"
+  },
+  "stats": {
+    "activeHours": "Actieve Uren",
+    "activities": "Activiteiten",
+    "kudos": "Kudos",
+    "daysActive": "Actieve Dagen",
+    "kmDistance": "km Afstand",
+    "mElevation": "m Hoogtemeters",
+    "avgSpeedKmh": "Gem. Snelheid (km/u)",
+    "longestKm": "Langste (km)",
+    "biggestClimbM": "Grootste Klim (m)",
+    "avgHeartRate": "Gem. Hartslag",
+    "maxSpeedKmh": "Max Snelheid (km/u)",
+    "caloriesBurned": "Verbrande Calorieën"
+  },
+  "socialCard": {
+    "cancel": "Annuleren",
+    "preparing": "Voorbereiden...",
+    "exporting": "Exporteren...",
+    "shareButton": "🚀 Delen",
+    "downloadButton": "📥 Downloaden",
+    "shareText": "Mijn {{year}} Sportjaar! 🏃‍♂️🚴‍♂️ #Sportjaar #Strava",
+    "stats": "statistiek",
+    "statsPlural": "statistieken",
+    "noHighlights": "Geen hoogtepunten",
+    "highlight": "hoogtepunt",
+    "highlightsPlural": "hoogtepunten",
+    "shareFailed": "Delen mislukt. Probeer te downloaden."
+  },
+  "loading": {
+    "title": "Activiteiten Laden",
+    "subtitle": "Even geduld terwijl we je gegevens voorbereiden...",
+    "complete": "{{progress}}% Voltooid",
+    "helpText": "Dit kan even duren afhankelijk van de hoeveelheid gegevens...",
+    "stages": {
+      "checking": "Strava verbinding controleren",
+      "fetching": "Je activiteiten ophalen van Strava",
+      "transforming": "Activiteitengegevens transformeren",
+      "aggregating": "Statistiekmodel bouwen"
+    }
+  },
+  "errors": {
+    "cacheClearSuccess": "Lokale cache succesvol gewist. Gegevens worden vernieuwd.",
+    "cacheClearFailed": "Wissen van gegevens mislukt. Probeer opnieuw.",
+    "syncStarted": "Synchronisatie gestart! Je activiteiten worden bijgewerkt.",
+    "syncFailed": "Synchroniseren mislukt. Probeer opnieuw.",
+    "cardNotFound": "Kaartelement niet gevonden. Probeer opnieuw.",
+    "maxItemsReached": "Je kunt maximaal 3 items selecteren"
+  },
+  "units": {
+    "hours": "u"
+  },
+  "export": {
+    "customizeExport": "Export Aanpassen",
+    "format": "Export Formaat",
+    "sections": "Secties om op te nemen",
+    "sectionsDescription": "Selecteer en herschik de secties die je wilt opnemen in je export",
+    "exportButton": "Exporteren"
+  },
+  "months": {},
+  "statsOverview": {
+    "title": "{{year}} Overzicht",
+    "totalDistance": "Totale Afstand",
+    "totalElevation": "Totale Hoogtemeters",
+    "totalTime": "Totale Tijd",
+    "activities": "Activiteiten",
+    "longestActivity": "Langste Activiteit",
+    "mostElevation": "Meeste Hoogtemeters"
+  },
+  "statsSelector": {
+    "title": "Selecteer Statistieken",
+    "subtitle": "Kies 1-4 statistieken om weer te geven op je sociale media kaart",
+    "selectOne": "Je moet minimaal 1 statistiek selecteren",
+    "maxFour": "Je kunt maximaal 4 statistieken selecteren",
+    "selected": "{{count}} van 4 geselecteerd",
+    "ready": "Klaar",
+    "selectAtLeastOne": "Selecteer minimaal 1",
+    "cancel": "Annuleren",
+    "nextSelectHighlights": "Volgende: Selecteer Hoogtepunten"
+  },
+  "activityBreakdown": {
+    "activities": "activiteiten",
+    "totalDistance": "Totale Afstand",
+    "totalTime": "Totale Tijd",
+    "avgDistance": "Gem. Afstand",
+    "avgSpeed": "Gem. Snelheid",
+    "avgPace": "Gem. Tempo",
+    "longestActivity": "Langste Activiteit",
+    "totalElevation": "Totale Hoogtemeters",
+    "avgPerActivity": "Gem. {{value}} m per activiteit"
+  },
+  "yearInReviewSettings": {
+    "background": {
+      "sizeLimit": "Afbeeldingsgrootte moet kleiner zijn dan 5MB",
+      "uploadFailed": "Kan bestand niet lezen. Probeer opnieuw."
+    }
+  },
+  "dashboard": {
+    "activityTrends": "Activiteit Trends",
+    "sportBreakdown": "Per sport",
+    "activityMap": "Activiteiten Kaart",
+    "customize": "Aanpassen",
+    "noActivitiesSelected": "Geen activiteiten geselecteerd voor Sport Verdeling.",
+    "configureActivities": "Configureer Activiteiten",
+    "allActivitiesFor": "Al je activiteiten voor {{year}} gevisualiseerd op een kaart. Klik op een route voor details."
+  },
+  "charts": {
+    "monthlyTrends": "Maandelijkse Trends",
+    "weeklyTrends": "Wekelijkse Trends",
+    "byActivityType": "Per Activiteit Type",
+    "activityTypes": "Activiteit Types",
+    "noActivitiesYet": "Nog geen activiteiten",
+    "view": "Weergave",
+    "sport": "Sport",
+    "allSports": "Alle Sporten",
+    "month": "Maand",
+    "week": "Week",
+    "metrics": {
+      "distance": "Afstand",
+      "time": "Tijd",
+      "elevation": "Hoogtemeters",
+      "activities": "Activiteiten",
+      "count": "Aantal"
+    },
+    "units": {
+      "km": "km",
+      "hours": "uur",
+      "activities": "activiteiten"
+    }
+  },
+  "activityTypes": {
+    "Run": "Hardlopen",
+    "Ride": "Fietsen",
+    "Swim": "Zwemmen"
+  },
+  "achievements": {
+    "title": "Prestatie Tijdlijn",
+    "subtitle": "Jouw grootste prestaties gedurende het jaar",
+    "longestRun": "Langste Loop",
+    "biggestClimb": "Grootste Klim",
+    "longestRide": "Langste Rit",
+    "longestSwim": "Langste Zwempartij"
+  },
+  "stravaSettings": {
+    "title": "Strava Instellingen",
+    "subtitle": "Beheer je Strava app inloggegevens",
+    "technicalNotice": "Technische Installatie Vereist:",
+    "technicalDescription": "Dit proces vereist het aanmaken van een Strava API applicatie. Volg deze stappen zorgvuldig.",
+    "setupInstructions": "Installatie Instructies",
+    "step1": {
+      "title": "Ga naar Strava API Instellingen",
+      "description": "Klik op de knop hieronder. Het opent Strava's API instellingenpagina in een nieuw tabblad zodat je gemakkelijk terug kunt schakelen om je inloggegevens te kopiëren.",
+      "button": "Open Strava API Instellingen",
+      "note": "Dit opent in een nieuw tabblad zodat je gemakkelijk je inloggegevens kunt kopiëren."
+    },
+    "step2": {
+      "title": "Configureer Je Applicatie",
+      "applicationName": "Applicatie Naam:",
+      "applicationNameDesc": "Kies een naam die je leuk vindt (bijv. \"Mijn Sportjaar\")",
+      "category": "Categorie:",
+      "categoryDesc": "Selecteer een categorie die past",
+      "website": "Website:",
+      "websiteDesc": "Voer een website URL in (bijv. je persoonlijke site of gebruik een placeholder zoals https://example.com)",
+      "callbackDomain": "Autorisatie Callback Domein:",
+      "callbackImportant": "⚠️ Belangrijk: Voer ALLEEN het domein in zonder poortnummer:",
+      "callbackNote": "Kopieer deze waarde exact. Voeg geen \"http://\", \"https://\" of poortnummers toe."
+    },
+    "step3": {
+      "title": "Kopieer Je Inloggegevens",
+      "description": "Na het aanmaken van je app toont Strava een Client ID en Client Secret. Kopieer deze waarden en voer ze hieronder in."
+    },
+    "credentials": {
+      "title": "Voer Je Inloggegevens In",
+      "clientId": "Client ID",
+      "clientIdPlaceholder": "bijv. 123456",
+      "clientSecret": "Client Secret",
+      "clientSecretPlaceholder": "Voer je client secret in",
+      "show": "Tonen",
+      "hide": "Verbergen"
+    },
+    "securityNote": "Beveiligingsnotitie:",
+    "securityDescription": "Je inloggegevens worden alleen lokaal in je browser opgeslagen. Ze verlaten nooit je apparaat.",
+    "saveChanges": "Wijzigingen Opslaan",
+    "cancel": "Annuleren",
+    "dataManagement": {
+      "title": "Gegevensbeheer",
+      "syncButton": "Activiteiten Synchroniseren",
+      "syncing": "Synchroniseren...",
+      "clearCacheButton": "Gecachte Gegevens Wissen",
+      "clearing": "Wissen...",
+      "note": "Synchronisatie controleert op nieuwe activiteiten. Cache wissen forceert een volledige verversing.",
+      "syncConfirm": "Activiteiten synchroniseren van Strava? Dit controleert op nieuwe of bijgewerkte activiteiten.",
+      "clearConfirm": "Weet je zeker dat je alle gecachte activiteitengegevens wilt wissen? Dit forceert een volledige verversing bij de volgende synchronisatie. Dit verwijdert NIET je Strava-gegevens, alleen de lokale cache."
+    },
+    "clearCredentials": "Inloggegevens Wissen",
+    "clearCredentialsConfirm": "Weet je zeker dat je je Strava-inloggegevens wilt wissen? Je moet ze opnieuw instellen."
+  },
+  "onboardingGuide": {
+    "step1": {
+      "title": "Welkom bij Sportjaar!",
+      "description": "Creëer prachtige Jaaroverzichten van je sportprestaties. Laten we beginnen!"
+    },
+    "step2": {
+      "title": "Voeg een Achtergrondafbeelding Toe",
+      "description": "Personaliseer je Jaaroverzicht met een aangepaste hero achtergrond. Upload je favoriete foto of gebruik een URL.",
+      "action": "Achtergrond Toevoegen"
+    },
+    "step3": {
+      "title": "Configureer Filters",
+      "description": "Pas aan welke activiteiten verschijnen in je overzicht. Sluit activiteittypes uit, filter virtuele activiteiten, of verberg specifieke trainingen.",
+      "action": "Filters Instellen"
+    },
+    "step4": {
+      "title": "Je Bent Helemaal Klaar!",
+      "description": "Je Jaaroverzicht is klaar! Klik op de \"📱 Social Card\" knop om een deelbare afbeelding voor sociale media te maken.",
+      "action": "Aan de Slag"
+    },
+    "alreadyConfigured": "Al Geconfigureerd",
+    "features": {
+      "charts": {
+        "title": "Interactieve Grafieken",
+        "description": "Bekijk je voortgang met gedetailleerde statistieken"
+      },
+      "map": {
+        "title": "Activiteiten Kaart",
+        "description": "Zie waar je het hele jaar hebt getraind"
+      },
+      "social": {
+        "title": "Sociaal Delen",
+        "description": "Creëer prachtige afbeeldingen om te delen"
+      }
+    },
+    "skip": "Overslaan",
+    "next": "Volgende",
+    "stepIndicator": "Stap {{current}} van {{total}}"
+  }
+}

@@ -3,8 +3,8 @@ import { stravaClient } from '../api/strava/index.ts';
 import { transformActivities } from '../utils/index.ts';
 import { useDataSyncStore } from '../stores/dataSyncStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
-
-export const useActivities = (year: number) => {
+import type { Activity } from '../types/activity.ts';
+export const useActivities = (year: number | 'last365') => {
   const { getLastActivityTimestamp, setLastActivityTimestamp, setLastSyncTime } =
     useDataSyncStore();
   const setLoadingStage = useLoadingStore((state) => state.setStage);
@@ -20,33 +20,39 @@ export const useActivities = (year: number) => {
 
         // Stage 2: Fetching data from Strava
         setLoadingStage('fetching');
-        const lastTimestamp = getLastActivityTimestamp(year);
+
+        // Handle 'last365' differently - use current timestamp
+        const queryYear = year === 'last365' ? 'last365' : year;
+        const lastTimestamp = getLastActivityTimestamp(queryYear);
 
         // Get existing cached activities (will be empty on first load)
-        const existingActivities = queryClient.getQueryData<any[]>(['activities', year]) || [];
+        const existingActivities = queryClient.getQueryData<Activity[]>(['activities', year]) || [];
 
         // Only do incremental fetch if we have BOTH lastTimestamp AND existing cached data
         // This ensures first load always gets all activities
         let transformed;
         if (lastTimestamp && existingActivities.length > 0) {
           // Incremental update - fetch only new activities and merge
-          const newStravaActivities = await stravaClient.getActivitiesIncremental(
-            year,
-            lastTimestamp
-          );
+          const newStravaActivities =
+            year === 'last365'
+              ? await stravaClient.getActivitiesLast365Days(lastTimestamp)
+              : await stravaClient.getActivitiesIncremental(year, lastTimestamp);
 
           // Stage 3: Transforming activities
           setLoadingStage('transforming');
           const newTransformed = transformActivities(newStravaActivities);
 
           // Merge new activities with existing ones, avoiding duplicates
-          const existingIds = new Set(existingActivities.map((a: any) => a.id));
+          const existingIds = new Set(existingActivities.map((a: Activity) => a.id));
           const uniqueNewActivities = newTransformed.filter((a) => !existingIds.has(a.id));
 
           transformed = [...existingActivities, ...uniqueNewActivities];
         } else {
-          // First time fetch OR no cache - get all activities for the year
-          const stravaActivities = await stravaClient.getActivitiesForYear(year);
+          // First time fetch OR no cache - get all activities for the period
+          const stravaActivities =
+            year === 'last365'
+              ? await stravaClient.getActivitiesLast365Days()
+              : await stravaClient.getActivitiesForYear(year);
 
           // Stage 3: Transforming activities
           setLoadingStage('transforming');
@@ -60,11 +66,11 @@ export const useActivities = (year: number) => {
             return new Date(activity.date) > new Date(latest.date) ? activity : latest;
           });
           const timestamp = Math.floor(new Date(mostRecent.date).getTime() / 1000);
-          setLastActivityTimestamp(year, timestamp);
+          setLastActivityTimestamp(queryYear, timestamp);
         }
 
         // Update last sync time
-        setLastSyncTime(year, Date.now());
+        setLastSyncTime(queryYear, Date.now());
 
         return transformed;
       } catch (error) {

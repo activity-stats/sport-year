@@ -1,16 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface DataSyncState {
-  // Track last activity timestamp for each year
-  lastActivityTimestamps: Record<number, number>;
-  // Track last sync time for each year
-  lastSyncTimes: Record<number, number>;
+type YearKey = number | 'last365';
 
-  setLastActivityTimestamp: (year: number, timestamp: number) => void;
-  getLastActivityTimestamp: (year: number) => number | undefined;
-  setLastSyncTime: (year: number, timestamp: number) => void;
-  getLastSyncTime: (year: number) => number | undefined;
+interface DataSyncState {
+  // Track last activity timestamp for each year or 'last365'
+  lastActivityTimestamps: Record<string, number>;
+  // Track last sync time for each year or 'last365'
+  lastSyncTimes: Record<string, number>;
+
+  setLastActivityTimestamp: (year: YearKey, timestamp: number) => void;
+  getLastActivityTimestamp: (year: YearKey) => number | undefined;
+  setLastSyncTime: (year: YearKey, timestamp: number) => void;
+  getLastSyncTime: (year: YearKey) => number | undefined;
   clearData: () => void;
 }
 
@@ -24,26 +26,26 @@ export const useDataSyncStore = create<DataSyncState>()(
         set((state) => ({
           lastActivityTimestamps: {
             ...state.lastActivityTimestamps,
-            [year]: timestamp,
+            [year.toString()]: timestamp,
           },
         }));
       },
 
       getLastActivityTimestamp: (year) => {
-        return get().lastActivityTimestamps[year];
+        return get().lastActivityTimestamps[year.toString()];
       },
 
       setLastSyncTime: (year, timestamp) => {
         set((state) => ({
           lastSyncTimes: {
             ...state.lastSyncTimes,
-            [year]: timestamp,
+            [year.toString()]: timestamp,
           },
         }));
       },
 
       getLastSyncTime: (year) => {
-        return get().lastSyncTimes[year];
+        return get().lastSyncTimes[year.toString()];
       },
 
       clearData: () => {

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export interface LoadingStep {
   id: string;
   label: string;
@@ -10,6 +12,7 @@ interface LoadingProgressProps {
 }
 
 export function LoadingProgress({ steps }: LoadingProgressProps) {
+  const { t } = useTranslation();
   // Calculate progress directly from props
   const completedSteps = steps.filter((s) => s.status === 'complete').length;
   const totalSteps = steps.length;
@@ -47,11 +50,9 @@ export function LoadingProgress({ steps }: LoadingProgressProps) {
         {/* Title */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Loading Your Activities
+            {t('loading.title')}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Please wait while we prepare your data...
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">{t('loading.subtitle')}</p>
         </div>
 
         {/* Progress Bar */}
@@ -64,7 +65,7 @@ export function LoadingProgress({ steps }: LoadingProgressProps) {
 
         {/* Progress Percentage */}
         <div className="text-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-          {Math.round(progress)}% Complete
+          {t('loading.complete', { progress: Math.round(progress) })}
         </div>
 
         {/* Steps List */}
@@ -96,7 +97,7 @@ export function LoadingProgress({ steps }: LoadingProgressProps) {
 
         {/* Helper Text */}
         <div className="text-center text-xs text-gray-500 dark:text-gray-400 pt-4">
-          This may take a few moments depending on the amount of data...
+          {t('loading.helpText')}
         </div>
       </div>
     </div>

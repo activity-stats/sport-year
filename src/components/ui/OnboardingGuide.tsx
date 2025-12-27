@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../stores/settingsStore';
 
 interface OnboardingGuideProps {
@@ -7,6 +8,7 @@ interface OnboardingGuideProps {
 }
 
 export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProps) {
+  const { t } = useTranslation();
   const { yearInReview } = useSettingsStore();
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -33,19 +35,17 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
   const steps = [
     {
       emoji: '👋',
-      title: 'Welcome to Sport Year!',
-      description:
-        "Create beautiful Year in Review summaries of your athletic achievements. Let's get you started!",
+      title: t('onboardingGuide.step1.title'),
+      description: t('onboardingGuide.step1.description'),
       action: null,
     },
     {
       emoji: '🖼️',
-      title: 'Add a Background Image',
-      description:
-        'Personalize your Year in Review with a custom hero background. Upload your favorite photo or use a URL.',
+      title: t('onboardingGuide.step2.title'),
+      description: t('onboardingGuide.step2.description'),
       completed: hasBackgroundImage,
       action: {
-        label: 'Add Background',
+        label: t('onboardingGuide.step2.action'),
         onClick: () => {
           onOpenSettings();
           onClose();
@@ -54,12 +54,11 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
     },
     {
       emoji: '🔍',
-      title: 'Configure Filters',
-      description:
-        'Customize which activities appear in your review. Exclude activity types, filter virtual activities, or hide specific workouts.',
+      title: t('onboardingGuide.step3.title'),
+      description: t('onboardingGuide.step3.description'),
       completed: hasFilters,
       action: {
-        label: 'Set Filters',
+        label: t('onboardingGuide.step3.action'),
         onClick: () => {
           onOpenSettings();
           onClose();
@@ -68,11 +67,10 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
     },
     {
       emoji: '🎉',
-      title: "You're All Set!",
-      description:
-        'Your Year in Review is ready! Click the "📱 Social Card" button to create a shareable image for social media.',
+      title: t('onboardingGuide.step4.title'),
+      description: t('onboardingGuide.step4.description'),
       action: {
-        label: 'Get Started',
+        label: t('onboardingGuide.step4.action'),
         onClick: onClose,
       },
     },
@@ -115,7 +113,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
             {currentStepData.completed && (
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full text-sm font-semibold">
                 <span>✓</span>
-                <span>Already Configured</span>
+                <span>{t('onboardingGuide.alreadyConfigured')}</span>
               </div>
             )}
           </div>
@@ -132,28 +130,32 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
                 <span className="text-2xl">📊</span>
                 <div>
                   <div className="font-semibold text-gray-900 dark:text-white">
-                    Interactive Charts
+                    {t('onboardingGuide.features.charts.title')}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    View your progress with detailed stats
+                    {t('onboardingGuide.features.charts.description')}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
                 <span className="text-2xl">🗺️</span>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">Activity Map</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    {t('onboardingGuide.features.map.title')}
+                  </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    See where you trained throughout the year
+                    {t('onboardingGuide.features.map.description')}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-pink-50 dark:bg-pink-900/30 rounded-xl">
                 <span className="text-2xl">📱</span>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">Social Sharing</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    {t('onboardingGuide.features.social.title')}
+                  </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Create beautiful images to share
+                    {t('onboardingGuide.features.social.description')}
                   </div>
                 </div>
               </div>
@@ -163,7 +165,10 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
           {/* Navigation */}
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              Step {currentStep + 1} of {steps.length}
+              {t('onboardingGuide.stepIndicator', {
+                current: currentStep + 1,
+                total: steps.length,
+              })}
             </div>
 
             <div className="flex gap-3">
@@ -172,7 +177,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
                   onClick={onClose}
                   className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-lg transition"
                 >
-                  Skip
+                  {t('onboardingGuide.skip')}
                 </button>
               )}
 
@@ -190,7 +195,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
                   onClick={() => setCurrentStep(currentStep + 1)}
                   className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
                 >
-                  Next
+                  {t('onboardingGuide.next')}
                 </button>
               )}
             </div>

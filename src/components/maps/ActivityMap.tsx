@@ -174,7 +174,7 @@ export const ActivityMap = ({ activities, height = '600px' }: ActivityMapProps) 
     return () => {
       // Don't destroy the map, just clean up layers
     };
-  }, [activities]);
+  }, [activities, isDark]);
 
   // Cleanup on unmount
   useEffect(() => {

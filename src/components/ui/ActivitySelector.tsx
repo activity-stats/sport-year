@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Activity } from '../../types';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
@@ -9,7 +10,10 @@ interface ActivitySelectorProps {
   activities: Activity[];
   highlightActivities: Activity[];
   highlights: RaceHighlight[];
+  initialSelectedActivities?: Activity[];
+  initialSelectedHighlights?: RaceHighlight[];
   onConfirm: (selectedActivities: Activity[], selectedHighlights: RaceHighlight[]) => void;
+  onBack?: () => void;
   onClose: () => void;
 }
 
@@ -21,15 +25,29 @@ export function ActivitySelector({
   activities,
   highlightActivities,
   highlights,
+  initialSelectedActivities,
+  initialSelectedHighlights,
   onConfirm,
+  onBack,
   onClose,
 }: ActivitySelectorProps) {
-  // Combine activities and highlights, pre-select triathlon highlights
+  const { t } = useTranslation();
+  // Combine activities and highlights, pre-select triathlon highlights or use previous selections
   const triathlonHighlights = highlights.filter((h) => h.type === 'triathlon');
-  const initialSelectedIds = new Set([
-    ...triathlonHighlights.slice(0, 3).map((h) => h.id),
-    ...highlightActivities.slice(0, Math.max(0, 3 - triathlonHighlights.length)).map((a) => a.id),
-  ]);
+  const hasInitialSelection =
+    (initialSelectedActivities && initialSelectedActivities.length > 0) ||
+    (initialSelectedHighlights && initialSelectedHighlights.length > 0);
+  const initialSelectedIds = hasInitialSelection
+    ? new Set([
+        ...(initialSelectedHighlights || []).map((h) => h.id),
+        ...(initialSelectedActivities || []).map((a) => a.id),
+      ])
+    : new Set([
+        ...triathlonHighlights.slice(0, 3).map((h) => h.id),
+        ...highlightActivities
+          .slice(0, Math.max(0, 3 - triathlonHighlights.length))
+          .map((a) => a.id),
+      ]);
   const [selected, setSelected] = useState<Set<string>>(initialSelectedIds);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -52,7 +70,7 @@ export function ActivitySelector({
       if (newSelected.size < 3) {
         newSelected.add(id);
       } else {
-        alert('You can select up to 3 items');
+        alert(t('errors.maxItemsReached'));
       }
     }
     setSelected(newSelected);
@@ -234,6 +252,14 @@ export function ActivitySelector({
             {selected.size} of 3 selected
           </div>
           <div className="flex gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"
+              >
+                ← Back
+              </button>
+            )}
             <button
               onClick={onClose}
               className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors"

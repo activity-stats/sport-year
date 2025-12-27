@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../../../i18n';
 import { LoadingProgress, type LoadingStep } from '../LoadingProgress';
 
 describe('LoadingProgress', () => {
+  const renderWithI18n = (ui: React.ReactElement) => {
+    return render(<I18nextProvider i18n={i18n}>{ui}</I18nextProvider>);
+  };
+
   it('renders loading progress with steps', () => {
     const steps: LoadingStep[] = [
       { id: 'step1', label: 'Step 1', status: 'complete' },
@@ -10,7 +16,7 @@ describe('LoadingProgress', () => {
       { id: 'step3', label: 'Step 3', status: 'pending' },
     ];
 
-    render(<LoadingProgress steps={steps} />);
+    renderWithI18n(<LoadingProgress steps={steps} />);
 
     expect(screen.getByText('Loading Your Activities')).toBeInTheDocument();
     expect(screen.getByText('Step 1')).toBeInTheDocument();
@@ -26,7 +32,7 @@ describe('LoadingProgress', () => {
       { id: 'step4', label: 'Step 4', status: 'pending' },
     ];
 
-    render(<LoadingProgress steps={steps} />);
+    renderWithI18n(<LoadingProgress steps={steps} />);
 
     // 2 complete out of 4 = 50%
     expect(screen.getByText('50% Complete')).toBeInTheDocument();
@@ -38,7 +44,7 @@ describe('LoadingProgress', () => {
       { id: 'step2', label: 'Step 2', status: 'complete' },
     ];
 
-    render(<LoadingProgress steps={steps} />);
+    renderWithI18n(<LoadingProgress steps={steps} />);
 
     expect(screen.getByText('100% Complete')).toBeInTheDocument();
   });
@@ -49,7 +55,7 @@ describe('LoadingProgress', () => {
       { id: 'step2', label: 'Step 2', status: 'pending' },
     ];
 
-    render(<LoadingProgress steps={steps} />);
+    renderWithI18n(<LoadingProgress steps={steps} />);
 
     expect(screen.getByText('0% Complete')).toBeInTheDocument();
   });
@@ -62,7 +68,7 @@ describe('LoadingProgress', () => {
       { id: 'step4', label: 'Error Step', status: 'error' },
     ];
 
-    render(<LoadingProgress steps={steps} />);
+    renderWithI18n(<LoadingProgress steps={steps} />);
 
     // Verify all step labels are visible
     expect(screen.getByText('Completed Step')).toBeInTheDocument();

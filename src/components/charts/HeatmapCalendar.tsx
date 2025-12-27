@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import type { Activity } from '../../types/activity';
 
 interface HeatmapCalendarProps {
-  year: number;
+  year: number | 'last365';
   activities: Activity[];
+  onDateClick?: (date: Date) => void;
 }
 
 interface DayData {
@@ -14,14 +15,25 @@ interface DayData {
   activities: Activity[];
 }
 
-export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
+export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalendarProps) {
   // Calculate daily totals
   const dailyData = useMemo(() => {
     const days = new Map<string, DayData>();
 
-    // Initialize all days of the year
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
+    // Initialize all days based on year type
+    let startDate: Date;
+    let endDate: Date;
+
+    if (year === 'last365') {
+      // Last 365 days from today
+      endDate = new Date();
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 365);
+    } else {
+      // Specific calendar year
+      startDate = new Date(year, 0, 1);
+      endDate = new Date(year, 11, 31);
+    }
 
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       const key = d.toISOString().split('T')[0];
@@ -52,8 +64,17 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
   // Organize days into weeks (starting Monday)
   const weeks = useMemo(() => {
     const weekArray: DayData[][] = [];
-    const startDate = new Date(year, 0, 1);
-    const endDate = new Date(year, 11, 31);
+    let startDate: Date;
+    let endDate: Date;
+
+    if (year === 'last365') {
+      endDate = new Date();
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 365);
+    } else {
+      startDate = new Date(year, 0, 1);
+      endDate = new Date(year, 11, 31);
+    }
 
     // Find the Monday of the week containing Jan 1
     const currentDate = new Date(startDate);
@@ -89,8 +110,13 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
 
       currentDate.setDate(currentDate.getDate() + 1);
 
-      // Stop after end of year + completing current week
-      if (currentDate > new Date(year + 1, 0, 7)) break;
+      // Stop after end of period + completing current week
+      if (currentDate > endDate) {
+        // Add any remaining days to complete the week
+        const nextWeek = new Date(endDate);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        if (currentDate > nextWeek) break;
+      }
     }
 
     return weekArray;
@@ -159,8 +185,11 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
                   </div>
                   {week.map((day, dayIndex) => {
                     const intensity = getIntensity(day.timeMinutes);
-                    const isInYear =
-                      day.date >= new Date(year, 0, 1) && day.date <= new Date(year, 11, 31);
+                    // For last365, all days in range are considered "in period"
+                    const isInPeriod =
+                      year === 'last365'
+                        ? true
+                        : day.date >= new Date(year, 0, 1) && day.date <= new Date(year, 11, 31);
 
                     const formatTime = (minutes: number) => {
                       if (minutes < 60) return `${Math.round(minutes)}min`;
@@ -173,17 +202,24 @@ export function HeatmapCalendar({ year, activities }: HeatmapCalendarProps) {
                       <div
                         key={dayIndex}
                         className={`w-3 h-3 border rounded-sm transition-all hover:scale-125 hover:shadow-md cursor-pointer ${
-                          isInYear ? getColorClass(intensity) : 'bg-transparent border-transparent'
+                          isInPeriod
+                            ? getColorClass(intensity)
+                            : 'bg-transparent border-transparent'
                         }`}
                         title={
-                          isInYear && day.activityCount > 0
+                          isInPeriod && day.activityCount > 0
                             ? `${formatDate(day.date)}: ${formatTime(day.timeMinutes)} • ${day.activityCount} ${
                                 day.activityCount === 1 ? 'activity' : 'activities'
                               } • ${day.distanceKm.toFixed(1)} km`
-                            : isInYear
+                            : isInPeriod
                               ? `${formatDate(day.date)}: Rest day`
                               : ''
                         }
+                        onClick={() => {
+                          if (isInPeriod && day.activityCount > 0 && onDateClick) {
+                            onDateClick(day.date);
+                          }
+                        }}
                       ></div>
                     );
                   })}

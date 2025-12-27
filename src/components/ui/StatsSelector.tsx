@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { YearStats } from '../../types';
 import type { StatOption } from './statsOptions';
 import { availableStats } from './statsOptions';
@@ -6,13 +7,25 @@ import { availableStats } from './statsOptions';
 interface StatsSelectorProps {
   stats: YearStats;
   daysActive: number;
+  initialSelectedStats?: StatOption[];
   onConfirm: (selectedStats: StatOption[]) => void;
   onClose: () => void;
 }
 
-export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSelectorProps) {
+export function StatsSelector({
+  stats,
+  daysActive,
+  initialSelectedStats,
+  onConfirm,
+  onClose,
+}: StatsSelectorProps) {
+  const { t } = useTranslation();
   // Default: First 3 stats from StatsOverview (Distance, Elevation, Time)
-  const [selected, setSelected] = useState<Set<string>>(new Set(['distance', 'elevation', 'time']));
+  const defaultStats =
+    initialSelectedStats && initialSelectedStats.length > 0
+      ? new Set(initialSelectedStats.map((s) => s.id))
+      : new Set(['distance', 'elevation', 'time']);
+  const [selected, setSelected] = useState<Set<string>>(defaultStats);
 
   // Close on ESC key
   useEffect(() => {
@@ -32,13 +45,13 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
         // Don't allow deselecting all stats
         newSelected.delete(id);
       } else {
-        alert('You must select at least 1 stat');
+        alert(t('statsSelector.selectOne'));
       }
     } else {
       if (newSelected.size < 4) {
         newSelected.add(id);
       } else {
-        alert('You can select up to 4 stats');
+        alert(t('statsSelector.maxFour'));
       }
     }
     setSelected(newSelected);
@@ -56,9 +69,11 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
         <div className="p-6 border-b border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white">Select Stats</h2>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+                {t('statsSelector.title')}
+              </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Choose 1-4 stats to display on your social card
+                {t('statsSelector.subtitle')}
               </p>
             </div>
             <button
@@ -108,21 +123,22 @@ export function StatsSelector({ stats, daysActive, onConfirm, onClose }: StatsSe
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {selected.size} of 4 selected • {selected.size < 1 ? 'Select at least 1' : 'Ready'}
+            {t('statsSelector.selected', { count: selected.size })} •{' '}
+            {selected.size < 1 ? t('statsSelector.selectAtLeastOne') : t('statsSelector.ready')}
           </div>
           <div className="flex gap-3">
             <button
               onClick={onClose}
               className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg font-semibold transition-colors"
             >
-              Cancel
+              {t('statsSelector.cancel')}
             </button>
             <button
               onClick={handleConfirm}
               disabled={selected.size < 1}
               className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Next: Select Highlights
+              {t('statsSelector.nextSelectHighlights')}
             </button>
           </div>
         </div>

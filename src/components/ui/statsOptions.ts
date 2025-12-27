@@ -22,7 +22,7 @@ export const availableStats: StatOption[] = [
   },
   {
     id: 'time',
-    label: 'Hours Time',
+    label: 'Active Hours',
     icon: '⏱️',
     getValue: (stats) => {
       const hours = Math.round(stats.totalTimeHours);
