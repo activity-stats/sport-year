@@ -4,6 +4,7 @@ import { transformActivities } from '../utils/index.ts';
 import { useDataSyncStore } from '../stores/dataSyncStore.ts';
 import { useLoadingStore } from '../stores/loadingStore.ts';
 import type { Activity } from '../types/activity.ts';
+import { TIMING } from '../constants/timing.ts';
 export const useActivities = (year: number | 'last365') => {
   const { getLastActivityTimestamp, setLastActivityTimestamp, setLastSyncTime } =
     useDataSyncStore();
@@ -78,8 +79,8 @@ export const useActivities = (year: number | 'last365') => {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 60, // 1 hour - critical for rate limits
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: TIMING.CACHE_STALE_TIME_MS, // 1 hour - critical for rate limits
+    gcTime: TIMING.CACHE_GC_TIME_MS, // 24 hours
     enabled: true,
   });
 };
@@ -121,7 +122,7 @@ export const useAllActivities = () => {
 
       return transformActivities(allActivities);
     },
-    staleTime: 1000 * 60 * 60, // 1 hour
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: TIMING.CACHE_STALE_TIME_MS, // 1 hour
+    gcTime: TIMING.CACHE_GC_TIME_MS, // 24 hours
   });
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TIMING } from '../../constants/timing';
 import { useStravaConfigStore } from '../../stores/stravaConfigStore';
 import { useDataSyncStore } from '../../stores/dataSyncStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -83,7 +84,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
     try {
       refreshActivities(currentYear);
       // Wait a bit for the query to start
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, TIMING.RETRY_DELAY_MS));
       alert(t('errors.syncStarted'));
     } catch (error) {
       // Log critical sync error for debugging

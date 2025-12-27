@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { domToCanvas } from 'modern-screenshot';
 import jsPDF from 'jspdf';
+import { TIMING } from '../constants/timing';
 import type { ExportSection, ExportFormat } from '../components/ui/ExportDialog';
 
 interface AdvancedExportOptions {
@@ -86,7 +87,7 @@ export function useAdvancedExport() {
       setProgress(40);
 
       // Wait for layout to settle
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, TIMING.DOWNLOAD_CLEANUP_DELAY_MS));
 
       const canvas = await domToCanvas(mainContainer, {
         scale,
