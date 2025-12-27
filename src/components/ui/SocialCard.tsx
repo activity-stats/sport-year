@@ -106,7 +106,7 @@ export function SocialCard({
 
   const handleShare = async () => {
     if (!cardRef.current) {
-      alert('Card element not found. Please try again.');
+      alert(t('errors.cardNotFound'));
       return;
     }
 
@@ -166,7 +166,7 @@ export function SocialCard({
       );
     } catch (error) {
       console.error('Failed to share:', error);
-      alert('Failed to share. Please try downloading instead.');
+      alert(t('socialCard.shareFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -174,7 +174,7 @@ export function SocialCard({
 
   const handleExport = async () => {
     if (!cardRef.current) {
-      alert('Card element not found. Please try again.');
+      alert(t('errors.cardNotFound'));
       return;
     }
 

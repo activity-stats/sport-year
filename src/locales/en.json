@@ -148,7 +148,13 @@
   "errors": {
     "loadingFailed": "Failed to load activities",
     "noActivities": "No activities found for this period",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "cacheClearSuccess": "Local cache cleared successfully. Data will be refreshed.",
+    "cacheClearFailed": "Failed to clear data. Please try again.",
+    "syncStarted": "Sync started! Your activities are being updated.",
+    "syncFailed": "Failed to sync. Please try again.",
+    "cardNotFound": "Card element not found. Please try again.",
+    "maxItemsReached": "You can select up to 3 items"
   },
   "onboarding": {
     "welcome": "Welcome to Sport Year!",

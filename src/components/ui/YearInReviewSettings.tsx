@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSettingsStore, AVAILABLE_STATS, type StatType } from '../../stores/settingsStore';
 import type { ActivityType } from '../../types';
 import { ImagePositionEditor } from './ImagePositionEditor';
@@ -16,6 +17,7 @@ export function YearInReviewSettings({
   onClose,
   availableActivityTypes,
 }: YearInReviewSettingsProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'background' | 'types' | 'filters' | 'stats'>(
     'background'
   );
@@ -50,7 +52,7 @@ export function YearInReviewSettings({
     // Check file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      alert('Image size must be less than 5MB');
+      alert(t('yearInReviewSettings.background.sizeLimit'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -68,7 +70,7 @@ export function YearInReviewSettings({
       }
     };
     reader.onerror = () => {
-      alert('Failed to read file. Please try again.');
+      alert(t('yearInReviewSettings.background.uploadFailed'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

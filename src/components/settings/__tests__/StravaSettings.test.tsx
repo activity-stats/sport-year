@@ -283,6 +283,68 @@ describe('StravaSettings', () => {
     });
   });
 
+  describe('keyboard shortcuts', () => {
+    it('should close modal on ESC key press', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      window.dispatchEvent(escapeEvent);
+
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not close on other key presses', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+      window.dispatchEvent(enterEvent);
+
+      expect(mockOnClose).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('data management', () => {
+    it('should show Sync Activities button', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      expect(screen.getByRole('button', { name: /Sync Activities/i })).toBeInTheDocument();
+    });
+
+    it('should show Clear Cached Data button', () => {
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      expect(screen.getByRole('button', { name: /Clear Cached Data/i })).toBeInTheDocument();
+    });
+
+    it('should not sync when confirmation is cancelled', async () => {
+      const user = userEvent.setup();
+      (window.confirm as any).mockReturnValue(false);
+
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const syncButton = screen.getByRole('button', { name: /Sync Activities/i });
+      await user.click(syncButton);
+
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('Sync activities from Strava?')
+      );
+    });
+
+    it('should not clear data when confirmation is cancelled', async () => {
+      const user = userEvent.setup();
+      (window.confirm as any).mockReturnValue(false);
+
+      render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });
+
+      const clearButton = screen.getByRole('button', { name: /Clear Cached Data/i });
+      await user.click(clearButton);
+
+      expect(window.confirm).toHaveBeenCalledWith(
+        expect.stringContaining('Are you sure you want to clear all cached activity data?')
+      );
+    });
+  });
+
   describe('UI elements', () => {
     it('should display security note', () => {
       render(<StravaSettings onClose={mockOnClose} />, { wrapper: createWrapper() });

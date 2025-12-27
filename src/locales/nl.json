@@ -148,7 +148,13 @@
   "errors": {
     "loadingFailed": "Laden van activiteiten mislukt",
     "noActivities": "Geen activiteiten gevonden voor deze periode",
-    "tryAgain": "Probeer opnieuw"
+    "tryAgain": "Probeer opnieuw",
+    "cacheClearSuccess": "Lokale cache succesvol gewist. Gegevens worden vernieuwd.",
+    "cacheClearFailed": "Wissen van gegevens mislukt. Probeer opnieuw.",
+    "syncStarted": "Synchronisatie gestart! Je activiteiten worden bijgewerkt.",
+    "syncFailed": "Synchroniseren mislukt. Probeer opnieuw.",
+    "cardNotFound": "Kaartelement niet gevonden. Probeer opnieuw.",
+    "maxItemsReached": "Je kunt maximaal 3 items selecteren"
   },
   "onboarding": {
     "welcome": "Welkom bij Sportjaar!",

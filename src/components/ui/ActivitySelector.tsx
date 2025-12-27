@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Activity } from '../../types';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import { formatDistanceWithUnit, formatDuration } from '../../utils/formatters';
@@ -24,6 +25,7 @@ export function ActivitySelector({
   onConfirm,
   onClose,
 }: ActivitySelectorProps) {
+  const { t } = useTranslation();
   // Combine activities and highlights, pre-select triathlon highlights
   const triathlonHighlights = highlights.filter((h) => h.type === 'triathlon');
   const initialSelectedIds = new Set([
@@ -52,7 +54,7 @@ export function ActivitySelector({
       if (newSelected.size < 3) {
         newSelected.add(id);
       } else {
-        alert('You can select up to 3 items');
+        alert(t('errors.maxItemsReached'));
       }
     }
     setSelected(newSelected);
