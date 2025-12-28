@@ -19,9 +19,6 @@ test.describe('User Preferences', () => {
         .first();
 
       if (await languageSelector.isVisible().catch(() => false)) {
-        // Get initial page text
-        const initialText = await page.locator('body').textContent();
-
         // Try to change language
         await languageSelector.click();
         await page.waitForTimeout(500);

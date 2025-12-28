@@ -15,12 +15,6 @@ test.describe('Advanced Features', () => {
       await navigateToYearInReview(page);
       await page.waitForTimeout(2000);
 
-      // Check if triathlon section or card is visible
-      const triathlonSection = page.getByText(/triathlon|tri/i).first();
-
-      // If triathlon activities exist in mock data, section should be visible
-      const isVisible = await triathlonSection.isVisible().catch(() => false);
-
       // For now, just verify the page loads (triathlon presence depends on mock data)
       const pageContent = await page.locator('body').textContent();
       expect(pageContent).toBeTruthy();

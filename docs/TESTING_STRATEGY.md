@@ -11,9 +11,9 @@ We follow the standard testing pyramid approach:
 ```
         /\
        /E2E\      ← 35 tests (User workflows)
-      /------\    
+      /------\
      /Integration\   ← ~20 tests (Component + Hook + API)
-    /----------\  
+    /----------\
    / Unit Tests \  ← 73+ tests (Pure logic)
   /--------------\
 ```
@@ -30,29 +30,29 @@ We follow the standard testing pyramid approach:
 
 **NO** - They serve fundamentally different purposes:
 
-| **Aspect** | **Unit Tests (Vitest)** | **E2E Tests (Playwright)** |
-|------------|-------------------------|----------------------------|
-| **Purpose** | Verify logic correctness in isolation | Verify user workflows and integration |
-| **Speed** | Fast (milliseconds) | Slow (seconds) |
-| **Scope** | Single function/component | Full application stack |
-| **Mocking** | Heavy mocking of dependencies | Minimal mocking (real APIs) |
-| **When to run** | Every save (watch mode) | Before commit/deploy |
-| **Failures indicate** | Logic bug | Integration or UX issue |
+| **Aspect**            | **Unit Tests (Vitest)**               | **E2E Tests (Playwright)**            |
+| --------------------- | ------------------------------------- | ------------------------------------- |
+| **Purpose**           | Verify logic correctness in isolation | Verify user workflows and integration |
+| **Speed**             | Fast (milliseconds)                   | Slow (seconds)                        |
+| **Scope**             | Single function/component             | Full application stack                |
+| **Mocking**           | Heavy mocking of dependencies         | Minimal mocking (real APIs)           |
+| **When to run**       | Every save (watch mode)               | Before commit/deploy                  |
+| **Failures indicate** | Logic bug                             | Integration or UX issue               |
 
 ### Decision Matrix
 
-| **Test Scenario** | **Type** | **Reasoning** |
-|-------------------|----------|---------------|
-| `formatDistance(5000) returns '5,00'` | **Unit** | Pure function, no dependencies |
-| User sees distance formatted on card | **E2E** | Integration of multiple layers |
+| **Test Scenario**                      | **Type** | **Reasoning**                     |
+| -------------------------------------- | -------- | --------------------------------- |
+| `formatDistance(5000) returns '5,00'`  | **Unit** | Pure function, no dependencies    |
+| User sees distance formatted on card   | **E2E**  | Integration of multiple layers    |
 | `aggregateYearStats` calculates totals | **Unit** | Pure logic, fast, many edge cases |
-| Year-in-review displays correct stats | **E2E** | Full workflow validation |
-| Triathlon detection logic | **Unit** | Business rule, many scenarios |
-| Triathlon section visibility in UI | **E2E** | User-facing feature |
-| OAuth token refresh | **Unit** | API client method |
-| Complete Strava login flow | **E2E** | Multi-step user journey |
-| Chart renders with mock data | **Unit** | Component in isolation |
-| Clicking heatmap navigates correctly | **E2E** | User interaction + navigation |
+| Year-in-review displays correct stats  | **E2E**  | Full workflow validation          |
+| Triathlon detection logic              | **Unit** | Business rule, many scenarios     |
+| Triathlon section visibility in UI     | **E2E**  | User-facing feature               |
+| OAuth token refresh                    | **Unit** | API client method                 |
+| Complete Strava login flow             | **E2E**  | Multi-step user journey           |
+| Chart renders with mock data           | **Unit** | Component in isolation            |
+| Clicking heatmap navigates correctly   | **E2E**  | User interaction + navigation     |
 
 ## Current Test Coverage
 
@@ -143,6 +143,7 @@ We follow the standard testing pyramid approach:
 **File:** `src/utils/__tests__/sportHighlights.test.ts`
 
 **What to test:**
+
 ```typescript
 describe('sportHighlights', () => {
   it('should detect marathon distance (42.195 km)');
@@ -164,6 +165,7 @@ describe('sportHighlights', () => {
 **File:** `src/utils/__tests__/triathlonDetection.test.ts`
 
 **What to test:**
+
 ```typescript
 describe('triathlonDetection', () => {
   it('should detect Triathlon activity type');
@@ -183,6 +185,7 @@ describe('triathlonDetection', () => {
 **File:** `src/utils/__tests__/raceDetection.test.ts`
 
 **What to test:**
+
 ```typescript
 describe('raceDetection', () => {
   it('should detect 5K races (±100m tolerance)');
@@ -205,6 +208,7 @@ describe('raceDetection', () => {
 **File:** `src/components/charts/__tests__/MonthlyChart.test.tsx`
 
 **What to test:**
+
 ```typescript
 describe('MonthlyChart', () => {
   it('should render chart with monthly data');
@@ -222,6 +226,7 @@ describe('MonthlyChart', () => {
 **File:** `src/components/activities/__tests__/ActivityCard.test.tsx`
 
 **What to test:**
+
 ```typescript
 describe('ActivityCard', () => {
   it('should display activity name and type');
@@ -242,6 +247,7 @@ describe('ActivityCard', () => {
 **File:** `e2e/pdf-export.spec.ts`
 
 **What to test:**
+
 ```typescript
 describe('PDF Export', () => {
   it('should export year in review as PDF');
@@ -258,6 +264,7 @@ describe('PDF Export', () => {
 **File:** `e2e/data-sync.spec.ts`
 
 **What to test:**
+
 ```typescript
 describe('Data Sync', () => {
   it('should incrementally sync new activities');
@@ -275,6 +282,7 @@ describe('Data Sync', () => {
 **File:** `e2e/responsive.spec.ts`
 
 **What to test:**
+
 ```typescript
 describe('Responsive Design', () => {
   it('should display mobile layout on small screens');
@@ -291,6 +299,7 @@ describe('Responsive Design', () => {
 **File:** `e2e/accessibility.spec.ts`
 
 **What to test:**
+
 ```typescript
 describe('Accessibility', () => {
   it('should navigate with keyboard only');
@@ -377,6 +386,7 @@ npm run validate
 ### Coverage Exclusions
 
 The following are intentionally excluded from coverage:
+
 - `node_modules/`
 - `src/test/` - Test utilities
 - `**/*.d.ts` - Type definitions
@@ -446,12 +456,14 @@ The following are intentionally excluded from coverage:
 ### When to Add Tests
 
 **Always add tests for:**
+
 - New features
 - Bug fixes (regression tests)
 - Complex business logic
 - User-facing workflows
 
 **Test file naming:**
+
 - Unit: `ComponentName.test.tsx` or `utilityName.test.ts`
 - E2E: `feature-name.spec.ts`
 - Place in `__tests__/` subdirectory for unit tests
@@ -477,19 +489,23 @@ The following are intentionally excluded from coverage:
 ## Implementation Timeline
 
 ### Week 1 - High Priority Unit Tests
+
 - [ ] sportHighlights.test.ts
 - [ ] triathlonDetection.test.ts
 - [ ] raceDetection.test.ts
 
 ### Week 2 - Component Tests
+
 - [ ] MonthlyChart.test.tsx
 - [ ] ActivityCard.test.tsx
 
 ### Week 3 - E2E Enhancements
+
 - [ ] pdf-export.spec.ts
 - [ ] data-sync.spec.ts
 
 ### Week 4 - Polish
+
 - [ ] responsive.spec.ts
 - [ ] accessibility.spec.ts
 - [ ] Update documentation
@@ -497,16 +513,19 @@ The following are intentionally excluded from coverage:
 ## Resources
 
 ### Documentation
+
 - [Vitest Documentation](https://vitest.dev/)
 - [Playwright Documentation](https://playwright.dev/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 
 ### Internal Docs
+
 - [Contributing Guidelines](../CONTRIBUTING.md)
 - [I18N Testing](./I18N.md)
 - [E2E Test README](../e2e/README.md)
 
 ### Test Utilities
+
 - Test setup: `/src/test/setup.ts`
 - Mock fixtures: `/e2e/fixtures/strava-mock.ts`
 - Test data factories: Use in individual test files

@@ -65,11 +65,23 @@ test.describe('Dashboard', () => {
     await page.waitForTimeout(2000);
 
     // Look for any of these year in review indicators
-    const hasCalendar = await page.getByText(/activity calendar/i).isVisible().catch(() => false);
-    const hasEpicYear = await page.getByText(/epic year/i).isVisible().catch(() => false);
-    const hasRaceOverview = await page.getByText(/race overview/i).isVisible().catch(() => false);
-    const hasYearHeading = await page.getByRole('heading', { name: /^20\d{2}$/ }).isVisible().catch(() => false);
-    
+    const hasCalendar = await page
+      .getByText(/activity calendar/i)
+      .isVisible()
+      .catch(() => false);
+    const hasEpicYear = await page
+      .getByText(/epic year/i)
+      .isVisible()
+      .catch(() => false);
+    const hasRaceOverview = await page
+      .getByText(/race overview/i)
+      .isVisible()
+      .catch(() => false);
+    const hasYearHeading = await page
+      .getByRole('heading', { name: /^20\d{2}$/ })
+      .isVisible()
+      .catch(() => false);
+
     // At least one should be visible
     expect(hasCalendar || hasEpicYear || hasRaceOverview || hasYearHeading).toBeTruthy();
   });
@@ -106,13 +118,13 @@ test.describe('Dashboard', () => {
 
     // Look for activity details - stats, distances, times should be visible
     const hasStats = await page.locator('body').textContent();
-    const hasActivityData = hasStats && (
-      hasStats.includes('km') || 
-      hasStats.includes('Active Hours') ||
-      hasStats.includes('Distance') ||
-      hasStats.includes('Elevation')
-    );
-    
+    const hasActivityData =
+      hasStats &&
+      (hasStats.includes('km') ||
+        hasStats.includes('Active Hours') ||
+        hasStats.includes('Distance') ||
+        hasStats.includes('Elevation'));
+
     expect(hasActivityData).toBeTruthy();
   });
 
