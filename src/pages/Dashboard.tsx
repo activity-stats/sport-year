@@ -303,6 +303,7 @@ export const Dashboard = () => {
                 onClick={() => setShowSettings(true)}
                 className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
                 title="Customize Year in Review"
+                data-testid="customize-button"
               >
                 <span className="text-xl">🎨</span>
                 {sidebarExpanded && (
@@ -316,6 +317,7 @@ export const Dashboard = () => {
               onClick={() => setShowStravaSettings(true)}
               className="w-full px-3 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition backdrop-blur-sm flex items-center gap-3"
               title="Strava Settings"
+              data-testid="strava-settings-button"
             >
               <span className="text-xl">🔑</span>
               {sidebarExpanded && (
