@@ -1054,7 +1054,7 @@ export function YearInReview({
                   transformOrigin: 'center',
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/70 to-purple-800/70 dark:from-gray-900/80 dark:via-black/70 dark:to-gray-900/80" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70 dark:from-gray-900/80 dark:via-black/90 dark:to-gray-900/80" />
             </>
           ) : (
             <>

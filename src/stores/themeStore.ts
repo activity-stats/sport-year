@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const useMocks = typeof import.meta !== 'undefined' && import.meta.env?.VITE_USE_MOCKS === 'true';
+
 type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeStore {
@@ -49,7 +51,7 @@ export const useThemeStore = create<ThemeStore>()(
       },
     }),
     {
-      name: 'theme-storage',
+      name: useMocks ? 'theme-storage-demo' : 'theme-storage',
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Apply theme immediately after rehydration

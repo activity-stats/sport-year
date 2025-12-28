@@ -304,5 +304,36 @@
     "skip": "Skip",
     "next": "Next",
     "stepIndicator": "Step {{current}} of {{total}}"
+  },
+  "welcome": {
+    "title": "Sport Year",
+    "subtitle": "Visualize Your Athletic Journey",
+    "description": "Transform your Strava activities into beautiful year-in-review presentations. Track your progress, celebrate achievements, and share your athletic story.",
+    "exploreDemo": "Explore Demo",
+    "setupOwn": "Set Up Your Own",
+    "features": {
+      "analytics": {
+        "title": "Rich Analytics",
+        "description": "Detailed stats, charts, and insights from your training data"
+      },
+      "design": {
+        "title": "Beautiful Design",
+        "description": "Stunning year-in-review cards ready to share on social media"
+      },
+      "privacy": {
+        "title": "Privacy First",
+        "description": "Your data stays secure. Set up your own instance with your Strava credentials"
+      }
+    },
+    "footer": {
+      "enjoying": "Enjoying this app?",
+      "buyMeCoffee": "Buy me a coffee"
+    }
+  },
+  "demoBanner": {
+    "message": "You're viewing a",
+    "demo": "demo",
+    "withSampleData": "with sample data",
+    "setupOwn": "Set Up Your Own"
   }
 }

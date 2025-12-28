@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { SetupWizard } from '../SetupWizard';
 import { useStravaConfigStore } from '../../../stores/stravaConfigStore';
 
@@ -8,6 +9,11 @@ import { useStravaConfigStore } from '../../../stores/stravaConfigStore';
 vi.mock('../../../stores/stravaConfigStore', () => ({
   useStravaConfigStore: vi.fn(),
 }));
+
+// Helper to render with router
+const renderWithRouter = (ui: React.ReactElement) => {
+  return render(<MemoryRouter>{ui}</MemoryRouter>);
+};
 
 describe('SetupWizard', () => {
   const mockSetConfig = vi.fn();
@@ -30,28 +36,28 @@ describe('SetupWizard', () => {
 
   describe('initial render', () => {
     it('should render welcome header', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByText('Welcome to Sport Year!')).toBeInTheDocument();
       expect(screen.getByText("Let's get you set up")).toBeInTheDocument();
     });
 
     it('should show instructions step by default', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByText('Step 1: Create a Strava App')).toBeInTheDocument();
       expect(screen.getByText(/Why do I need this?/)).toBeInTheDocument();
     });
 
     it('should display callback domain', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       // Check for Authorization Callback Domain section
       expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
     });
 
     it('should have link to Strava API settings', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       const link = screen.getByRole('link', { name: /Open Strava API Settings/i });
       expect(link).toHaveAttribute('href', 'https://www.strava.com/settings/api');
@@ -63,7 +69,7 @@ describe('SetupWizard', () => {
   describe('navigation', () => {
     it('should navigate to credentials step when Next is clicked', async () => {
       const user = userEvent.setup();
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       const nextButton = screen.getByRole('button', { name: /Next: Enter Credentials/i });
       await user.click(nextButton);
@@ -73,7 +79,7 @@ describe('SetupWizard', () => {
 
     it('should navigate back to instructions when Back is clicked', async () => {
       const user = userEvent.setup();
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       // Go to credentials step
       await user.click(screen.getByRole('button', { name: /Next: Enter Credentials/i }));
@@ -89,7 +95,7 @@ describe('SetupWizard', () => {
   describe('credentials form', () => {
     beforeEach(async () => {
       const user = userEvent.setup();
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       // Navigate to credentials step
       await user.click(screen.getByRole('button', { name: /Next: Enter Credentials/i }));
@@ -166,7 +172,7 @@ describe('SetupWizard', () => {
 
   describe('instructions content', () => {
     it('should show step-by-step instructions', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByText(/Go to Strava's API settings/)).toBeInTheDocument();
       expect(screen.getByText(/Create a new app/)).toBeInTheDocument();
@@ -174,14 +180,14 @@ describe('SetupWizard', () => {
     });
 
     it('should highlight callback URL importance', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();
       expect(screen.getByText(/Enter only the domain/)).toBeInTheDocument();
     });
 
     it('should show application form fields', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByText(/Application Name:/)).toBeInTheDocument();
       expect(screen.getByText(/Category:/)).toBeInTheDocument();
@@ -191,14 +197,14 @@ describe('SetupWizard', () => {
 
   describe('accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       expect(screen.getByRole('heading', { name: /Welcome to Sport Year!/i })).toBeInTheDocument();
     });
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       const nextButton = screen.getByRole('button', { name: /Next: Enter Credentials/i });
 
@@ -213,7 +219,7 @@ describe('SetupWizard', () => {
 
     it('should have proper input types', async () => {
       const user = userEvent.setup();
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       await user.click(screen.getByRole('button', { name: /Next: Enter Credentials/i }));
 
@@ -227,7 +233,7 @@ describe('SetupWizard', () => {
 
   describe('responsive design', () => {
     it('should use dynamic callback domain', () => {
-      render(<SetupWizard />);
+      renderWithRouter(<SetupWizard />);
 
       // Check for Authorization Callback Domain section without port
       expect(screen.getByText(/Authorization Callback Domain:/)).toBeInTheDocument();

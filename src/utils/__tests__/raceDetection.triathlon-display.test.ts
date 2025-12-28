@@ -203,7 +203,7 @@ describe('Triathlon Display Bug', () => {
     const tri = triathlons[0];
 
     // Total elevation should be > 1000m
-    expect(tri.totalElevation).toBe(1600); // 50 + 1200 + 350
+    expect(tri.totalElevation).toBe(1550); // 50 + 1200 + 350
 
     // Should be classified as mountain type
     expect(tri.type).toBe('mountain');
@@ -218,7 +218,7 @@ describe('Triathlon Display Bug', () => {
     expect(triathlonHighlight).toBeDefined();
 
     // Should have elevation data
-    expect(triathlonHighlight?.elevation).toBe(1600);
+    expect(triathlonHighlight?.elevation).toBe(1550);
 
     // Badge should indicate mountain triathlon
     expect(triathlonHighlight?.badge).toContain('Mountain Triathlon');

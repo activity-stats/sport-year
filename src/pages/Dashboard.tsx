@@ -25,6 +25,7 @@ import type { ActivityType } from '../types';
 import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
 import { calculateSportHighlights } from '../utils/sportHighlights';
 import { filterActivities } from '../utils/activityFilters';
+import { DemoBanner } from '../components/DemoBanner';
 
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
 
@@ -474,6 +475,7 @@ export const Dashboard = () => {
 
         {/* Main Content */}
         <main>
+          {useMocks && <DemoBanner />}
           {isLoading ? (
             <LoadingProgress steps={loadingSteps} currentStep={loadingStage} />
           ) : stats && activities ? (

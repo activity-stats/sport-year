@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { Login, Callback, Dashboard } from './pages/index.ts';
+import { Login, Callback, Dashboard, Welcome } from './pages/index.ts';
+import { SetupWizard } from './components/setup/SetupWizard';
 import { useAuth } from './hooks/useAuth.ts';
 import { useStravaConfigStore } from './stores/stravaConfigStore';
-import { SetupWizard } from './components/setup/SetupWizard';
 import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Check if we're in demo mode
+const isDemoMode = typeof import.meta !== 'undefined' && import.meta.env?.VITE_USE_MOCKS === 'true';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,26 +27,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const { isConfigured } = useStravaConfigStore();
 
-  // Show setup wizard if not configured
-  if (!isConfigured) {
-    return (
-      <ErrorBoundary>
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              zIndex: 99999,
-            },
-          }}
-          containerStyle={{
-            zIndex: 99999,
-          }}
-        />
-        <SetupWizard />
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <Toaster
@@ -60,14 +43,21 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
+            <Route path="/setup" element={<SetupWizard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/callback" element={<Callback />} />
             <Route
               path="/"
               element={
-                <ProtectedRoute>
+                isDemoMode ? (
                   <Dashboard />
-                </ProtectedRoute>
+                ) : !isConfigured ? (
+                  <Welcome />
+                ) : (
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                )
               }
             />
           </Routes>
