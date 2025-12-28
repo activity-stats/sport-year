@@ -8,9 +8,9 @@ npm run i18n:check || exit 1
 echo "Running type check..."
 npm run type-check || exit 1
 
-# Run tests
-echo "Running tests..."
-npm test -- --run || exit 1
+# Run tests with coverage
+echo "Running tests with coverage..."
+npm run test:coverage || exit 1
 
 # Run build to ensure everything compiles
 echo "Running build validation..."
