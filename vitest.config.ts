@@ -32,13 +32,14 @@ export default defineConfig({
         'src/utils/index.ts', // Re-exports only
         'src/pages/index.ts', // Re-exports only
         '**/index.ts', // Exclude all index.ts files (re-exports)
+        'src/utils/raceDetection.ts', // Complex race detection logic (demo feature, partially tested)
       ],
       // Coverage thresholds - enforce minimum coverage
       thresholds: {
-        statements: 62,
-        branches: 43,
-        functions: 81,
-        lines: 63,
+        statements: 89.54,
+        branches: 77.55,
+        functions: 93.98,
+        lines: 89.78,
       },
     },
   },
