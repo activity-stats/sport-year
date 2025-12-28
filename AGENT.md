@@ -25,7 +25,8 @@ This document provides context and guidelines for AI assistants working on the S
 - **Data**: TanStack Query (React Query)
 - **Routing**: React Router 7
 - **Charts**: Recharts
-- **Testing**: Vitest + React Testing Library
+- **Unit Testing**: Vitest + React Testing Library
+- **E2E Testing**: Playwright
 
 ### Project Structure
 
@@ -53,6 +54,49 @@ Key files:
 ```
 
 ## 🎯 Design Principles
+
+### Core Principles
+
+The codebase follows several software engineering principles to maintain clean, maintainable, and professional code:
+
+#### Clean Code Principles
+
+- **Meaningful Names**: Variables, functions, and classes have descriptive, intention-revealing names
+- **Functions Do One Thing**: Each function has a single responsibility and does it well
+- **Code Comments**: Code should be self-explanatory; comments explain "why", not "what"
+- **Error Handling**: Proper error handling with meaningful messages, no silent failures
+- **DRY (Don't Repeat Yourself)**: Avoid duplication; extract common logic into reusable functions
+- **KISS (Keep It Simple, Stupid)**: Prefer simple solutions over complex ones
+- **YAGNI (You Aren't Gonna Need It)**: Don't add functionality until it's needed
+
+#### Boy Scout Rule
+
+> "Leave the code cleaner than you found it."
+
+**Always improve code when touching it:**
+
+- Fix formatting issues you encounter
+- Improve variable names if unclear
+- Extract magic numbers to constants
+- Add missing type annotations
+- Remove unused imports or code
+- Simplify complex conditions
+- Add tests for untested code
+
+**Example:**
+
+```typescript
+// Found this code
+function calc(a, b) {
+  return a * 1.21;
+}
+
+// Leave it better
+function calculatePriceWithTax(priceExcludingTax: number): number {
+  const TAX_RATE = 1.21;
+  return priceExcludingTax * TAX_RATE;
+}
+```
 
 ### SOLID Architecture
 
@@ -555,6 +599,52 @@ concurrency:
 
 ### Dependency Management & Version Pinning
 
+**⚠️ CRITICAL RULE: Third-Party Dependencies**
+
+**Never add, update, or remove third-party dependencies without explicit approval.**
+
+This includes:
+
+- ❌ Adding new packages to `package.json`
+- ❌ Updating existing package versions (major, minor, or patch)
+- ❌ Removing unused dependencies
+- ❌ Changing dependency ranges (e.g., `^1.0.0` to `~1.0.0`)
+
+**Why this rule exists:**
+
+- Dependencies affect security, bundle size, and compatibility
+- Version updates can introduce breaking changes
+- Each dependency increases attack surface
+- Requires careful review of licenses, maintainers, and security history
+
+**Exceptions (require approval):**
+
+- Security patches for critical vulnerabilities (high/critical severity)
+- Automated Dependabot PRs (must be reviewed by maintainer)
+- Documented build failures due to outdated dependencies
+
+**Before requesting approval to add a dependency:**
+
+1. Check if existing dependencies can solve the problem
+2. Evaluate bundle size impact (`npm bundlephobia <package>`)
+3. Review package maintenance status (last update, open issues)
+4. Check security advisories (`npm audit`)
+5. Verify license compatibility
+6. Consider implementation complexity vs benefit
+
+**Example approval request:**
+
+```
+Requesting approval to add: react-pdf@7.7.0
+
+Reason: Need to export Year in Review as PDF
+Alternatives considered: html2canvas + jspdf (insufficient quality)
+Bundle size: +180KB gzipped
+Maintenance: Active (updated 2 weeks ago)
+License: MIT
+Security: No known vulnerabilities
+```
+
 **package.json Strategy:**
 
 ```json
@@ -905,9 +995,19 @@ export const useMyStore = create<MyStore>()(
 
 ### Test Failures
 
+**Unit Tests:**
+
 - Mock window.location properly
 - Use `waitFor` for async operations
 - Clear mocks in `beforeEach`
+
+**E2E Tests:**
+
+- First-time setup: `npm run e2e:setup` (installs browsers)
+- Run all: `npm run test:e2e`
+- Debug: `npm run test:e2e:debug`
+- Interactive: `npm run test:e2e:ui`
+- Browsers install to: `~/.cache/ms-playwright/`
 
 ### Linting Issues
 
@@ -977,7 +1077,8 @@ export const useMyStore = create<MyStore>()(
 Before marking work complete:
 
 - [ ] TypeScript compiles (`npm run type-check`)
-- [ ] Tests pass (`npm test -- --run`)
+- [ ] Unit tests pass (`npm test -- --run`)
+- [ ] E2E tests pass (`npm run test:e2e`) - if touching UI/flows
 - [ ] Linting passes (`npm run lint`)
 - [ ] Formatted correctly (`npm run format:check`)
 - [ ] No console.log statements

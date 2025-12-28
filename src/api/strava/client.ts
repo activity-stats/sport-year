@@ -25,18 +25,15 @@ class StravaClient {
     // Add response interceptor for rate limiting
     this.axiosInstance.interceptors.response.use(
       (response) => {
-        // Log rate limit info (useful for debugging)
-        const rateLimit = response.headers['x-ratelimit-limit'];
-        const rateUsage = response.headers['x-ratelimit-usage'];
-
-        if (rateLimit && rateUsage) {
-          console.log(`Rate Limit: ${rateUsage}/${rateLimit}`);
-        }
+        // Rate limit headers available for monitoring if needed:
+        // response.headers['x-ratelimit-limit']
+        // response.headers['x-ratelimit-usage']
 
         return response;
       },
       (error) => {
         if (error.response?.status === 429) {
+          // Log critical rate limit error for debugging
           console.error('Rate limit exceeded. Please try again later.');
         }
         return Promise.reject(error);
@@ -55,11 +52,6 @@ class StravaClient {
     const scope = 'read,activity:read_all';
 
     const authUrl = `${STRAVA_AUTH_BASE}/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
-
-    console.log('=== STRAVA AUTH DEBUG ===');
-    console.log('Client ID:', clientId);
-    console.log('Redirect URI:', redirectUri);
-    console.log('Full Auth URL:', authUrl);
 
     return authUrl;
   }

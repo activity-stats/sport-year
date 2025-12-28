@@ -21,15 +21,12 @@ function applyThemeToDom(theme: Theme) {
         : 'light'
       : theme;
 
-  console.log('[Theme] Applying:', theme, '→', effectiveTheme);
-
   // Apply immediately - no need for RAF as this is not during React render
   if (effectiveTheme === 'dark') {
     root.classList.add('dark');
   } else {
     root.classList.remove('dark');
   }
-  console.log('[Theme] DOM classes after apply:', root.classList.toString());
 }
 
 export const useThemeStore = create<ThemeStore>()(
@@ -37,8 +34,6 @@ export const useThemeStore = create<ThemeStore>()(
     (set, get) => ({
       theme: 'light',
       setTheme: (newTheme) => {
-        console.log('[Theme Store] setTheme called with:', newTheme);
-
         // Apply to DOM immediately
         applyThemeToDom(newTheme);
 
@@ -56,7 +51,6 @@ export const useThemeStore = create<ThemeStore>()(
     {
       name: 'theme-storage',
       onRehydrateStorage: () => (state) => {
-        console.log('[Theme] Rehydrated from storage:', state?.theme);
         if (state) {
           // Apply theme immediately after rehydration
           applyThemeToDom(state.theme);
@@ -78,6 +72,5 @@ if (typeof window !== 'undefined') {
   // Apply theme eagerly on module load to prevent flash
   // This will be overridden by onRehydrateStorage if there's a saved theme
   const initialState = useThemeStore.getState();
-  console.log('[Theme] Module init, applying initial theme:', initialState.theme);
   applyThemeToDom(initialState.theme);
 }

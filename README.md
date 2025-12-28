@@ -63,11 +63,20 @@ Visit `http://localhost:5173`
 # Run development server
 npm run dev
 
-# Run tests
+# Run unit tests
 npm test
 
 # Run tests with coverage
 npm run test:coverage
+
+# Run E2E tests (first time: install browsers)
+npm run e2e:setup
+npm run test:e2e
+
+# E2E test variations
+npm run test:e2e:ui        # Interactive UI mode
+npm run test:e2e:headed    # See browser in action
+npm run test:e2e:debug     # Debug with Playwright Inspector
 
 # Type check
 npm run type-check
@@ -100,13 +109,27 @@ npm run preview
 - **Zustand** - State management
 - **TanStack Query** - Data fetching
 - **Recharts** - Data visualization
-- **Vitest** - Testing
+- **Vitest** - Unit testing
+- **Playwright** - E2E testing
 
 ## 🧪 Testing
 
-- 73 unit tests with 100% statement coverage
+### Unit Tests
+
+- 291 unit tests with ~90% statement coverage
 - React Testing Library for component tests
 - Vitest for test runner
+- Run: `npm test`
+
+### E2E Tests
+
+- 105 E2E tests (35 tests × 3 browsers)
+- Playwright testing framework
+- Comprehensive mock data including triathlon activities
+- First-time setup: `npm run e2e:setup`
+- Run: `npm run test:e2e`
+
+See [TESTING_STRATEGY.md](./docs/TESTING_STRATEGY.md) for detailed testing approach.
 
 ## 🔒 Security
 

@@ -10,7 +10,6 @@ export const Login = () => {
   // If already authenticated, redirect to home
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('User already authenticated, redirecting to home');
       navigate('/', { replace: true });
     }
   }, [isAuthenticated, navigate]);
