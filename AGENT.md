@@ -25,7 +25,8 @@ This document provides context and guidelines for AI assistants working on the S
 - **Data**: TanStack Query (React Query)
 - **Routing**: React Router 7
 - **Charts**: Recharts
-- **Testing**: Vitest + React Testing Library
+- **Unit Testing**: Vitest + React Testing Library
+- **E2E Testing**: Playwright
 
 ### Project Structure
 
@@ -994,9 +995,19 @@ export const useMyStore = create<MyStore>()(
 
 ### Test Failures
 
+**Unit Tests:**
+
 - Mock window.location properly
 - Use `waitFor` for async operations
 - Clear mocks in `beforeEach`
+
+**E2E Tests:**
+
+- First-time setup: `npm run e2e:setup` (installs browsers)
+- Run all: `npm run test:e2e`
+- Debug: `npm run test:e2e:debug`
+- Interactive: `npm run test:e2e:ui`
+- Browsers install to: `~/.cache/ms-playwright/`
 
 ### Linting Issues
 
@@ -1066,7 +1077,8 @@ export const useMyStore = create<MyStore>()(
 Before marking work complete:
 
 - [ ] TypeScript compiles (`npm run type-check`)
-- [ ] Tests pass (`npm test -- --run`)
+- [ ] Unit tests pass (`npm test -- --run`)
+- [ ] E2E tests pass (`npm run test:e2e`) - if touching UI/flows
 - [ ] Linting passes (`npm run lint`)
 - [ ] Formatted correctly (`npm run format:check`)
 - [ ] No console.log statements
