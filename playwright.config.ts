@@ -11,11 +11,14 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  timeout: 60000,
 
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    navigationTimeout: 30000,
+    actionTimeout: 15000,
   },
 
   projects: [
@@ -27,22 +30,18 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    // WebKit disabled in CI due to connection issues
-    // Can be run locally with: npm run test:e2e -- --project=webkit
-    ...(!process.env.CI
-      ? [
-          {
-            name: 'webkit',
-            use: { ...devices['Desktop Safari'] },
-          },
-        ]
-      : []),
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
 
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
