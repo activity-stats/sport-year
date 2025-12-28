@@ -14,6 +14,7 @@ import {
   formatDuration,
   formatDistanceForClosing,
   formatAthleteSlug,
+  formatElevation,
 } from '../../utils/formatters';
 import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
 import { filterActivities } from '../../utils/activityFilters';
@@ -461,10 +462,16 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
             <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
-              Distance
+              {highlight.badge.includes('Mountain Triathlon')
+                ? 'Total Elevation'
+                : highlight.type === 'triathlon'
+                  ? 'Total Distance'
+                  : 'Distance'}
             </div>
             <div className="text-2xl font-black text-gray-900 dark:text-white">
-              {formatDistanceWithUnit(highlight.distance * 1000)}
+              {highlight.badge.includes('Mountain Triathlon')
+                ? formatElevation(highlight.elevation || 0)
+                : formatDistanceWithUnit(highlight.distance * 1000)}
             </div>
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
@@ -1195,8 +1202,16 @@ export function YearInReview({
                                   </h3>
                                   <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
-                                      <span className="font-semibold">📏</span>
-                                      <span>{formatDistanceWithUnit(tri.distance * 1000)}</span>
+                                      <span className="font-semibold">
+                                        {badge.includes('Mountain Triathlon')
+                                          ? '⛰️ Elevation:'
+                                          : '📏 Total:'}
+                                      </span>
+                                      <span>
+                                        {badge.includes('Mountain Triathlon')
+                                          ? formatElevation(tri.elevation || 0)
+                                          : formatDistanceWithUnit(tri.distance * 1000)}
+                                      </span>
                                     </div>
                                     <div className="flex items-center gap-1">
                                       <span className="font-semibold">⏱️</span>

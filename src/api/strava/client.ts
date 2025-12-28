@@ -5,7 +5,7 @@ import { useStravaConfigStore } from '../../stores/stravaConfigStore';
 const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
 const STRAVA_AUTH_BASE = 'https://www.strava.com/oauth';
 
-class StravaClient {
+export class StravaClient {
   private axiosInstance: AxiosInstance;
   private accessToken: string | null = null;
 
@@ -217,6 +217,3 @@ class StravaClient {
     return response.data;
   }
 }
-
-// Singleton instance
-export const stravaClient = new StravaClient();
