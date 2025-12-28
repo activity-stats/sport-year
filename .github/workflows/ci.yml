@@ -104,8 +104,7 @@ jobs:
     strategy:
       matrix:
         node-version: ['24.x']
-        # Ready for sharding: uncomment to split tests across runners
-        # shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4]
 
     steps:
       - name: Checkout code
@@ -138,16 +137,13 @@ jobs:
         run: npm run e2e:setup
 
       - name: Run E2E tests
-        run: npm run test:e2e
-        # Ready for sharding: uncomment to enable
-        # run: npm run test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/4
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         if: always()
         with:
-          name: playwright-report
-          # Ready for sharding: change to playwright-report-${{ matrix.shard }}
+          name: playwright-report-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 30
 
