@@ -40,8 +40,11 @@ cd sport-year
 # Install dependencies
 npm install
 
-# Start development server
+# Start development server (live Strava)
 npm run dev
+
+# Start development server with built-in mock Strava data
+npm run dev:mock
 ```
 
 Visit `http://localhost:5173`
@@ -62,6 +65,9 @@ Visit `http://localhost:5173`
 ```bash
 # Run development server
 npm run dev
+
+# Run with mock Strava data (no API keys required)
+npm run dev:mock
 
 # Run unit tests
 npm test
@@ -158,4 +164,3 @@ MIT License - see LICENSE file for details
 ## 📞 Support
 
 - Issues: https://github.com/activity-stats/sport-year/issues
-- Discussions: https://github.com/activity-stats/sport-year/discussions

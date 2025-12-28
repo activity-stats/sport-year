@@ -34,7 +34,7 @@ vi.mock('../../../stores/stravaConfigStore', () => ({
 
 // Import after mocks
 import axios from 'axios';
-import { stravaClient } from '../client';
+import { stravaClient } from '../index';
 
 describe('StravaClient', () => {
   // Get the mocked instance for assertions

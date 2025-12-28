@@ -33,6 +33,7 @@ export interface TriathlonRace {
   };
   totalDistance: number;
   totalTime: number;
+  totalElevation: number;
   type: 'full' | 'half' | 'olympic' | 'sprint' | 'quarter' | 't100' | 'mountain' | 'other';
 }
 
@@ -51,6 +52,7 @@ export interface RaceHighlight {
     | 'custom-highlight';
   distance: number;
   duration: number;
+  elevation?: number;
   activities?: Activity[];
   badge: string;
   activityType?: string; // Added to track which sport this highlight belongs to
@@ -254,15 +256,15 @@ export function detectTriathlons(activities: Activity[]): TriathlonRace[] {
         type = 'sprint';
       }
 
+      // Calculate total elevation
+      const totalElevation =
+        (swim.elevationGainMeters || 0) +
+        (bike.elevationGainMeters || 0) +
+        (run.elevationGainMeters || 0);
+
       // Check for Mountain category: elevation gain > 1000m (only if not already full)
-      if (type !== 'full') {
-        const totalElevation =
-          (swim.elevationGainMeters || 0) +
-          (bike.elevationGainMeters || 0) +
-          (run.elevationGainMeters || 0);
-        if (totalElevation > 1000) {
-          type = 'mountain';
-        }
+      if (type !== 'full' && totalElevation > 1000) {
+        type = 'mountain';
       }
 
       triathlons.push({
@@ -270,6 +272,7 @@ export function detectTriathlons(activities: Activity[]): TriathlonRace[] {
         activities: { swim, bike, run },
         totalDistance,
         totalTime,
+        totalElevation,
         type,
       });
     }
@@ -516,6 +519,7 @@ export function detectRaceHighlights(
       type: 'triathlon',
       distance: tri.totalDistance,
       duration: tri.totalTime,
+      elevation: tri.totalElevation,
       activities,
       badge,
     });
@@ -784,6 +788,7 @@ export function detectRaceHighlightsWithExcluded(
       type: 'triathlon',
       distance: tri.totalDistance,
       duration: tri.totalTime,
+      elevation: tri.totalElevation,
       activities,
       badge,
     });

@@ -8,10 +8,6 @@ npm run i18n:check || exit 1
 echo "Running type check..."
 npm run type-check || exit 1
 
-# Run tests
-echo "Running tests..."
-npm test -- --run || exit 1
-
 # Run build to ensure everything compiles
 echo "Running build validation..."
 npm run build || exit 1

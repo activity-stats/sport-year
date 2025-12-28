@@ -304,5 +304,36 @@
     "skip": "Overslaan",
     "next": "Volgende",
     "stepIndicator": "Stap {{current}} van {{total}}"
+  },
+  "welcome": {
+    "title": "Sportjaar",
+    "subtitle": "Visualiseer Je Sportieve Reis",
+    "description": "Transformeer je Strava activiteiten in prachtige jaaroverzicht presentaties. Volg je voortgang, vier prestaties, en deel je sportieve verhaal.",
+    "exploreDemo": "Ontdek Demo",
+    "setupOwn": "Stel Je Eigen In",
+    "features": {
+      "analytics": {
+        "title": "Rijke Analyses",
+        "description": "Gedetailleerde statistieken, grafieken en inzichten van je trainingsgegevens"
+      },
+      "design": {
+        "title": "Prachtig Design",
+        "description": "Verbluffende jaaroverzicht kaarten klaar om te delen op sociale media"
+      },
+      "privacy": {
+        "title": "Privacy Eerst",
+        "description": "Je gegevens blijven veilig. Stel je eigen instantie in met je Strava inloggegevens"
+      }
+    },
+    "footer": {
+      "enjoying": "Toffe app?",
+      "buyMeCoffee": "Doe mij een bakkie"
+    }
+  },
+  "demoBanner": {
+    "message": "Je bekijkt een",
+    "demo": "demo",
+    "withSampleData": "met voorbeeldgegevens",
+    "setupOwn": "Stel Je Eigen In"
   }
 }

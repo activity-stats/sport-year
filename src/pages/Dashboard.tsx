@@ -25,14 +25,19 @@ import type { ActivityType } from '../types';
 import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
 import { calculateSportHighlights } from '../utils/sportHighlights';
 import { filterActivities } from '../utils/activityFilters';
+import { DemoBanner } from '../components/DemoBanner';
 
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
+
+const useMocks = typeof import.meta !== 'undefined' && import.meta.env?.VITE_USE_MOCKS === 'true';
 
 export const Dashboard = () => {
   const { t } = useTranslation();
   const { athlete, logout } = useAuth();
   const currentYear = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState<number | 'last365'>(currentYear);
+  const [selectedYear, setSelectedYear] = useState<number | 'last365'>(
+    useMocks ? 2024 : currentYear
+  );
   const [viewMode, setViewMode] = useState<'presentation' | 'detailed' | 'map'>('presentation');
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaSettings, setShowStravaSettings] = useState(false);
@@ -470,6 +475,7 @@ export const Dashboard = () => {
 
         {/* Main Content */}
         <main>
+          {useMocks && <DemoBanner />}
           {isLoading ? (
             <LoadingProgress steps={loadingSteps} currentStep={loadingStage} />
           ) : stats && activities ? (

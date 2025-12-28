@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const useMocks = typeof import.meta !== 'undefined' && import.meta.env?.VITE_USE_MOCKS === 'true';
+
 type YearKey = number | 'last365';
 
 interface DataSyncState {
@@ -56,7 +58,7 @@ export const useDataSyncStore = create<DataSyncState>()(
       },
     }),
     {
-      name: 'sport-year-data-sync',
+      name: useMocks ? 'sport-year-data-sync-demo' : 'sport-year-data-sync',
     }
   )
 );

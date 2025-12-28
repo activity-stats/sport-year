@@ -190,4 +190,54 @@ describe('StatsSelector', () => {
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
+
+  it('prevents deselecting the last remaining stat', async () => {
+    const user = userEvent.setup();
+
+    // Start with only 1 stat selected
+    renderWithI18n(
+      <StatsSelector
+        stats={mockStats}
+        daysActive={150}
+        initialSelectedStats={[availableStats[0]]} // Only distance
+        onConfirm={mockOnConfirm}
+        onClose={mockOnClose}
+      />
+    );
+
+    // Try to deselect the only selected stat
+    const distanceButton = screen.getByText('km Distance').closest('button');
+    if (distanceButton) {
+      await user.click(distanceButton);
+      expect(toast.showWarning).toHaveBeenCalledWith('You must select at least 1 stat');
+    }
+  });
+
+  it('allows reordering stats by deselecting and reselecting', async () => {
+    const user = userEvent.setup();
+    renderWithI18n(
+      <StatsSelector
+        stats={mockStats}
+        daysActive={150}
+        onConfirm={mockOnConfirm}
+        onClose={mockOnClose}
+      />
+    );
+
+    // Deselect elevation (2nd stat)
+    const elevationButton = screen.getByText('m Elevation').closest('button');
+    if (elevationButton) {
+      await user.click(elevationButton);
+    }
+
+    // Select it again
+    if (elevationButton) {
+      await user.click(elevationButton);
+    }
+
+    const nextButton = screen.getByText('Next: Select Highlights');
+    await user.click(nextButton);
+
+    expect(mockOnConfirm).toHaveBeenCalled();
+  });
 });

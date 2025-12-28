@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStravaConfigStore } from '../../stores/stravaConfigStore';
 
 export function SetupWizard() {
+  const navigate = useNavigate();
   const { setConfig } = useStravaConfigStore();
   const [clientId, setClientId] = useState('');
   const [clientSecret, setClientSecret] = useState('');
@@ -14,6 +16,8 @@ export function SetupWizard() {
   const handleSave = () => {
     if (clientId.trim() && clientSecret.trim()) {
       setConfig({ clientId: clientId.trim(), clientSecret: clientSecret.trim() });
+      // Navigate to login page after saving credentials
+      navigate('/login');
     }
   };
 

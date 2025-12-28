@@ -26,9 +26,12 @@ export const formatDistanceForClosing = (meters: number): string => {
 };
 
 export const formatDuration = (seconds: number): string => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  // Round to avoid floating-point precision issues
+  const roundedSeconds = Math.round(seconds);
+
+  const hours = Math.floor(roundedSeconds / 3600);
+  const minutes = Math.floor((roundedSeconds % 3600) / 60);
+  const secs = roundedSeconds % 60;
 
   if (hours > 0) {
     return `${hours}h ${minutes}m`;

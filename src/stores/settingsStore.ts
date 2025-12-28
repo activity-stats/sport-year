@@ -316,6 +316,8 @@ export const AVAILABLE_STATS: Record<StatType, Omit<StatOption, 'enabled'>> = {
   },
 };
 
+const useMocks = typeof import.meta !== 'undefined' && import.meta.env?.VITE_USE_MOCKS === 'true';
+
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
@@ -688,7 +690,7 @@ export const useSettingsStore = create<SettingsState>()(
         })),
     }),
     {
-      name: 'sport-year-settings',
+      name: useMocks ? 'sport-year-settings-demo' : 'sport-year-settings',
       version: 5,
       migrate: (persistedState: unknown, version: number) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
