@@ -164,4 +164,3 @@ MIT License - see LICENSE file for details
 ## 📞 Support
 
 - Issues: https://github.com/activity-stats/sport-year/issues
-- Discussions: https://github.com/activity-stats/sport-year/discussions
