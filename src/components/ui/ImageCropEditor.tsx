@@ -122,13 +122,13 @@ export function ImageCropEditor({
 
       <div className="space-y-3">
         {/* Zoom Slider */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label htmlFor="crop-zoom" className="text-sm font-medium text-gray-700">
-              Zoom
-            </label>
-            <span className="text-sm text-gray-500">{Math.round((zoom - 1) * 100)}%</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <label
+            htmlFor="crop-zoom"
+            className="text-sm font-medium text-gray-700 whitespace-nowrap"
+          >
+            Zoom
+          </label>
           <input
             id="crop-zoom"
             type="range"
@@ -137,17 +137,20 @@ export function ImageCropEditor({
             step={0.1}
             value={zoom}
             onChange={(e) => setZoom(parseFloat(e.target.value))}
-            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+            className="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
               background: `linear-gradient(to right, rgb(249 115 22) 0%, rgb(249 115 22) ${((zoom - 1) / 2) * 100}%, rgb(229 231 235) ${((zoom - 1) / 2) * 100}%, rgb(229 231 235) 100%)`,
             }}
           />
+          <span className="text-sm text-gray-500 min-w-[3rem] text-right">
+            {Math.round((zoom - 1) * 100)}%
+          </span>
         </div>
 
         {/* Reset Button */}
         <button
           onClick={handleReset}
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
         >
           Reset Crop
         </button>

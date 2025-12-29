@@ -197,32 +197,32 @@ export function YearInReviewSettings({
                     </div>
 
                     {/* Transparency/Opacity Slider */}
-                    <div className="mb-4">
-                      <div className="mb-2 flex items-center justify-between">
+                    <div className="mb-3">
+                      <div className="flex items-center gap-3">
                         <label
                           htmlFor="hero-opacity"
-                          className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                          className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
                         >
-                          Background Transparency
+                          Transparency
                         </label>
-                        <span className="text-sm text-gray-500">
+                        <input
+                          id="hero-opacity"
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={5}
+                          value={(yearInReview.backgroundImageOpacity || 0.7) * 100}
+                          onChange={handleOpacityChange}
+                          className="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-gray-200"
+                          style={{
+                            background: `linear-gradient(to right, rgb(249 115 22) 0%, rgb(249 115 22) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) 100%)`,
+                          }}
+                        />
+                        <span className="text-sm text-gray-500 min-w-[3rem] text-right">
                           {Math.round((yearInReview.backgroundImageOpacity || 0.7) * 100)}%
                         </span>
                       </div>
-                      <input
-                        id="hero-opacity"
-                        type="range"
-                        min={0}
-                        max={100}
-                        step={5}
-                        value={(yearInReview.backgroundImageOpacity || 0.7) * 100}
-                        onChange={handleOpacityChange}
-                        className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-                        style={{
-                          background: `linear-gradient(to right, rgb(249 115 22) 0%, rgb(249 115 22) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) 100%)`,
-                        }}
-                      />
-                      <p className="mt-2 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-gray-500">
                         Adjust the transparency of the gradient overlay on the hero section
                         background
                       </p>

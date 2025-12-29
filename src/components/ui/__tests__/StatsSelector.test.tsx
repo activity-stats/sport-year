@@ -47,6 +47,7 @@ describe('StatsSelector', () => {
   beforeEach(() => {
     mockOnConfirm = vi.fn();
     mockOnClose = vi.fn();
+    vi.clearAllMocks(); // Clear all mocks including toast
     i18n.changeLanguage('en'); // Ensure tests run in English
   });
 
@@ -191,7 +192,7 @@ describe('StatsSelector', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  it('prevents deselecting the last remaining stat', async () => {
+  it('allows deselecting all stats', async () => {
     const user = userEvent.setup();
 
     // Start with only 1 stat selected
@@ -205,11 +206,12 @@ describe('StatsSelector', () => {
       />
     );
 
-    // Try to deselect the only selected stat
+    // Deselect the only selected stat - should be allowed now
     const distanceButton = screen.getByText('km Distance').closest('button');
     if (distanceButton) {
       await user.click(distanceButton);
-      expect(toast.showWarning).toHaveBeenCalledWith('You must select at least 1 stat');
+      // No warning should be shown
+      expect(toast.showWarning).not.toHaveBeenCalled();
     }
   });
 
