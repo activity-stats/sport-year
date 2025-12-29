@@ -180,7 +180,8 @@ export const Dashboard = () => {
       activitiesForTotals,
       yearInReview.activityFilters,
       excludedResult.excludedActivityIds,
-      yearInReview.titleIgnorePatterns
+      yearInReview.titleIgnorePatterns,
+      yearInReview.activityTypeSettings.includeInHighlights
     );
 
     return {

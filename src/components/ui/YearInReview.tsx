@@ -161,7 +161,7 @@ function SportDetailSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Custom Highlights - activities matching custom filters */}
         {customHighlights.map((highlight) => {
-          // Check if this is the longest activity
+          // Check if this custom highlight is also the longest activity
           const isLongest = highlight.id === highlights.longestActivity.id;
           const sportColors = getSportBadgeColors(highlight.type);
           const paceSpeed = formatPaceSpeed(
@@ -235,7 +235,7 @@ function SportDetailSection({
           );
         })}
 
-        {/* Longest activity - only show if not already displayed, or merge badges if it's in distanceRecords */}
+        {/* Longest activity - only show if not already displayed in custom highlights or distance records */}
         {(() => {
           // Check if longest activity is already shown in distance records or custom highlights
           const inDistanceRecords = highlights.distanceRecords.find(
@@ -245,15 +245,8 @@ function SportDetailSection({
             (h) => h.id === highlights.longestActivity.id
           );
 
-          // If it's in custom highlights, don't show it again
-          if (inCustomHighlights) {
-            return null;
-          }
-
-          // If it's in distance records, ADD the "🏆 Longest" badge to that card instead of showing separately
-          if (inDistanceRecords) {
-            // Already shown in distance records with Marathon/Half Marathon badge
-            // The distance record card will be enhanced to show both badges
+          // If the longest is already displayed, don't show it again (it has the badge added)
+          if (inCustomHighlights || inDistanceRecords) {
             return null;
           }
 
@@ -335,14 +328,16 @@ function SportDetailSection({
           highlights.biggestClimb.elevationGainMeters &&
           highlights.biggestClimb.elevationGainMeters > 50 &&
           (() => {
-            // Check if already shown as custom highlight or longest
+            // Check if biggest climb is already shown
             const inCustomHighlights = customHighlights.some(
               (h) => h.id === highlights.biggestClimb!.id
             );
-            const isLongest = highlights.biggestClimb.id === highlights.longestActivity.id;
+            const inDistanceRecords = highlights.distanceRecords.some(
+              (r) => r.activity.id === highlights.biggestClimb!.id
+            );
 
             // If already shown, don't duplicate
-            if (inCustomHighlights || isLongest) {
+            if (inCustomHighlights || inDistanceRecords) {
               return null;
             }
 
@@ -716,13 +711,15 @@ export function YearInReview({
         activitiesForTotals,
         highlightFilters.activityFilters,
         excludedActivityIds,
-        highlightFilters.titleIgnorePatterns
+        highlightFilters.titleIgnorePatterns,
+        highlightFilters.activityTypeSettings.includeInHighlights
       ),
     [
       activitiesForTotals,
       highlightFilters.activityFilters,
       excludedActivityIds,
       highlightFilters.titleIgnorePatterns,
+      highlightFilters.activityTypeSettings.includeInHighlights,
     ]
   );
 
@@ -1020,18 +1017,32 @@ export function YearInReview({
 
   // Extract custom highlights per sport for SportDetailSection
   // Sort by distance to ensure proper ordering
+  // IMPORTANT: Only include activity types that are in includeInHighlights
+  const includeInHighlights = highlightFilters.activityTypeSettings.includeInHighlights || [];
+
   const runningCustomHighlights = highlights
-    .filter((h) => h.type === 'custom-highlight' && h.activityType === 'Run')
+    .filter(
+      (h) =>
+        h.type === 'custom-highlight' &&
+        h.activityType === 'Run' &&
+        includeInHighlights.includes('Run')
+    )
     .sort((a, b) => a.distance - b.distance);
   const cyclingCustomHighlights = highlights
     .filter(
       (h) =>
         h.type === 'custom-highlight' &&
-        (h.activityType === 'Ride' || h.activityType === 'VirtualRide')
+        (h.activityType === 'Ride' || h.activityType === 'VirtualRide') &&
+        includeInHighlights.includes(h.activityType)
     )
     .sort((a, b) => a.distance - b.distance);
   const swimmingCustomHighlights = highlights
-    .filter((h) => h.type === 'custom-highlight' && h.activityType === 'Swim')
+    .filter(
+      (h) =>
+        h.type === 'custom-highlight' &&
+        h.activityType === 'Swim' &&
+        includeInHighlights.includes('Swim')
+    )
     .sort((a, b) => a.distance - b.distance);
 
   // Get sport breakdowns
