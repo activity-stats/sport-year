@@ -33,6 +33,8 @@ describe('YearInReview', () => {
     totalKudos: 500,
     byMonth: [],
     byType: {} as Record<ActivityType, TypeStats>,
+    byDayOfWeek: [],
+    hourDayHeatmap: new Map(),
   };
 
   const createActivity = (

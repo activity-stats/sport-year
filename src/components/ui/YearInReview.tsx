@@ -917,6 +917,15 @@ export function YearInReview({
             });
           }
           break;
+        case 'mostActiveDay':
+          if (stats.mostActiveDay) {
+            cards.push({
+              value: t(`days.${stats.mostActiveDay.dayName}`),
+              label: t('stats.mostActiveDay'),
+              colorClass: 'hover:shadow-violet-500/50',
+            });
+          }
+          break;
         case 'avgHeartRate':
           if (additionalStats.avgHeartRate > 0) {
             cards.push({

@@ -157,7 +157,23 @@ function main() {
   console.log(`✅ Found ${usedKeys.size} keys used in code\n`);
 
   // Check for defined but unused keys
-  const unusedKeys = [...enKeys].filter((key) => !usedKeys.has(key));
+  // Whitelist for keys accessed dynamically (via template literals)
+  const dynamicKeys = [
+    'days.monday',
+    'days.tuesday',
+    'days.wednesday',
+    'days.thursday',
+    'days.friday',
+    'days.saturday',
+    'days.sunday',
+    'timeBlocks.earlyMorning',
+    'timeBlocks.morning',
+    'timeBlocks.afternoon',
+    'timeBlocks.evening',
+    'timeBlocks.night',
+  ];
+
+  const unusedKeys = [...enKeys].filter((key) => !usedKeys.has(key) && !dynamicKeys.includes(key));
   if (unusedKeys.length > 0) {
     console.log(`🗑️  Keys defined but not used in code (${unusedKeys.length}):`);
     unusedKeys.slice(0, 20).forEach((key) => console.log(`   - ${key}`));

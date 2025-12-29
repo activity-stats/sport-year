@@ -80,6 +80,7 @@
     "avgSpeedKmh": "Gem. Snelheid (km/u)",
     "longestKm": "Langste (km)",
     "biggestClimbM": "Grootste Klim (m)",
+    "mostActiveDay": "Meest Actieve Dag",
     "avgHeartRate": "Gem. Hartslag",
     "maxSpeedKmh": "Max Snelheid (km/u)",
     "caloriesBurned": "Verbrande Calorieën"
@@ -129,6 +130,29 @@
     "exportButton": "Exporteren"
   },
   "months": {},
+  "days": {
+    "monday": "Maandag",
+    "tuesday": "Dinsdag",
+    "wednesday": "Woensdag",
+    "thursday": "Donderdag",
+    "friday": "Vrijdag",
+    "saturday": "Zaterdag",
+    "sunday": "Zondag",
+    "mon": "Ma",
+    "tue": "Di",
+    "wed": "Wo",
+    "thu": "Do",
+    "fri": "Vr",
+    "sat": "Za",
+    "sun": "Zo"
+  },
+  "timeBlocks": {
+    "earlyMorning": "Vroege Ochtend",
+    "morning": "Ochtend",
+    "afternoon": "Middag",
+    "evening": "Avond",
+    "night": "Nacht"
+  },
   "statsOverview": {
     "title": "{{year}} Overzicht",
     "totalDistance": "Totale Afstand",
@@ -136,7 +160,9 @@
     "totalTime": "Totale Tijd",
     "activities": "Activiteiten",
     "longestActivity": "Langste Activiteit",
-    "mostElevation": "Meeste Hoogtemeters"
+    "mostElevation": "Meeste Hoogtemeters",
+    "mostActiveDay": "Meest Actieve Dag",
+    "preferredTime": "Voorkeur Trainingstijd"
   },
   "statsSelector": {
     "title": "Selecteer Statistieken",
@@ -178,6 +204,8 @@
   "charts": {
     "monthlyTrends": "Maandelijkse Trends",
     "weeklyTrends": "Wekelijkse Trends",
+    "weeklyPattern": "Wekelijks Trainingspatroon",
+    "trainingHeatmap": "Trainingstijd Heatmap",
     "byActivityType": "Per Activiteit Type",
     "activityTypes": "Activiteit Types",
     "noActivitiesYet": "Nog geen activiteiten",
