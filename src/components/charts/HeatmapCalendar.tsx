@@ -16,6 +16,14 @@ interface DayData {
 }
 
 export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalendarProps) {
+  // Helper to get YYYY-MM-DD from local date without UTC conversion
+  const getLocalDateKey = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Calculate daily totals
   const dailyData = useMemo(() => {
     const days = new Map<string, DayData>();
@@ -30,13 +38,13 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
       startDate = new Date();
       startDate.setDate(startDate.getDate() - 365);
     } else {
-      // Specific calendar year
-      startDate = new Date(year, 0, 1);
-      endDate = new Date(year, 11, 31);
+      // Specific calendar year - create dates at noon to avoid timezone shifts
+      startDate = new Date(year, 0, 1, 12, 0, 0);
+      endDate = new Date(year, 11, 31, 12, 0, 0);
     }
 
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const key = d.toISOString().split('T')[0];
+      const key = getLocalDateKey(d);
       days.set(key, {
         date: new Date(d),
         distanceKm: 0,
@@ -48,7 +56,7 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
 
     // Aggregate activities by day
     activities.forEach((activity) => {
-      const key = activity.date.toISOString().split('T')[0];
+      const key = getLocalDateKey(activity.date);
       const dayData = days.get(key);
       if (dayData) {
         dayData.distanceKm += activity.distanceKm;
@@ -72,8 +80,9 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
       startDate = new Date();
       startDate.setDate(startDate.getDate() - 365);
     } else {
-      startDate = new Date(year, 0, 1);
-      endDate = new Date(year, 11, 31);
+      // Use noon to avoid timezone shifts when calculating weeks
+      startDate = new Date(year, 0, 1, 12, 0, 0);
+      endDate = new Date(year, 11, 31, 12, 0, 0);
     }
 
     // Find the Monday of the week containing Jan 1
@@ -85,8 +94,8 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
     let week: DayData[] = [];
 
     // Iterate through all days from start to end
-    while (currentDate <= endDate || week.length > 0) {
-      const key = currentDate.toISOString().split('T')[0];
+    while (currentDate <= endDate) {
+      const key = getLocalDateKey(currentDate);
       const dayData = dailyData.get(key);
 
       if (dayData) {
@@ -109,14 +118,11 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
       }
 
       currentDate.setDate(currentDate.getDate() + 1);
+    }
 
-      // Stop after end of period + completing current week
-      if (currentDate > endDate) {
-        // Add any remaining days to complete the week
-        const nextWeek = new Date(endDate);
-        nextWeek.setDate(nextWeek.getDate() + 7);
-        if (currentDate > nextWeek) break;
-      }
+    // Add any incomplete final week
+    if (week.length > 0) {
+      weekArray.push(week);
     }
 
     return weekArray;
@@ -186,10 +192,12 @@ export function HeatmapCalendar({ year, activities, onDateClick }: HeatmapCalend
                   {week.map((day, dayIndex) => {
                     const intensity = getIntensity(day.timeMinutes);
                     // For last365, all days in range are considered "in period"
+                    // Use noon to avoid timezone issues when comparing dates
                     const isInPeriod =
                       year === 'last365'
                         ? true
-                        : day.date >= new Date(year, 0, 1) && day.date <= new Date(year, 11, 31);
+                        : day.date >= new Date(year, 0, 1, 12, 0, 0) &&
+                          day.date <= new Date(year, 11, 31, 12, 0, 0);
 
                     const formatTime = (minutes: number) => {
                       if (minutes < 60) return `${Math.round(minutes)}min`;
