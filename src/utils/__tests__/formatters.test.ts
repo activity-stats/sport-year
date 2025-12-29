@@ -9,6 +9,7 @@ import {
   formatHeartRate,
   formatDate,
   formatTime,
+  formatAthleteSlug,
 } from '../formatters';
 
 describe('formatters', () => {
@@ -155,6 +156,56 @@ describe('formatters', () => {
 
       // Should include time with AM/PM
       expect(formatted).toMatch(/\d{1,2}:\d{2} (AM|PM)/);
+    });
+  });
+
+  describe('formatAthleteSlug', () => {
+    it('should format athlete name as slug', () => {
+      const athlete = { firstname: 'John', lastname: 'Doe' };
+      expect(formatAthleteSlug(athlete)).toBe('john-doe');
+    });
+
+    it('should handle names with spaces', () => {
+      const athlete = { firstname: 'John Paul', lastname: 'Doe Smith' };
+      expect(formatAthleteSlug(athlete)).toBe('john-paul-doe-smith');
+    });
+
+    it('should handle names with uppercase', () => {
+      const athlete = { firstname: 'JOHN', lastname: 'DOE' };
+      expect(formatAthleteSlug(athlete)).toBe('john-doe');
+    });
+
+    it('should handle spaces in names', () => {
+      const athlete = { firstname: 'John Paul', lastname: 'Doe Smith' };
+      expect(formatAthleteSlug(athlete)).toBe('john-paul-doe-smith');
+    });
+
+    it('should return "athlete" when both names are empty', () => {
+      const athlete = { firstname: '', lastname: '' };
+      expect(formatAthleteSlug(athlete)).toBe('athlete');
+    });
+
+    it('should return "athlete" when athlete is null', () => {
+      expect(formatAthleteSlug(null)).toBe('athlete');
+    });
+
+    it('should return "athlete" when athlete is undefined', () => {
+      expect(formatAthleteSlug(undefined)).toBe('athlete');
+    });
+
+    it('should handle single name when lastname is empty', () => {
+      const athlete = { firstname: 'John', lastname: '' };
+      expect(formatAthleteSlug(athlete)).toBe('john-');
+    });
+
+    it('should handle single name when firstname is empty', () => {
+      const athlete = { firstname: '', lastname: 'Doe' };
+      expect(formatAthleteSlug(athlete)).toBe('-doe');
+    });
+
+    it('should handle multiple spaces by collapsing to single hyphen', () => {
+      const athlete = { firstname: 'John   Paul', lastname: 'Doe   Smith' };
+      expect(formatAthleteSlug(athlete)).toBe('john-paul-doe-smith');
     });
   });
 });

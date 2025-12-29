@@ -46,6 +46,7 @@ export const Dashboard = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [highlightedActivityIds, setHighlightedActivityIds] = useState<string[]>([]);
 
   const { stats, isLoading, error } = useYearStats(selectedYear);
   const { data: activities } = useActivities(selectedYear);
@@ -209,6 +210,20 @@ export const Dashboard = () => {
   const handleOpenSettingsFromOnboarding = () => {
     setShowSettings(true);
     handleCloseOnboarding();
+  };
+
+  const handleActivityClick = (activityIds: string | string[]) => {
+    // Switch to detailed view
+    setViewMode('detailed');
+    // Set highlighted activities (convert single ID to array)
+    setHighlightedActivityIds(Array.isArray(activityIds) ? activityIds : [activityIds]);
+    // Scroll to activity list after view change
+    setTimeout(() => {
+      const activityList = document.getElementById('activity-list');
+      if (activityList) {
+        activityList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   if (error) {
@@ -501,6 +516,7 @@ export const Dashboard = () => {
                         }
                       }, 100);
                     }}
+                    onActivityClick={handleActivityClick}
                   />
                   <YearInReviewSettings
                     isOpen={showSettings}
@@ -615,7 +631,11 @@ export const Dashboard = () => {
                     <ActivityList
                       activities={activities}
                       selectedDate={selectedDate}
-                      onClearDateFilter={() => setSelectedDate(null)}
+                      onClearDateFilter={() => {
+                        setSelectedDate(null);
+                        setHighlightedActivityIds([]);
+                      }}
+                      highlightedActivityIds={highlightedActivityIds}
                     />
                   </div>
                   {showStravaSettings && (

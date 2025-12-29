@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Activity } from '../../types/activity.ts';
 import {
   formatDistanceWithUnit,
@@ -12,6 +12,7 @@ interface ActivityListProps {
   activities: Activity[];
   selectedDate?: Date | null;
   onClearDateFilter?: () => void;
+  highlightedActivityIds?: string[];
 }
 
 const ACTIVITY_ICONS: Record<string, string> = {
@@ -27,10 +28,24 @@ export const ActivityList = ({
   activities,
   selectedDate,
   onClearDateFilter,
+  highlightedActivityIds = [],
 }: ActivityListProps) => {
   const [filter, setFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'date' | 'distance' | 'duration' | 'elevation'>('date');
   const [searchText, setSearchText] = useState<string>('');
+
+  // Auto-scroll to first highlighted activity
+  useEffect(() => {
+    if (highlightedActivityIds.length > 0) {
+      // Wait for DOM to update
+      setTimeout(() => {
+        const element = document.getElementById(`activity-${highlightedActivityIds[0]}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, [highlightedActivityIds]);
 
   // Get unique activity types
   const activityTypes = ['All', ...Array.from(new Set(activities.map((a) => a.type)))];
@@ -163,11 +178,16 @@ export const ActivityList = ({
       <div className="space-y-3 max-h-[600px] overflow-y-auto">
         {filteredActivities.map((activity) => (
           <a
+            id={`activity-${activity.id}`}
             key={activity.id}
             href={`https://www.strava.com/activities/${activity.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-750 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white dark:hover:from-gray-700 dark:hover:to-gray-750 hover:shadow-md transition-all duration-200 hover:border-orange-400"
+            className={`block p-5 border rounded-xl transition-all duration-300 ${
+              highlightedActivityIds.includes(activity.id)
+                ? 'border-orange-500 dark:border-orange-400 bg-orange-50 dark:bg-orange-900/20 shadow-lg shadow-orange-500/50 ring-2 ring-orange-500 dark:ring-orange-400'
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-750 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white dark:hover:from-gray-700 dark:hover:to-gray-750 hover:shadow-md hover:border-orange-400'
+            }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">

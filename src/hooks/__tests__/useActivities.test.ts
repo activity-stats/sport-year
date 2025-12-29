@@ -91,6 +91,7 @@ describe('useActivities', () => {
       defaultOptions: {
         queries: {
           retry: false,
+          staleTime: 0, // Make queries stale immediately for testing
         },
       },
     });
@@ -155,50 +156,199 @@ describe('useActivities', () => {
   });
 
   describe('useActivities - incremental updates', () => {
-    // Note: This is a simplified test. Full incremental update testing would require
-    // more complex setup to manage React Query's cache and stale time correctly.
-    it('should merge new activities with existing ones when both present', async () => {
+    it('should use incremental fetch when lastTimestamp and cache exist', async () => {
       const year = 2024;
       const existingActivity = mockActivity;
-      const newActivity = { ...mockActivity, id: '456' };
-
-      // Simulate the behavior by mocking the function to return merged data
-      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValue([
-        mockStravaActivity,
-        { ...mockStravaActivity, id: 456 },
-      ]);
-      vi.mocked(transformActivities).mockReturnValue([existingActivity, newActivity]);
-
-      const { result } = renderHook(() => useActivities(year), { wrapper });
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-      expect(result.current.data).toHaveLength(2);
-    });
-
-    it('should deduplicate activities when merging', async () => {
-      const year = 2024;
-      queryClient.setQueryData(['activities', year], [mockActivity]);
+      const newActivity = { ...mockActivity, id: '456', name: 'Evening Run' };
+      const newStravaActivity = { ...mockStravaActivity, id: 456, name: 'Evening Run' };
 
       const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      const mockGetLastTimestamp = vi.fn().mockReturnValue(1705305600);
       vi.mocked(useDataSyncStore).mockReturnValue({
-        getLastActivityTimestamp: vi.fn().mockReturnValue(1705305600),
+        getLastActivityTimestamp: mockGetLastTimestamp,
         setLastActivityTimestamp: vi.fn(),
         setLastSyncTime: vi.fn(),
       });
 
-      // Return same activity (duplicate)
-      vi.mocked(stravaClient.getActivitiesIncremental).mockResolvedValue([mockStravaActivity]);
+      // First render - will fetch all and cache
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValueOnce([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([existingActivity]);
+
+      const { result, rerender } = renderHook(() => useActivities(year), { wrapper });
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Now setup for incremental fetch
+      mockGetLastTimestamp.mockReturnValue(1705305600); // Set timestamp after first fetch
+      vi.mocked(stravaClient.getActivitiesIncremental).mockResolvedValueOnce([newStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([newActivity]);
+
+      // Force refetch by invalidating
+      queryClient.invalidateQueries({ queryKey: ['activities', year] });
+      rerender();
+
+      await waitFor(() => {
+        return (
+          result.current.isSuccess &&
+          result.current.data &&
+          result.current.data.length === 2 &&
+          (stravaClient.getActivitiesIncremental as any).mock.calls.length > 0
+        );
+      });
+
+      // Should call incremental on second fetch
+      expect(stravaClient.getActivitiesIncremental).toHaveBeenCalledWith(year, 1705305600);
+    });
+
+    it('should use incremental fetch for last365 with timestamp and cache', async () => {
+      const existingActivity = mockActivity;
+      const newActivity = { ...mockActivity, id: '789', name: 'Weekend Ride' };
+      const newStravaActivity = { ...mockStravaActivity, id: 789, name: 'Weekend Ride' };
+
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      const mockGetLastTimestamp = vi.fn().mockReturnValue(null);
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: mockGetLastTimestamp,
+        setLastActivityTimestamp: vi.fn(),
+        setLastSyncTime: vi.fn(),
+      });
+
+      // First fetch
+      vi.mocked(stravaClient.getActivitiesLast365Days).mockResolvedValueOnce([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([existingActivity]);
+
+      const { result, rerender } = renderHook(() => useActivities('last365'), { wrapper });
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Setup incremental
+      mockGetLastTimestamp.mockReturnValue(1705305600);
+      vi.mocked(stravaClient.getActivitiesLast365Days).mockResolvedValueOnce([newStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([newActivity]);
+
+      queryClient.invalidateQueries({ queryKey: ['activities', 'last365'] });
+      rerender();
+
+      await waitFor(() => {
+        return result.current.isSuccess && result.current.data && result.current.data.length === 2;
+      });
+
+      // Should call with timestamp on second fetch
+      expect(stravaClient.getActivitiesLast365Days).toHaveBeenCalledWith(1705305600);
+    });
+
+    it('should deduplicate activities when merging incremental updates', async () => {
+      const year = 2024;
+
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      const mockGetLastTimestamp = vi.fn().mockReturnValue(null);
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: mockGetLastTimestamp,
+        setLastActivityTimestamp: vi.fn(),
+        setLastSyncTime: vi.fn(),
+      });
+
+      // First fetch
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValueOnce([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([mockActivity]);
+
+      const { result, rerender } = renderHook(() => useActivities(year), { wrapper });
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Setup incremental with duplicate
+      mockGetLastTimestamp.mockReturnValue(1705305600);
+      vi.mocked(stravaClient.getActivitiesIncremental).mockResolvedValueOnce([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValueOnce([mockActivity]); // Same activity
+
+      queryClient.invalidateQueries({ queryKey: ['activities', year] });
+      rerender();
+
+      await waitFor(() => {
+        return (
+          result.current.isSuccess &&
+          (stravaClient.getActivitiesIncremental as any).mock.calls.length > 0
+        );
+      });
+
+      // Should have only 1 activity (duplicate removed)
+      expect(result.current.data).toHaveLength(1);
+    });
+
+    it('should fall back to full fetch when no timestamp exists', async () => {
+      const year = 2024;
+      // Start with cache but no timestamp - should still do full fetch on refetch
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: vi.fn().mockReturnValue(null), // No timestamp
+        setLastActivityTimestamp: vi.fn(),
+        setLastSyncTime: vi.fn(),
+      });
+
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValue([mockStravaActivity]);
       vi.mocked(transformActivities).mockReturnValue([mockActivity]);
 
       const { result } = renderHook(() => useActivities(year), { wrapper });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-      expect(result.current.data).toHaveLength(1); // Duplicate removed
+      // Should use full fetch when no timestamp exists
+      expect(stravaClient.getActivitiesForYear).toHaveBeenCalledWith(year);
+      expect(stravaClient.getActivitiesIncremental).not.toHaveBeenCalled();
     });
 
-    it('should update last activity timestamp after fetch', async () => {
+    it('should fall back to full fetch when cache is empty', async () => {
+      const year = 2024;
+      // No cache set
+
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: vi.fn().mockReturnValue(1705305600), // Has timestamp
+        setLastActivityTimestamp: vi.fn(),
+        setLastSyncTime: vi.fn(),
+      });
+
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValue([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValue([mockActivity]);
+
+      const { result } = renderHook(() => useActivities(year), { wrapper });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Should use full fetch when cache is empty, even with timestamp
+      expect(stravaClient.getActivitiesForYear).toHaveBeenCalledWith(year);
+      expect(stravaClient.getActivitiesIncremental).not.toHaveBeenCalled();
+    });
+
+    it('should update last activity timestamp to most recent activity', async () => {
+      const year = 2024;
+      const mockSetLastActivityTimestamp = vi.fn();
+      const mockSetLastSyncTime = vi.fn();
+
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: vi.fn(),
+        setLastActivityTimestamp: mockSetLastActivityTimestamp,
+        setLastSyncTime: mockSetLastSyncTime,
+      });
+
+      // Activity with specific date
+      const activity = {
+        ...mockActivity,
+        id: '999',
+        date: new Date('2024-12-25T10:00:00Z'),
+      };
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValue([mockStravaActivity]);
+      vi.mocked(transformActivities).mockReturnValue([activity]);
+
+      const { result } = renderHook(() => useActivities(year), { wrapper });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Should update timestamp with correct value
+      const expectedTimestamp = Math.floor(new Date('2024-12-25T10:00:00Z').getTime() / 1000);
+      expect(mockSetLastActivityTimestamp).toHaveBeenCalledWith(year, expectedTimestamp);
+      expect(mockSetLastSyncTime).toHaveBeenCalledWith(year, expect.any(Number));
+    });
+
+    it('should update last activity timestamp after full fetch', async () => {
       const mockSetLastActivityTimestamp = vi.fn();
       const { useDataSyncStore } = await import('../../stores/dataSyncStore');
       vi.mocked(useDataSyncStore).mockReturnValue({
@@ -215,6 +365,29 @@ describe('useActivities', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
       expect(mockSetLastActivityTimestamp).toHaveBeenCalledWith(2024, expect.any(Number));
+    });
+
+    it('should not update timestamp when no activities are fetched', async () => {
+      const year = 2024;
+      const mockSetLastActivityTimestamp = vi.fn();
+
+      const { useDataSyncStore } = await import('../../stores/dataSyncStore');
+      vi.mocked(useDataSyncStore).mockReturnValue({
+        getLastActivityTimestamp: vi.fn(),
+        setLastActivityTimestamp: mockSetLastActivityTimestamp,
+        setLastSyncTime: vi.fn(),
+      });
+
+      vi.mocked(stravaClient.getActivitiesForYear).mockResolvedValue([]);
+      vi.mocked(transformActivities).mockReturnValue([]);
+
+      const { result } = renderHook(() => useActivities(year), { wrapper });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      // Should not call setLastActivityTimestamp when no activities
+      expect(mockSetLastActivityTimestamp).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual([]);
     });
   });
 
