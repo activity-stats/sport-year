@@ -68,16 +68,19 @@ interface YearInReviewProps {
   highlightFilters: HighlightFilters;
   backgroundImageUrl?: string | null;
   onDateClick?: (date: Date) => void;
+  onActivityClick?: (activityIds: string | string[]) => void;
 }
 
 function SportDetailSection({
   highlights,
   customHighlights = [],
   sectionId,
+  onActivityClick,
 }: {
   highlights: SportHighlights;
   customHighlights?: RaceHighlight[];
   sectionId?: string;
+  onActivityClick?: (activityIds: string | string[]) => void;
 }) {
   const { t } = useTranslation();
   const sportConfig = {
@@ -176,6 +179,12 @@ function SportDetailSection({
               href={`https://www.strava.com/activities/${highlight.id}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                if (onActivityClick) {
+                  e.preventDefault();
+                  onActivityClick(highlight.id);
+                }
+              }}
               className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
@@ -262,6 +271,12 @@ function SportDetailSection({
               href={`https://www.strava.com/activities/${highlights.longestActivity.id}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                if (onActivityClick) {
+                  e.preventDefault();
+                  onActivityClick(highlights.longestActivity.id);
+                }
+              }}
               className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
@@ -352,6 +367,12 @@ function SportDetailSection({
                 href={`https://www.strava.com/activities/${highlights.biggestClimb.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (onActivityClick) {
+                    e.preventDefault();
+                    onActivityClick(highlights.biggestClimb!.id);
+                  }
+                }}
                 className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -414,7 +435,13 @@ function SportDetailSection({
   );
 }
 
-function RaceCard({ highlight }: { highlight: RaceHighlight }) {
+function RaceCard({
+  highlight,
+  onActivityClick,
+}: {
+  highlight: RaceHighlight;
+  onActivityClick?: (activityIds: string | string[]) => void;
+}) {
   const formattedDate = highlight.date.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -427,11 +454,23 @@ function RaceCard({ highlight }: { highlight: RaceHighlight }) {
       : highlight.id;
   const stravaUrl = `https://www.strava.com/activities/${activityId}`;
 
+  // Get all activity IDs for multi-sport events
+  const activityIds =
+    highlight.activities && highlight.activities.length > 0
+      ? highlight.activities.map((a) => a.id)
+      : [highlight.id];
+
   return (
     <a
       href={stravaUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={(e) => {
+        if (onActivityClick) {
+          e.preventDefault();
+          onActivityClick(activityIds);
+        }
+      }}
       className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 dark:border-gray-700 block"
     >
       {/* Colorful top accent bar */}
@@ -571,6 +610,7 @@ export function YearInReview({
   highlightFilters,
   backgroundImageUrl,
   onDateClick,
+  onActivityClick,
 }: YearInReviewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1232,6 +1272,11 @@ export function YearInReview({
                       const displayName = item.displayName || tri.name;
                       const badge = item.badge || tri.badge;
 
+                      const triathlonActivityIds =
+                        tri.activities && tri.activities.length > 0
+                          ? tri.activities.map((a) => a.id)
+                          : [tri.id];
+
                       return (
                         <div
                           key={tri.id}
@@ -1244,7 +1289,14 @@ export function YearInReview({
                           <div
                             className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
                           >
-                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                            <div
+                              onClick={() => {
+                                if (onActivityClick) {
+                                  onActivityClick(triathlonActivityIds);
+                                }
+                              }}
+                              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
+                            >
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1316,7 +1368,14 @@ export function YearInReview({
                           <div
                             className={`flex-1 ${isLeft ? 'md:pr-12 pl-16 md:pl-0' : 'md:pl-12 pl-16 md:pr-0'}`}
                           >
-                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                            <div
+                              onClick={() => {
+                                if (onActivityClick) {
+                                  onActivityClick(activity.id);
+                                }
+                              }}
+                              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-2 border-yellow-200 dark:border-yellow-900 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
+                            >
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
@@ -1382,7 +1441,11 @@ export function YearInReview({
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {triathlons.map((highlight) => (
-                <RaceCard key={highlight.id} highlight={highlight} />
+                <RaceCard
+                  key={highlight.id}
+                  highlight={highlight}
+                  onActivityClick={onActivityClick}
+                />
               ))}
             </div>
           </div>
@@ -1394,6 +1457,7 @@ export function YearInReview({
             sectionId="running"
             highlights={sportHighlights.running}
             customHighlights={runningCustomHighlights}
+            onActivityClick={onActivityClick}
           />
         )}
         {sportHighlights.cycling && (
@@ -1401,6 +1465,7 @@ export function YearInReview({
             sectionId="cycling"
             highlights={sportHighlights.cycling}
             customHighlights={cyclingCustomHighlights}
+            onActivityClick={onActivityClick}
           />
         )}
         {sportHighlights.swimming && (
@@ -1408,6 +1473,7 @@ export function YearInReview({
             sectionId="swimming"
             highlights={sportHighlights.swimming}
             customHighlights={swimmingCustomHighlights}
+            onActivityClick={onActivityClick}
           />
         )}
 
@@ -1428,7 +1494,11 @@ export function YearInReview({
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {[...longRuns, ...fondos].map((highlight) => (
-                <RaceCard key={highlight.id} highlight={highlight} />
+                <RaceCard
+                  key={highlight.id}
+                  highlight={highlight}
+                  onActivityClick={onActivityClick}
+                />
               ))}
             </div>
           </div>

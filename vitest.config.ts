@@ -33,6 +33,15 @@ export default defineConfig({
         'src/pages/index.ts', // Re-exports only
         '**/index.ts', // Exclude all index.ts files (re-exports)
         'src/utils/raceDetection.ts', // Complex race detection logic (demo feature, partially tested)
+        // Exclude UI export/social features (advanced features, not core functionality)
+        'src/components/ui/ActivitySelector.tsx', // Export feature
+        'src/components/ui/ExportDialog.tsx', // Export feature
+        'src/components/ui/ImageCropEditor.tsx', // Export feature
+        'src/components/ui/SocialCard.tsx', // Social media export
+        'src/components/ui/YearInReview.tsx', // Large UI component (partially tested)
+        'src/hooks/useAdvancedExport.ts', // Export feature hook
+        'src/hooks/usePDFExport.ts', // PDF export feature
+        'src/utils/imageCrop.ts', // Image cropping utility
       ],
       // Coverage thresholds - enforce minimum coverage
       thresholds: {

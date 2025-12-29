@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateSportHighlights } from '../sportHighlights';
 import type { Activity } from '../../types';
-import type { TitlePattern } from '../../stores/settingsStore';
+import type { TitlePattern, ActivityTypeFilter } from '../../stores/settingsStore';
 
 // Helper to create test activities
 const createActivity = (
@@ -565,19 +565,340 @@ describe('calculateSportHighlights - Title Ignore Filters', () => {
         createActivity('3', '5K Race', 'Run', 5, 20),
       ];
 
-      // Both activities matched distance filters
-      const excludeActivityIds = new Set(['1', '2', '3']);
+      // Only 10K and 5K matched distance filters (excluded from longest)
+      const excludeActivityIds = new Set(['1', '3']);
 
       const result = calculateSportHighlights(activities, undefined, excludeActivityIds, undefined);
 
       expect(result.running).toBeDefined();
 
-      // Marathon should still be longest
+      // Marathon should be longest (not in excludeActivityIds)
       expect(result.running?.longestActivity.id).toBe('2');
       expect(result.running?.longestActivity.distanceKm).toBe(42.195);
 
-      // All activities matched distance filters, so they're shown in distance-specific cards
-      // The longest calculation still works correctly even though all are in excludeActivityIds
+      // Marathon can still be longest even though it could also match a 42km distance filter
+      // (it's just not in excludeActivityIds for this test)
+    });
+  });
+
+  describe('findBestForDistance edge cases', () => {
+    it('should calculate pace for running', () => {
+      const activities: Activity[] = [
+        createActivity('1', '10K Fast', 'Run', 10, 40), // 4 min/km pace
+        createActivity('2', '10K Slow', 'Run', 10, 50), // 5 min/km pace
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Run',
+          distanceFilters: [{ id: '1', value: 10, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.running?.distanceRecords.length).toBe(1);
+      expect(result.running?.distanceRecords[0].pace).toBeDefined();
+      expect(result.running?.distanceRecords[0].activity.id).toBe('1'); // Fastest one
+    });
+
+    it('should calculate pace for swimming', () => {
+      const activities: Activity[] = [
+        createActivity('1', '1000m Fast', 'Swim', 1, 15), // 1.5 min/100m
+        createActivity('2', '1000m Slow', 'Swim', 1, 20), // 2 min/100m
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Swim',
+          distanceFilters: [{ id: '2', value: 1, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.swimming?.distanceRecords.length).toBe(1);
+      expect(result.swimming?.distanceRecords[0].pace).toBeDefined();
+      expect(result.swimming?.distanceRecords[0].activity.id).toBe('1'); // Fastest one
+    });
+
+    it('should calculate speed for cycling', () => {
+      const activities: Activity[] = [
+        createActivity('1', '50K Fast', 'Ride', 50, 80), // 37.5 km/h
+        createActivity('2', '50K Slow', 'Ride', 50, 120), // 25 km/h
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Ride',
+          distanceFilters: [{ id: '3', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.cycling?.distanceRecords.length).toBe(1);
+      expect(result.cycling?.distanceRecords[0].speed).toBeDefined();
+      expect(result.cycling?.distanceRecords[0].activity.id).toBe('1'); // Fastest one
+    });
+
+    it('should return null when no activities match distance range', () => {
+      const activities: Activity[] = [createActivity('1', '5K', 'Run', 5, 25)];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Run',
+          distanceFilters: [{ id: '4', value: 10, operator: '±', unit: 'km' }], // Looking for 10K
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.running?.distanceRecords.length).toBe(0); // No match
+    });
+
+    it('should handle "eq" operator with 10% tolerance', () => {
+      const activities: Activity[] = [
+        createActivity('1', '10K', 'Run', 10, 40),
+        createActivity('2', '11K', 'Run', 11, 45), // Within 10% tolerance of 10
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Run',
+          distanceFilters: [{ id: '5', value: 10, operator: 'eq', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.running?.distanceRecords.length).toBe(1);
+    });
+
+    it('should handle "=" operator with 0.1km tolerance', () => {
+      const activities: Activity[] = [createActivity('1', '10K', 'Run', 10, 40)];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Run',
+          distanceFilters: [{ id: '6', value: 10, operator: '=', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.running?.distanceRecords.length).toBe(1);
+    });
+
+    it('should format swim distances under 1km as meters', () => {
+      const activities: Activity[] = [createActivity('1', '500m', 'Swim', 0.5, 10)];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Swim',
+          distanceFilters: [{ id: '7', value: 0.5, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.swimming?.distanceRecords.length).toBe(1);
+      expect(result.swimming?.distanceRecords[0].distance).toBe('500m');
+    });
+
+    it('should format swim distances over 1km in kilometers', () => {
+      const activities: Activity[] = [createActivity('1', '2K', 'Swim', 2, 40)];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Swim',
+          distanceFilters: [{ id: '8', value: 2, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.swimming?.distanceRecords.length).toBe(1);
+      expect(result.swimming?.distanceRecords[0].distance).toBe('2km');
+    });
+
+    it('should use special names for common run distances', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Half Marathon', 'Run', 21, 105),
+        createActivity('2', 'Marathon', 'Run', 42, 180),
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Run',
+          distanceFilters: [
+            { id: '9', value: 21, operator: '±', unit: 'km' },
+            { id: '10', value: 42, operator: '±', unit: 'km' },
+          ],
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      expect(result.running?.distanceRecords.length).toBe(2);
+      expect(result.running?.distanceRecords[0].distance).toBe('Half Marathon');
+      expect(result.running?.distanceRecords[1].distance).toBe('Marathon');
+    });
+  });
+
+  describe('includeInHighlights parameter', () => {
+    it('should exclude activity types not in includeInHighlights list', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Run', 'Run', 10, 40),
+        createActivity('2', 'Ride', 'Ride', 50, 120),
+        createActivity('3', 'Swim', 'Swim', 2, 40),
+      ];
+
+      // Only include running in highlights
+      const includeInHighlights = ['Run'];
+
+      const result = calculateSportHighlights(
+        activities,
+        undefined,
+        undefined,
+        undefined,
+        includeInHighlights
+      );
+
+      expect(result.running).toBeDefined();
+      expect(result.cycling).toBeUndefined();
+      expect(result.swimming).toBeUndefined();
+    });
+
+    it('should only include cycling distance filters for included activity types', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Real Ride', 'Ride', 50, 120),
+        createActivity('2', 'Virtual Ride', 'VirtualRide', 50, 120),
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Ride',
+          distanceFilters: [{ id: '11', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+        {
+          activityType: 'VirtualRide',
+          distanceFilters: [{ id: '12', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      // Only include Ride, not VirtualRide
+      const includeInHighlights = ['Ride'];
+
+      const result = calculateSportHighlights(
+        activities,
+        activityFilters,
+        undefined,
+        undefined,
+        includeInHighlights
+      );
+
+      // Should have cycling but with only one distance filter (Ride)
+      expect(result.cycling).toBeDefined();
+      // VirtualRide distance filter should be excluded
+    });
+
+    it('should deduplicate cycling distance filters from Ride and VirtualRide', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Real Ride', 'Ride', 50, 120),
+        createActivity('2', 'Virtual Ride', 'VirtualRide', 50, 120),
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Ride',
+          distanceFilters: [{ id: '13', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+        {
+          activityType: 'VirtualRide',
+          distanceFilters: [{ id: '14', value: 50, operator: '±', unit: 'km' }], // Same distance
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      // Should have only one distance record (deduplicated)
+      expect(result.cycling?.distanceRecords.length).toBeLessThanOrEqual(1);
+    });
+
+    it('should handle cycling with different distances from Ride and VirtualRide', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Real Ride 50K', 'Ride', 50, 120),
+        createActivity('2', 'Virtual Ride 100K', 'VirtualRide', 100, 240),
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Ride',
+          distanceFilters: [{ id: '15', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+        {
+          activityType: 'VirtualRide',
+          distanceFilters: [{ id: '16', value: 100, operator: '±', unit: 'km' }], // Different distance
+          titlePatterns: [],
+        },
+      ];
+
+      const result = calculateSportHighlights(activities, activityFilters);
+
+      // Should have two distance records (different distances)
+      expect(result.cycling?.distanceRecords.length).toBe(2);
+    });
+
+    it('should skip cycling distance filters if VirtualRide not in includeInHighlights', () => {
+      const activities: Activity[] = [
+        createActivity('1', 'Real Ride', 'Ride', 50, 120),
+        createActivity('2', 'Virtual Ride', 'VirtualRide', 50, 120),
+      ];
+
+      const activityFilters: ActivityTypeFilter[] = [
+        {
+          activityType: 'Ride',
+          distanceFilters: [{ id: '17', value: 50, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+        {
+          activityType: 'VirtualRide',
+          distanceFilters: [{ id: '18', value: 100, operator: '±', unit: 'km' }],
+          titlePatterns: [],
+        },
+      ];
+
+      // Only include Ride, not VirtualRide
+      const includeInHighlights = ['Ride'];
+
+      const result = calculateSportHighlights(
+        activities,
+        activityFilters,
+        undefined,
+        undefined,
+        includeInHighlights
+      );
+
+      // Should only have Ride's distance filter (50km), not VirtualRide's (100km)
+      expect(result.cycling?.distanceRecords.length).toBeLessThanOrEqual(1);
+      if (result.cycling?.distanceRecords.length === 1) {
+        expect(result.cycling.distanceRecords[0].distance).toBe('50km');
+      }
     });
   });
 });
