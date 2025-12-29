@@ -109,34 +109,51 @@ export function calculateSportHighlights(
     return includeInHighlights.includes(activityType);
   };
 
-  // STEP 1: Filter out activities that were matched by custom filters
+  // STEP 1: Filter out activities that were matched by custom filters (for display only)
   const filteredActivities = excludeActivityIds
     ? activities.filter((a) => !excludeActivityIds.has(a.id))
     : activities;
 
-  // STEP 2: For EACH sport, filter by type FIRST (include ALL activities of that type for longest/biggest)
-  // Then filter by excludeActivityIds + title patterns + includeInHighlights for highlights display
+  // STEP 2: For EACH sport, filter by type FIRST
+  // - allSport: ALL activities for totals (no filtering)
+  // - sportForLongest: For longest/biggest climb calculations (only filter by title patterns, NOT by excludeActivityIds)
+  // - sportForHighlights: For distance records display (filtered by excludeActivityIds AND title patterns)
 
-  // Running: ALL runs for totals and longest calculation
+  // Running: ALL runs for totals calculation (not filtered)
   const allRunning = activities.filter((a) => a.type === 'Run');
-  // FILTERED runs for highlights display (exclude race-detected activities)
+  // Runs for longest/biggest climb (filter by title patterns only, NOT by excludeActivityIds)
+  const runningForLongest = activities
+    .filter((a) => a.type === 'Run')
+    .filter((a) => !shouldExcludeFromHighlights(a));
+  // Runs for highlights display (filtered by excludeActivityIds AND title patterns)
   const runningForHighlights = filteredActivities
     .filter((a) => a.type === 'Run')
-    .filter((a) => isIncludedInHighlights(a.type) && !shouldExcludeFromHighlights(a));
+    .filter((a) => !shouldExcludeFromHighlights(a))
+    .filter((a) => isIncludedInHighlights(a.type));
 
-  // Cycling: ALL cycling for totals and longest calculation
+  // Cycling: ALL cycling for totals calculation (not filtered)
   const allCycling = activities.filter((a) => ['Ride', 'VirtualRide'].includes(a.type));
-  // FILTERED cycling for highlights display
+  // Cycling for longest/biggest climb (filter by title patterns only, NOT by excludeActivityIds)
+  const cyclingForLongest = activities
+    .filter((a) => ['Ride', 'VirtualRide'].includes(a.type))
+    .filter((a) => !shouldExcludeFromHighlights(a));
+  // Cycling for highlights display (filtered by excludeActivityIds AND title patterns)
   const cyclingForHighlights = filteredActivities
     .filter((a) => ['Ride', 'VirtualRide'].includes(a.type))
-    .filter((a) => isIncludedInHighlights(a.type) && !shouldExcludeFromHighlights(a));
+    .filter((a) => !shouldExcludeFromHighlights(a))
+    .filter((a) => isIncludedInHighlights(a.type));
 
-  // Swimming: ALL swimming for totals and longest calculation
+  // Swimming: ALL swimming for totals calculation (not filtered)
   const allSwimming = activities.filter((a) => a.type === 'Swim');
-  // FILTERED swimming for highlights display
+  // Swimming for longest (filter by title patterns only, NOT by excludeActivityIds)
+  const swimmingForLongest = activities
+    .filter((a) => a.type === 'Swim')
+    .filter((a) => !shouldExcludeFromHighlights(a));
+  // Swimming for highlights display (filtered by excludeActivityIds AND title patterns)
   const swimmingForHighlights = filteredActivities
     .filter((a) => a.type === 'Swim')
-    .filter((a) => isIncludedInHighlights(a.type) && !shouldExcludeFromHighlights(a));
+    .filter((a) => !shouldExcludeFromHighlights(a))
+    .filter((a) => isIncludedInHighlights(a.type));
 
   const result: {
     running?: SportHighlights;
@@ -189,14 +206,14 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(runningForHighlights, d, 'running'))
       .filter(Boolean) as DistanceRecord[];
 
-    // Calculate longest and biggest climb from ALL running activities (not filtered by highlights)
-    // This ensures race highlights (Marathon, etc.) are included in longest calculation
-    const longestActivity = allRunning.reduce((longest, current) =>
+    // Calculate longest and biggest climb from FILTERED running activities
+    // This respects title patterns with excludeFromHighlights flag
+    const longestActivity = runningForLongest.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
-    // Find activity with biggest elevation gain from all running
-    const biggestClimb = allRunning.reduce((biggest, current) => {
+    // Find activity with biggest elevation gain from filtered running
+    const biggestClimb = runningForLongest.reduce((biggest, current) => {
       const currentElevation = current.elevationGainMeters || 0;
       const biggestElevation = biggest.elevationGainMeters || 0;
       return currentElevation > biggestElevation ? current : biggest;
@@ -269,13 +286,14 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(cyclingForHighlights, d, 'cycling'))
       .filter(Boolean) as DistanceRecord[];
 
-    // Calculate longest and biggest climb from ALL cycling activities (not filtered by highlights)
-    const longestActivity = allCycling.reduce((longest, current) =>
+    // Calculate longest and biggest climb from FILTERED cycling activities
+    // This respects title patterns with excludeFromHighlights flag
+    const longestActivity = cyclingForLongest.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
-    // Find activity with biggest elevation gain from all cycling
-    const biggestClimb = allCycling.reduce((biggest, current) => {
+    // Find activity with biggest elevation gain from filtered cycling
+    const biggestClimb = cyclingForLongest.reduce((biggest, current) => {
       const currentElevation = current.elevationGainMeters || 0;
       const biggestElevation = biggest.elevationGainMeters || 0;
       return currentElevation > biggestElevation ? current : biggest;
@@ -342,13 +360,14 @@ export function calculateSportHighlights(
       .map((d) => findBestForDistance(swimmingForHighlights, d, 'swimming'))
       .filter(Boolean) as DistanceRecord[];
 
-    // Calculate longest and biggest climb from ALL swimming activities (not filtered by highlights)
-    const longestActivity = allSwimming.reduce((longest, current) =>
+    // Calculate longest from FILTERED swimming activities
+    // This respects title patterns with excludeFromHighlights flag
+    const longestActivity = swimmingForLongest.reduce((longest, current) =>
       current.distanceKm > longest.distanceKm ? current : longest
     );
 
     // Swimming rarely has elevation, but include for completeness
-    const biggestClimb = allSwimming.reduce((biggest, current) => {
+    const biggestClimb = swimmingForLongest.reduce((biggest, current) => {
       const currentElevation = current.elevationGainMeters || 0;
       const biggestElevation = biggest.elevationGainMeters || 0;
       return currentElevation > biggestElevation ? current : biggest;
