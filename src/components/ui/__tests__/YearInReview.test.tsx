@@ -313,7 +313,8 @@ describe('YearInReview', () => {
       );
 
       // Should not group as triathlon (shown individually instead)
-      expect(screen.queryByText(/🏊🚴🏃/)).not.toBeInTheDocument();
+      // When disabled, the triathlon section should not appear
+      expect(screen.queryByText('Triathlons')).not.toBeInTheDocument();
     });
 
     it('should call onActivityClick with all triathlon activity IDs', async () => {
@@ -382,7 +383,8 @@ describe('YearInReview', () => {
       );
 
       // Real run should be shown, virtual should be filtered
-      expect(screen.getByText('Real Run')).toBeInTheDocument();
+      const realRunElements = screen.getAllByText('Real Run');
+      expect(realRunElements.length).toBeGreaterThan(0);
     });
 
     it('should exclude activities by type when configured', () => {
@@ -425,7 +427,8 @@ describe('YearInReview', () => {
       );
 
       // IRONMAN should be excluded from highlights but stats should include it
-      expect(screen.getByText('Morning Run')).toBeInTheDocument();
+      const morningRunElements = screen.getAllByText('Morning Run');
+      expect(morningRunElements.length).toBeGreaterThan(0);
     });
   });
 

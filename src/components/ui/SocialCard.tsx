@@ -441,7 +441,7 @@ export function SocialCard({
             {backgroundImageUrl && (
               <button
                 onClick={() => setShowCropModal(true)}
-                className="px-4 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md text-sm inline-flex items-center gap-2 flex-shrink-0"
+                className="px-4 py-1.5 bg-linear-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md text-sm inline-flex items-center gap-2 flex-shrink-0"
               >
                 <span>✂️</span>
                 <span>Crop & Adjust</span>
@@ -472,7 +472,7 @@ export function SocialCard({
             >
               <div
                 ref={cardRef}
-                className="bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 rounded-xl overflow-hidden shadow-2xl relative"
+                className="bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 rounded-xl overflow-hidden shadow-2xl relative"
                 style={{
                   width: `${currentFormat.width}px`,
                   height: `${currentFormat.height}px`,
@@ -491,7 +491,7 @@ export function SocialCard({
                       }}
                     />
                     <div
-                      className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800"
+                      className="absolute inset-0 bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800"
                       style={{ opacity: imageOpacity }}
                     />
                   </>
@@ -875,14 +875,14 @@ export function SocialCard({
             <button
               onClick={handleShare}
               disabled={isExporting}
-              className="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all shadow-lg disabled:opacity-50"
+              className="px-6 py-2 bg-linear-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg hover:from-orange-600 hover:to-red-700 transition-all shadow-lg disabled:opacity-50"
             >
               {isExporting ? t('socialCard.preparing') : t('socialCard.shareButton')}
             </button>
             <button
               onClick={handleExport}
               disabled={isExporting}
-              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
+              className="px-6 py-2 bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50"
             >
               {isExporting ? t('socialCard.exporting') : t('socialCard.downloadButton')}
             </button>
@@ -926,7 +926,7 @@ export function SocialCard({
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
               <button
                 onClick={() => setShowCropModal(false)}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
+                className="px-6 py-2 bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
               >
                 Done
               </button>

@@ -58,7 +58,7 @@ export function ActivityManagement({ availableActivityTypes }: ActivityManagemen
   return (
     <div className="space-y-6">
       {/* Special Options */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700">
+      <div className="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700">
         <h3 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <span>⚡</span>
           Special Options

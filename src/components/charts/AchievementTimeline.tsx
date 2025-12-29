@@ -41,18 +41,18 @@ export function AchievementTimeline({
       if (!activity) return;
 
       let icon = '🏃';
-      let color = 'bg-gradient-to-r from-orange-500 to-red-600';
+      let color = 'bg-linear-to-r from-orange-500 to-red-600';
 
       // Determine icon and color based on type
       if (highlight.type === 'triathlon') {
         icon = '🏊🚴🏃';
-        color = 'bg-gradient-to-r from-cyan-500 via-green-500 to-orange-500';
+        color = 'bg-linear-to-r from-cyan-500 via-green-500 to-orange-500';
       } else if (highlight.activityType === 'Ride') {
         icon = '🚴';
-        color = 'bg-gradient-to-r from-blue-500 to-cyan-600';
+        color = 'bg-linear-to-r from-blue-500 to-cyan-600';
       } else if (highlight.activityType === 'Swim') {
         icon = '🏊';
-        color = 'bg-gradient-to-r from-teal-500 to-blue-600';
+        color = 'bg-linear-to-r from-teal-500 to-blue-600';
       }
 
       results.push({
@@ -74,14 +74,14 @@ export function AchievementTimeline({
       .filter((sh): sh is SportHighlights => sh !== undefined)
       .forEach((sportHighlight) => {
         let icon = '🏃';
-        let color = 'bg-gradient-to-r from-orange-500 to-red-600';
+        let color = 'bg-linear-to-r from-orange-500 to-red-600';
 
         if (sportHighlight.sport === 'cycling') {
           icon = '🚴';
-          color = 'bg-gradient-to-r from-blue-500 to-cyan-600';
+          color = 'bg-linear-to-r from-blue-500 to-cyan-600';
         } else if (sportHighlight.sport === 'swimming') {
           icon = '🏊';
-          color = 'bg-gradient-to-r from-teal-500 to-blue-600';
+          color = 'bg-linear-to-r from-teal-500 to-blue-600';
         }
 
         // Add all distance records (e.g., marathons, half marathons, 5Ks, 10Ks, etc.)
@@ -175,7 +175,7 @@ export function AchievementTimeline({
 
       <div className="relative">
         {/* Timeline line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200"></div>
+        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-linear-to-b from-blue-200 via-purple-200 to-pink-200"></div>
 
         {/* Achievements */}
         <div className="space-y-4">

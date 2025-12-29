@@ -97,7 +97,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
         {/* Progress Bar */}
         <div className="h-2 bg-gray-200 dark:bg-gray-700">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500"
+            className="h-full bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -184,7 +184,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
               {currentStepData.action && (
                 <button
                   onClick={currentStepData.action.onClick}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
+                  className="px-6 py-2 bg-linear-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
                 >
                   {currentStepData.action.label}
                 </button>
@@ -193,7 +193,7 @@ export function OnboardingGuide({ onClose, onOpenSettings }: OnboardingGuideProp
               {!currentStepData.action && currentStep < steps.length - 1 && (
                 <button
                   onClick={() => setCurrentStep(currentStep + 1)}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
+                  className="px-6 py-2 bg-linear-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
                 >
                   {t('onboardingGuide.next')}
                 </button>

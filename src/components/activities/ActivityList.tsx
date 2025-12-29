@@ -175,7 +175,7 @@ export const ActivityList = ({
         </div>
       </div>
 
-      <div className="space-y-3 max-h-[600px] overflow-y-auto">
+      <div className="space-y-3 max-h-150 overflow-y-auto">
         {filteredActivities.map((activity) => (
           <a
             id={`activity-${activity.id}`}
@@ -186,7 +186,7 @@ export const ActivityList = ({
             className={`block p-5 border rounded-xl transition-all duration-300 ${
               highlightedActivityIds.includes(activity.id)
                 ? 'border-orange-500 dark:border-orange-400 bg-orange-50 dark:bg-orange-900/20 shadow-lg shadow-orange-500/50 ring-2 ring-orange-500 dark:ring-orange-400'
-                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-750 hover:bg-gradient-to-r hover:from-gray-50 hover:to-white dark:hover:from-gray-700 dark:hover:to-gray-750 hover:shadow-md hover:border-orange-400'
+                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-750 hover:bg-linear-to-r hover:from-gray-50 hover:to-white dark:hover:from-gray-700 dark:hover:to-gray-750 hover:shadow-md hover:border-orange-400'
             }`}
           >
             <div className="flex items-start justify-between">

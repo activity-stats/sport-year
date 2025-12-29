@@ -13,7 +13,7 @@ export function ErrorFallback({ error, errorInfo, onReset }: ErrorFallbackProps)
   const isDevelopment = import.meta.env.DEV;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
         {/* Icon */}
         <div className="flex justify-center mb-6">

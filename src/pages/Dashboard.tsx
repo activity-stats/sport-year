@@ -241,7 +241,7 @@ export const Dashboard = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Left Sidebar Navigation - Hidden on mobile, shown as bottom nav */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-gradient-to-b from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-2xl transition-all duration-300 z-50 hidden md:block ${
+        className={`fixed left-0 top-0 h-full bg-linear-to-b from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-2xl transition-all duration-300 z-50 hidden md:block ${
           sidebarExpanded ? 'w-56' : 'w-16'
         }`}
         onMouseEnter={() => setSidebarExpanded(true)}
@@ -455,7 +455,7 @@ export const Dashboard = () => {
       {/* Main Content with margin for sidebar */}
       <div className="md:ml-16 pb-20 md:pb-0">
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl sticky top-0 z-40">
+        <header className="bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl sticky top-0 z-40">
           <div className="max-w-7xl mx-auto pl-3 sm:pl-6 lg:pl-8 pr-2 sm:pr-3 py-3 sm:py-6">
             <div className="flex justify-between items-center gap-2">
               <div className="min-w-0 flex-1 mr-2">
@@ -667,7 +667,7 @@ export const Dashboard = () => {
       )}
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-2xl z-50 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-2xl z-50 md:hidden">
         <div className="flex justify-around items-center py-2">
           <button
             onClick={() => setViewMode('presentation')}
@@ -719,7 +719,7 @@ export const Dashboard = () => {
           />
 
           {/* Drawer */}
-          <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-t-3xl shadow-2xl z-50 md:hidden animate-slide-up">
+          <div className="fixed bottom-0 left-0 right-0 bg-linear-to-br from-blue-600 via-purple-600 to-pink-600 dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-t-3xl shadow-2xl z-50 md:hidden animate-slide-up">
             <div className="p-6 space-y-3">
               {/* Header */}
               <div className="flex justify-between items-center mb-4">

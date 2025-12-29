@@ -43,7 +43,7 @@ export function ImagePositionEditor({
 
   return (
     <div className="space-y-4">
-      <div className="relative h-64 rounded-xl overflow-hidden border-2 border-gray-200 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800">
+      <div className="relative h-64 rounded-xl overflow-hidden border-2 border-gray-200 bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800">
         <div
           className="absolute inset-0 bg-cover"
           style={{
@@ -53,7 +53,7 @@ export function ImagePositionEditor({
             transformOrigin: 'center',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/70 to-purple-800/70" />
+        <div className="absolute inset-0 bg-linear-to-br from-blue-600/70 via-indigo-700/70 to-purple-800/70" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-white text-center">
             <h3 className="text-4xl font-black mb-2">2024</h3>
