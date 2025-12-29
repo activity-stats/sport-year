@@ -156,6 +156,41 @@ export async function setupAuthState(page: Page) {
     };
     localStorage.setItem('strava-auth-storage', JSON.stringify(authState));
 
+    // Set settings with new v6 structure
+    const settingsState = {
+      state: {
+        yearInReview: {
+          backgroundImageUrl: null,
+          backgroundImageCrop: null,
+          backgroundImageOpacity: 0.7,
+          socialCardCrops: {},
+          excludedActivityTypes: [],
+          excludeVirtualPerSport: {
+            cycling: { highlights: false, stats: false },
+            running: { highlights: false, stats: false },
+            swimming: { highlights: false, stats: false },
+          },
+          titleIgnorePatterns: [],
+          highlightStats: ['hours', 'daysActive', 'distance', 'elevation'],
+          activityTypeSettings: {
+            order: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
+            includeInStats: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
+            includeInHighlights: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
+          },
+          specialOptions: {
+            enableTriathlonHighlights: true,
+            mergeCycling: false,
+          },
+          activityFilters: [],
+        },
+        sportBreakdown: {
+          activities: [],
+        },
+      },
+      version: 6,
+    };
+    localStorage.setItem('sport-year-settings', JSON.stringify(settingsState));
+
     // Skip onboarding guide
     localStorage.setItem('sport-year-onboarding-seen', 'true');
   });
@@ -167,6 +202,9 @@ export async function setupAuthState(page: Page) {
  */
 export async function setupStravaConfig(page: Page) {
   await page.addInitScript(() => {
+    // Disable mock mode flag
+    delete (import.meta.env as any).VITE_USE_MOCKS;
+
     const configState = {
       state: {
         config: {

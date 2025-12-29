@@ -42,12 +42,8 @@ export function StatsSelector({
   const toggleStat = (id: string) => {
     const newSelected = new Set(selected);
     if (newSelected.has(id)) {
-      if (newSelected.size > 1) {
-        // Don't allow deselecting all stats
-        newSelected.delete(id);
-      } else {
-        showWarning(t('statsSelector.selectOne'));
-      }
+      // Allow deselecting to have 0 stats
+      newSelected.delete(id);
     } else {
       if (newSelected.size < 4) {
         newSelected.add(id);
@@ -124,8 +120,7 @@ export function StatsSelector({
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {t('statsSelector.selected', { count: selected.size })} •{' '}
-            {selected.size < 1 ? t('statsSelector.selectAtLeastOne') : t('statsSelector.ready')}
+            {t('statsSelector.selected', { count: selected.size })} • {t('statsSelector.ready')}
           </div>
           <div className="flex gap-3">
             <button
@@ -136,8 +131,7 @@ export function StatsSelector({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={selected.size < 1}
-              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
             >
               {t('statsSelector.nextSelectHighlights')}
             </button>

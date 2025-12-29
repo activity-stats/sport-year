@@ -7,36 +7,55 @@ test.describe('Authentication Flow', () => {
     await setupStravaConfig(page);
   });
   test('should show login page for unauthenticated user', async ({ page }) => {
+    // Only set config, NOT auth state (user is not authenticated)
+    await setupStravaConfig(page);
     await setupStravaMocks(page);
-    await page.goto('/');
+    await page.goto('/login');
 
-    // Should show login page with Sport Year heading
-    await expect(page.getByRole('heading', { name: /sport year/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /connect with strava/i })).toBeVisible();
-    await expect(page.getByText(/track your annual sports performance/i)).toBeVisible();
+    // Wait for page to fully load
+    await page.waitForLoadState('networkidle');
+
+    // Should show login page with Connect with Strava button
+    const connectButton = page.getByRole('button', { name: /connect with strava/i });
+    await expect(connectButton).toBeVisible({ timeout: 10000 });
+
+    // Verify we see the Sport Year title
+    await expect(page.getByRole('heading', { name: 'Sport Year' })).toBeVisible();
   });
 
   test('should handle Strava OAuth flow', async ({ page }) => {
     await setupStravaConfig(page);
-    await page.goto('/');
+    await setupStravaMocks(page);
+    await page.goto('/login'); // Start at login page explicitly
+
+    // Wait for page load
+    await page.waitForLoadState('networkidle');
 
     // Click connect button
     const connectButton = page.getByRole('button', { name: /connect with strava/i });
+    await expect(connectButton).toBeVisible({ timeout: 10000 });
     await connectButton.click();
 
-    // Should redirect to callback and then dashboard (root when authenticated)
-    await page.waitForURL('/', { timeout: 10000 }).catch(() => {});
+    // OAuth flow will redirect through callback to dashboard
+    // In demo mode (VITE_USE_MOCKS), root shows dashboard
+    await page.waitForURL(/\/$/, { timeout: 15000 });
 
-    // Wait for page to load
-    await page.waitForTimeout(2000);
+    // Wait for dashboard to load
+    await page.waitForLoadState('networkidle');
 
-    // Verify we're on dashboard by checking for dashboard elements
+    // Verify we're on dashboard - look for year selector or athlete name
     const isDashboard = await page
-      .getByText(/activities|distance|stats/i)
+      .getByRole('combobox')
+      .first()
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
+    const hasActivities = await page
+      .getByText(/activities|distance/i)
       .first()
       .isVisible()
       .catch(() => false);
-    expect(isDashboard).toBeTruthy();
+
+    expect(isDashboard || hasActivities).toBeTruthy();
   });
 
   test('should show dashboard after successful authentication', async ({ page }) => {

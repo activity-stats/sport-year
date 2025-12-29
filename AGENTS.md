@@ -835,6 +835,32 @@ When reviewing or creating PRs:
 
 ## 🛠️ Development Commands
 
+### Development Server
+
+```bash
+npm run dev             # Start dev server (requires real Strava API credentials)
+npm run dev:mock        # Start dev server with mock data (no Strava API needed)
+```
+
+**When to use each:**
+
+- **`npm run dev`**: Use when testing real Strava API integration
+  - Requires Strava OAuth credentials (Client ID + Secret)
+  - Fetches real activity data from Strava
+  - Tests authentication flow, API rate limits, real data edge cases
+  - Best for integration testing and production-like behavior
+
+- **`npm run dev:mock`**: Use for development without Strava API
+  - Uses pre-generated mock activity data (see `src/mocks/stravaActivities.ts`)
+  - No Strava credentials needed
+  - Instant startup, no API calls
+  - Best for UI development, testing features, and quick iteration
+  - E2E tests use this mode automatically
+
+**Environment Variables:**
+- `VITE_USE_MOCKS=true` - Enables mock data mode
+- Set in `.env.local` or via command: `VITE_USE_MOCKS=true npm run dev`
+
 ### Testing
 
 ```bash
@@ -929,8 +955,9 @@ npm run validate && npm run build
 3. ✅ No lint errors (`npm run lint`)
 4. ✅ Code formatted (`npm run format:check`)
 5. ✅ **Build succeeds (`npm run build`)**
+6. ⚠️ E2E tests pass (`npm run test:e2e`) - Optional, for UI/flow changes only
 
-**Note**: The automated pre-commit hook (Husky + lint-staged) runs formatting and linting on staged files. However, it does NOT run type checking or build validation. You MUST manually verify the build passes before committing.
+**Note**: The automated pre-commit hook (Husky + lint-staged) runs formatting and linting on staged files. However, it does NOT run type checking, build validation, or E2E tests. You MUST manually verify these pass before committing. E2E tests take 10-15s per browser and are optional but recommended for significant UI changes.
 
 ## 📝 Code Patterns
 
@@ -1008,6 +1035,8 @@ export const useMyStore = create<MyStore>()(
 - Debug: `npm run test:e2e:debug`
 - Interactive: `npm run test:e2e:ui`
 - Browsers install to: `~/.cache/ms-playwright/`
+
+**Note**: E2E tests are NOT part of the Husky pre-commit hook due to time constraints (10-15s per browser). Run manually before pushing significant UI/flow changes.
 
 ### Linting Issues
 

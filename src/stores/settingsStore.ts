@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ActivityType } from '../types';
+import type { CropArea } from '../utils/imageCrop';
 
 export interface TitlePattern {
   pattern: string;
@@ -72,7 +73,13 @@ interface SportBreakdownSettings {
 
 export interface YearInReviewSettings {
   backgroundImageUrl: string | null;
-  backgroundImagePosition: { x: number; y: number; scale: number };
+  backgroundImageCrop: CropArea | null;
+  backgroundImageOpacity: number; // 0-1 for hero section gradient overlay
+  socialCardCrops: {
+    landscape?: CropArea;
+    opengraph?: CropArea;
+    square?: CropArea;
+  };
   excludedActivityTypes: ActivityType[];
   excludeVirtualPerSport: {
     cycling: { highlights: boolean; stats: boolean };
@@ -97,7 +104,9 @@ interface SettingsState {
   yearInReview: YearInReviewSettings;
   sportBreakdown: SportBreakdownSettings;
   setBackgroundImage: (url: string | null) => void;
-  setBackgroundImagePosition: (position: { x: number; y: number; scale: number }) => void;
+  setBackgroundImageCrop: (crop: CropArea | null) => void;
+  setBackgroundImageOpacity: (opacity: number) => void;
+  setSocialCardCrop: (format: 'landscape' | 'opengraph' | 'square', crop: CropArea | null) => void;
   toggleActivityType: (type: ActivityType) => void;
   selectAllActivityTypes: () => void;
   deselectAllActivityTypes: (types: ActivityType[]) => void;
@@ -232,7 +241,9 @@ const defaultSportBreakdown: SportBreakdownSettings = {
 
 const defaultSettings: YearInReviewSettings = {
   backgroundImageUrl: null,
-  backgroundImagePosition: { x: 50, y: 50, scale: 1 },
+  backgroundImageCrop: null,
+  backgroundImageOpacity: 0.7,
+  socialCardCrops: {},
   excludedActivityTypes: [],
   excludeVirtualPerSport: {
     cycling: { highlights: false, stats: false },
@@ -329,9 +340,25 @@ export const useSettingsStore = create<SettingsState>()(
           yearInReview: { ...state.yearInReview, backgroundImageUrl: url },
         })),
 
-      setBackgroundImagePosition: (position) =>
+      setBackgroundImageCrop: (crop) =>
         set((state) => ({
-          yearInReview: { ...state.yearInReview, backgroundImagePosition: position },
+          yearInReview: { ...state.yearInReview, backgroundImageCrop: crop },
+        })),
+
+      setBackgroundImageOpacity: (opacity) =>
+        set((state) => ({
+          yearInReview: { ...state.yearInReview, backgroundImageOpacity: opacity },
+        })),
+
+      setSocialCardCrop: (format, crop) =>
+        set((state) => ({
+          yearInReview: {
+            ...state.yearInReview,
+            socialCardCrops: {
+              ...state.yearInReview.socialCardCrops,
+              [format]: crop,
+            },
+          },
         })),
 
       toggleActivityType: (type) =>
@@ -691,163 +718,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: useMocks ? 'sport-year-settings-demo' : 'sport-year-settings',
-      version: 5,
-      migrate: (persistedState: unknown, version: number) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let state = persistedState as any;
-        if (version < 2) {
-          state = {
-            ...state,
-            sportBreakdown: defaultSportBreakdown,
-          };
-        }
-        if (version < 3) {
-          state = {
-            ...state,
-            yearInReview: {
-              ...state.yearInReview,
-              backgroundImagePosition: { x: 50, y: 50, scale: 1 },
-            },
-          };
-        }
-        if (version < 4) {
-          // Add new activity management and filtering features with default filters
-          const defaultFilters = [
-            {
-              activityType: 'Run',
-              distanceFilters: [
-                { id: 'default-run-5', operator: '±', value: 5, unit: 'km' },
-                { id: 'default-run-10', operator: '±', value: 10, unit: 'km' },
-                { id: 'default-run-15', operator: '±', value: 15, unit: 'km' },
-                { id: 'default-run-21', operator: '±', value: 21, unit: 'km' },
-                { id: 'default-run-42', operator: '±', value: 42, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'Ride',
-              distanceFilters: [
-                { id: 'default-ride-40', operator: '±', value: 40, unit: 'km' },
-                { id: 'default-ride-50', operator: '±', value: 50, unit: 'km' },
-                { id: 'default-ride-90', operator: '±', value: 90, unit: 'km' },
-                { id: 'default-ride-100', operator: '±', value: 100, unit: 'km' },
-                { id: 'default-ride-150', operator: '±', value: 150, unit: 'km' },
-                { id: 'default-ride-200', operator: '±', value: 200, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'VirtualRide',
-              distanceFilters: [
-                { id: 'default-vride-40', operator: '±', value: 40, unit: 'km' },
-                { id: 'default-vride-50', operator: '±', value: 50, unit: 'km' },
-                { id: 'default-vride-90', operator: '±', value: 90, unit: 'km' },
-                { id: 'default-vride-100', operator: '±', value: 100, unit: 'km' },
-                { id: 'default-vride-150', operator: '±', value: 150, unit: 'km' },
-                { id: 'default-vride-200', operator: '±', value: 200, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'Swim',
-              distanceFilters: [
-                { id: 'default-swim-0.5', operator: '±', value: 0.5, unit: 'km' },
-                { id: 'default-swim-1', operator: '±', value: 1, unit: 'km' },
-                { id: 'default-swim-1.5', operator: '±', value: 1.5, unit: 'km' },
-                { id: 'default-swim-2', operator: '±', value: 2, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-          ];
-
-          state = {
-            ...state,
-            yearInReview: {
-              ...state.yearInReview,
-              activityTypeSettings: {
-                order: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
-                includeInStats: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
-                includeInHighlights: ['Run', 'Ride', 'VirtualRide', 'Swim', 'Walk', 'Hike'],
-              },
-              specialOptions: {
-                enableTriathlonHighlights: true,
-                mergeCycling: false,
-              },
-              activityFilters: defaultFilters,
-            },
-            sportBreakdown: {
-              ...state.sportBreakdown,
-              activities: state.sportBreakdown.activities.map(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (a: any) => ({
-                  ...a,
-                  includeInStats: a.includeInStats ?? true,
-                  includeInHighlights: a.includeInHighlights ?? true,
-                })
-              ),
-            },
-          };
-        }
-        if (version < 5) {
-          // Update default filters to new distances
-          const defaultFilters = [
-            {
-              activityType: 'Run',
-              distanceFilters: [
-                { id: 'default-run-5', operator: '±', value: 5, unit: 'km' },
-                { id: 'default-run-10', operator: '±', value: 10, unit: 'km' },
-                { id: 'default-run-15', operator: '±', value: 15, unit: 'km' },
-                { id: 'default-run-21', operator: '±', value: 21, unit: 'km' },
-                { id: 'default-run-42', operator: '±', value: 42, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'Ride',
-              distanceFilters: [
-                { id: 'default-ride-40', operator: '±', value: 40, unit: 'km' },
-                { id: 'default-ride-50', operator: '±', value: 50, unit: 'km' },
-                { id: 'default-ride-90', operator: '±', value: 90, unit: 'km' },
-                { id: 'default-ride-100', operator: '±', value: 100, unit: 'km' },
-                { id: 'default-ride-150', operator: '±', value: 150, unit: 'km' },
-                { id: 'default-ride-200', operator: '±', value: 200, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'VirtualRide',
-              distanceFilters: [
-                { id: 'default-vride-40', operator: '±', value: 40, unit: 'km' },
-                { id: 'default-vride-50', operator: '±', value: 50, unit: 'km' },
-                { id: 'default-vride-90', operator: '±', value: 90, unit: 'km' },
-                { id: 'default-vride-100', operator: '±', value: 100, unit: 'km' },
-                { id: 'default-vride-150', operator: '±', value: 150, unit: 'km' },
-                { id: 'default-vride-200', operator: '±', value: 200, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-            {
-              activityType: 'Swim',
-              distanceFilters: [
-                { id: 'default-swim-0.5', operator: '±', value: 0.5, unit: 'km' },
-                { id: 'default-swim-1', operator: '±', value: 1, unit: 'km' },
-                { id: 'default-swim-1.5', operator: '±', value: 1.5, unit: 'km' },
-                { id: 'default-swim-2', operator: '±', value: 2, unit: 'km' },
-              ],
-              titlePatterns: [],
-            },
-          ];
-
-          state = {
-            ...state,
-            yearInReview: {
-              ...state.yearInReview,
-              activityFilters: defaultFilters,
-            },
-          };
-        }
-        return state;
-      },
+      version: 6,
     }
   )
 );

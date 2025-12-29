@@ -179,8 +179,20 @@ function main() {
   // Check for used but not defined keys
   const undefinedKeys = [...usedKeys].filter((key) => !enKeys.has(key));
 
-  // Filter out false positives (single characters, common variable names)
-  const falsePositives = ['T', 'all', 'a', ' ', '-', 'code', 'error', 'error_description', ':'];
+  // Filter out false positives (single characters, common variable names, Canvas API)
+  const falsePositives = [
+    'T',
+    'all',
+    'a',
+    ' ',
+    '-',
+    'code',
+    'error',
+    'error_description',
+    ':',
+    'canvas',
+    '2d',
+  ];
   const realUndefinedKeys = undefinedKeys.filter((key) => !falsePositives.includes(key));
 
   if (realUndefinedKeys.length > 0) {
