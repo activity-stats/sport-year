@@ -58,7 +58,7 @@ export function LoadingProgress({ steps }: LoadingProgressProps) {
         {/* Progress Bar */}
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-orange-500 to-orange-600 transition-all duration-500 ease-out"
+            className="h-full bg-linear-to-r from-orange-500 to-orange-600 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>

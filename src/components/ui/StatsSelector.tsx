@@ -131,7 +131,7 @@ export function StatsSelector({
             </button>
             <button
               onClick={handleConfirm}
-              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
+              className="px-8 py-3 bg-linear-to-r from-purple-500 to-pink-600 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
             >
               {t('statsSelector.nextSelectHighlights')}
             </button>

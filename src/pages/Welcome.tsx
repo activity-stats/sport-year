@@ -16,14 +16,14 @@ export const Welcome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Language Selector */}
       <div className="absolute top-4 right-4 flex gap-2">
         <button
           onClick={() => setLanguage('en')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm ${
             language === 'en'
-              ? 'bg-gradient-to-r from-orange-600 to-blue-600 text-white'
+              ? 'bg-linear-to-r from-orange-600 to-blue-600 text-white'
               : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
@@ -33,7 +33,7 @@ export const Welcome = () => {
           onClick={() => setLanguage('nl')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm ${
             language === 'nl'
-              ? 'bg-gradient-to-r from-orange-600 to-blue-600 text-white'
+              ? 'bg-linear-to-r from-orange-600 to-blue-600 text-white'
               : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
@@ -47,7 +47,7 @@ export const Welcome = () => {
           <div className="text-6xl mb-8 flex items-center justify-center gap-4">🏊 🚴 🏃 💪 🧘</div>
 
           {/* Title */}
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-linear-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
             {t('welcome.title')}
           </h1>
 
@@ -65,7 +65,7 @@ export const Welcome = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <a
               href={demoUrl}
-              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="group relative inline-flex items-center gap-3 bg-linear-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               <span className="text-2xl">👀</span>
               <span>{t('welcome.exploreDemo')}</span>
@@ -73,7 +73,7 @@ export const Welcome = () => {
 
             <button
               onClick={handleSetupOwn}
-              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="group relative inline-flex items-center gap-3 bg-linear-to-r from-orange-600 to-orange-700 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-orange-700 hover:to-orange-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               <span className="text-2xl">🚀</span>
               <span>{t('welcome.setupOwn')}</span>

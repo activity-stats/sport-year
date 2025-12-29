@@ -201,7 +201,7 @@ export function AdvancedFilters({ availableActivityTypes }: AdvancedFiltersProps
             className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750 p-4 border-b-2 border-gray-200 dark:border-gray-700">
+            <div className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750 p-4 border-b-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{getActivityIcon(activityType)}</span>
@@ -417,7 +417,7 @@ export function AdvancedFilters({ availableActivityTypes }: AdvancedFiltersProps
       })}
 
       {/* Global Title Patterns */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl p-6 border-2 border-gray-300 dark:border-gray-700">
+      <div className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl p-6 border-2 border-gray-300 dark:border-gray-700">
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-3">
             Global Title Patterns

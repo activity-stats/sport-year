@@ -108,7 +108,7 @@ export function YearInReviewSettings({
     >
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-800 text-white p-6">
+        <div className="bg-linear-to-r from-blue-600 via-indigo-700 to-purple-800 text-white p-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-black mb-1">Year in Review Settings</h2>
@@ -241,7 +241,7 @@ export function YearInReviewSettings({
                         isClickingRef.current = false;
                       }, 500);
                     }}
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
+                    className="w-full bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
                   >
                     📤 Upload Image
                   </button>
@@ -379,7 +379,7 @@ export function YearInReviewSettings({
           </button>
           <button
             onClick={onClose}
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
+            className="bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
           >
             Done
           </button>

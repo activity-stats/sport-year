@@ -50,7 +50,7 @@ export function SportDetail({ sport, activities }: SportDetailProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-      <div className={`bg-gradient-to-r ${config.gradient} p-6 text-white`}>
+      <div className={`bg-linear-to-r ${config.gradient} p-6 text-white`}>
         <div className="flex items-center gap-3">
           <span className="text-5xl">{config.icon}</span>
           <div>

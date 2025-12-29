@@ -269,7 +269,7 @@ export function ActivitySelector({
             </button>
             <button
               onClick={handleConfirm}
-              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
+              className="px-6 py-2 bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
             >
               Create Card
             </button>

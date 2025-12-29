@@ -106,7 +106,7 @@ export function StravaSettings({ onClose }: StravaSettingsProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white flex justify-between items-center flex-shrink-0">
+        <div className="bg-linear-to-r from-orange-500 to-orange-600 p-6 text-white flex justify-between items-center flex-shrink-0">
           <div>
             <h2 className="text-2xl font-black">{t('stravaSettings.title')}</h2>
             <p className="text-orange-100 text-sm mt-1">{t('stravaSettings.subtitle')}</p>

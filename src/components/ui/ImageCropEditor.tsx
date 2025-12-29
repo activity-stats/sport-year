@@ -19,7 +19,7 @@ export function ImageCropEditor({
   aspectRatio,
   onChange,
   showPreviewOverlay = false,
-  previewGradient = 'bg-gradient-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70',
+  previewGradient = 'bg-linear-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70',
 }: ImageCropEditorProps) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);

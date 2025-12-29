@@ -133,7 +133,7 @@ function SportDetailSection({
           </h2>
         </div>
         <div
-          className={`h-1.5 w-24 sm:w-32 bg-gradient-to-r ${config.gradient} mx-auto rounded-full mb-4 sm:mb-6`}
+          className={`h-1.5 w-24 sm:w-32 bg-linear-to-r ${config.gradient} mx-auto rounded-full mb-4 sm:mb-6`}
         ></div>
 
         {/* Overview stats */}
@@ -195,7 +195,7 @@ function SportDetailSection({
                     {highlight.badge}
                   </div>
                   {isLongest && (
-                    <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
+                    <div className="inline-block px-4 py-2 rounded-lg bg-linear-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
                       🏆 {t('yearInReview.longest')}
                     </div>
                   )}
@@ -213,7 +213,7 @@ function SportDetailSection({
 
               {/* Stats grid - 2x2 layout */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                     {t('yearInReview.distance')}
                   </div>
@@ -221,7 +221,7 @@ function SportDetailSection({
                     📏 {formatDistanceWithUnit(highlight.distance * 1000)}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                <div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                     {t('yearInReview.time')}
                   </div>
@@ -230,7 +230,7 @@ function SportDetailSection({
                   </div>
                 </div>
                 {paceSpeed && highlight.type !== 'triathlon' && (
-                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                  <div className="bg-linear-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                       {t('yearInReview.pace')}
                     </div>
@@ -280,7 +280,7 @@ function SportDetailSection({
               className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
+                <div className="inline-block px-4 py-2 rounded-lg bg-linear-to-r from-amber-500 to-orange-500 text-white text-sm font-bold shadow-sm">
                   🏆 {t('yearInReview.longest')}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -296,7 +296,7 @@ function SportDetailSection({
 
               {/* Stats grid - 2x2 layout */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                     {t('yearInReview.distance')}
                   </div>
@@ -304,7 +304,7 @@ function SportDetailSection({
                     📏 {formatDistanceWithUnit(highlights.longestActivity.distanceKm * 1000)}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                <div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                   <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                     {t('yearInReview.time')}
                   </div>
@@ -313,7 +313,7 @@ function SportDetailSection({
                   </div>
                 </div>
                 {paceSpeed && (
-                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                  <div className="bg-linear-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                       {t('yearInReview.pace')}
                     </div>
@@ -324,7 +324,7 @@ function SportDetailSection({
                 )}
                 {highlights.longestActivity.elevationGainMeters &&
                   highlights.longestActivity.elevationGainMeters > 50 && (
-                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                    <div className="bg-linear-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
                       <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                         {t('yearInReview.elevation')}
                       </div>
@@ -376,7 +376,7 @@ function SportDetailSection({
                 className="flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200/50 dark:border-gray-600 p-6 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-sm">
+                  <div className="inline-block px-4 py-2 rounded-lg bg-linear-to-r from-emerald-500 to-green-600 text-white text-sm font-bold shadow-sm">
                     ⛰️ {t('yearInReview.biggestClimb')}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -392,7 +392,7 @@ function SportDetailSection({
 
                 {/* Stats grid - 2x2 layout */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
+                  <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                       {t('yearInReview.distance')}
                     </div>
@@ -400,7 +400,7 @@ function SportDetailSection({
                       📏 {formatDistanceWithUnit(highlights.biggestClimb.distanceKm * 1000)}
                     </div>
                   </div>
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
+                  <div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                       {t('yearInReview.time')}
                     </div>
@@ -409,7 +409,7 @@ function SportDetailSection({
                     </div>
                   </div>
                   {paceSpeed && (
-                    <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
+                    <div className="bg-linear-to-br from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600">
                       <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                         {t('yearInReview.pace')}
                       </div>
@@ -418,7 +418,7 @@ function SportDetailSection({
                       </div>
                     </div>
                   )}
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
+                  <div className="bg-linear-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-3 border border-emerald-100 dark:border-emerald-800">
                     <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
                       {t('yearInReview.elevation')}
                     </div>
@@ -474,10 +474,10 @@ function RaceCard({
       className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 dark:border-gray-700 block"
     >
       {/* Colorful top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
 
       {/* Subtle gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-linear-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       <div className="relative p-6">
         {/* Header with emoji and date */}
@@ -491,18 +491,18 @@ function RaceCard({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-14 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
           {highlight.name}
         </h3>
 
         {/* Badge label */}
-        <p className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-5">
+        <p className="text-sm font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 mb-5">
           {highlight.badge}
         </p>
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
+          <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-4 border border-blue-100 dark:border-blue-800">
             <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
               {highlight.badge.includes('Mountain Triathlon')
                 ? 'Total Elevation'
@@ -516,7 +516,7 @@ function RaceCard({
                 : formatDistanceWithUnit(highlight.distance * 1000)}
             </div>
           </div>
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
+          <div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl p-4 border border-purple-100 dark:border-purple-800">
             <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
               Time
             </div>
@@ -528,7 +528,7 @@ function RaceCard({
 
         {/* Activity splits for triathlons */}
         {highlight.activities && highlight.activities.length > 1 && (
-          <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+          <div className="bg-linear-to-r from-slate-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
             <div className="text-xs text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider mb-3">
               Splits
             </div>
@@ -1099,7 +1099,7 @@ export function YearInReview({
       <div
         ref={containerRef}
         id="year-in-review-content"
-        className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
+        className="relative min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
       >
         {/* Action Buttons - Fixed bottom right */}
         <div className="fixed bottom-24 md:bottom-6 right-6 z-40 flex flex-col gap-3 print:hidden">
@@ -1107,7 +1107,7 @@ export function YearInReview({
           <button
             onClick={() => setShowExportDialog(true)}
             disabled={isAdvancedExporting}
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             title={t('yearInReview.exportPDF')}
           >
             {isAdvancedExporting ? (
@@ -1126,7 +1126,7 @@ export function YearInReview({
           {/* Social Card Button */}
           <button
             onClick={handleCreateSocialCard}
-            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
+            className="bg-linear-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
             title="Create Social Card"
           >
             <span className="text-2xl">📱</span>
@@ -1137,7 +1137,7 @@ export function YearInReview({
         {/* Hero Section */}
         <div
           id="hero"
-          className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white"
+          className="relative overflow-hidden bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white"
         >
           {/* Background image or pattern */}
           {croppedBackgroundUrl ? (
@@ -1149,7 +1149,7 @@ export function YearInReview({
                 }}
               />
               <div
-                className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70 dark:from-gray-900/80 dark:via-black/90 dark:to-gray-900/80"
+                className="absolute inset-0 bg-linear-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70 dark:from-gray-900/80 dark:via-black/90 dark:to-gray-900/80"
                 style={{
                   opacity: highlightFilters.backgroundImageOpacity || 0.7,
                 }}
@@ -1188,7 +1188,7 @@ export function YearInReview({
                 <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tight drop-shadow-2xl">
                   {year === 'last365' ? t('yearInReview.last365Title') : year}
                 </h1>
-                <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-8 rounded-full"></div>
+                <div className="h-1.5 w-32 bg-linear-to-r from-transparent via-white to-transparent mx-auto mb-8 rounded-full"></div>
                 <p className="text-3xl md:text-4xl font-light mb-4 text-white/90 tracking-wide">
                   {t('app.tagline')}
                 </p>
@@ -1213,7 +1213,7 @@ export function YearInReview({
             </div>
           </div>
           {/* Bottom fade effect */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-50 dark:from-gray-900 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-slate-50 dark:from-gray-900 to-transparent"></div>
         </div>
 
         {/* Heatmap Calendar */}
@@ -1225,7 +1225,7 @@ export function YearInReview({
                 {t('yearInReview.activityCalendar')}
               </h2>
             </div>
-            <div className="h-1.5 w-32 bg-gradient-to-r from-emerald-500 to-teal-600 mx-auto rounded-full mb-6"></div>
+            <div className="h-1.5 w-32 bg-linear-to-r from-emerald-500 to-teal-600 mx-auto rounded-full mb-6"></div>
             <p className="text-xl text-gray-600 dark:text-gray-400 font-semibold">
               {t('yearInReview.trainingConsistency')}
             </p>
@@ -1243,7 +1243,7 @@ export function YearInReview({
                   {t('yearInReview.raceOverview')}
                 </h2>
               </div>
-              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-red-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <div className="h-1.5 w-24 sm:w-32 bg-linear-to-r from-yellow-500 to-red-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
               <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
                 {t(
                   raceItems.length === 1
@@ -1258,7 +1258,7 @@ export function YearInReview({
             <div className="max-w-4xl mx-auto">
               <div className="relative">
                 {/* Vertical timeline line */}
-                <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-yellow-500 via-orange-500 to-red-600"></div>
+                <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-yellow-500 via-orange-500 to-red-600"></div>
 
                 {/* Timeline items */}
                 <div className="space-y-8">
@@ -1283,7 +1283,7 @@ export function YearInReview({
                           className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
                         >
                           {/* Timeline dot */}
-                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-linear-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
 
                           {/* Content card */}
                           <div
@@ -1336,7 +1336,7 @@ export function YearInReview({
                                   </div>
                                 </div>
                                 <div className="ml-4">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                  <div className="w-12 h-12 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                                     <span className="text-2xl">🏆</span>
                                   </div>
                                 </div>
@@ -1362,7 +1362,7 @@ export function YearInReview({
                           className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-row`}
                         >
                           {/* Timeline dot */}
-                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
+                          <div className="absolute left-8 md:left-1/2 w-4 h-4 bg-linear-to-br from-yellow-400 to-orange-600 rounded-full border-4 border-white dark:border-gray-900 shadow-lg transform -translate-x-1/2 z-10"></div>
 
                           {/* Content card */}
                           <div
@@ -1404,7 +1404,7 @@ export function YearInReview({
                                   </div>
                                 </div>
                                 <div className="ml-4">
-                                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                                  <div className="w-12 h-12 bg-linear-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                                     <span className="text-2xl">🏆</span>
                                   </div>
                                 </div>
@@ -1422,7 +1422,7 @@ export function YearInReview({
         )}
 
         {/* Triathlons Section - Moved to top */}
-        {triathlons.length > 0 && (
+        {triathlons.length > 0 && highlightFilters.specialOptions.enableTriathlonHighlights && (
           <div id="triathlons" className="container mx-auto px-6 py-16 md:py-20">
             <div className="mb-12">
               <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
@@ -1431,7 +1431,7 @@ export function YearInReview({
                   {t('yearInReview.triathlons')}
                 </h2>
               </div>
-              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <div className="h-1.5 w-24 sm:w-32 bg-linear-to-r from-blue-500 to-purple-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
               <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
                 {triathlons.length}{' '}
                 {triathlons.length === 1
@@ -1487,7 +1487,7 @@ export function YearInReview({
                   {t('yearInReview.otherAchievements')}
                 </h2>
               </div>
-              <div className="h-1.5 w-24 sm:w-32 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
+              <div className="h-1.5 w-24 sm:w-32 bg-linear-to-r from-yellow-500 to-orange-600 mx-auto rounded-full mb-4 sm:mb-6"></div>
               <p className="text-xl text-gray-600 dark:text-gray-400 text-center font-semibold">
                 {t('yearInReview.morePerformances')}
               </p>
@@ -1507,7 +1507,7 @@ export function YearInReview({
         {/* Footer Message */}
         <div
           id="closing"
-          className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16"
+          className="relative overflow-hidden bg-linear-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white py-20 md:py-24 mt-16"
         >
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20" />
           <div className="container mx-auto px-6 text-center relative">
@@ -1516,7 +1516,7 @@ export function YearInReview({
               <h2 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-2xl">
                 {t('yearInReview.epicYear')}
               </h2>
-              <div className="h-1.5 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto rounded-full mb-8"></div>
+              <div className="h-1.5 w-32 bg-linear-to-r from-transparent via-white to-transparent mx-auto rounded-full mb-8"></div>
             </div>
 
             <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 md:p-10 border border-white/20 shadow-2xl max-w-4xl mx-auto">

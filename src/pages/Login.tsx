@@ -15,7 +15,7 @@ export const Login = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-600">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-500 to-red-600">
       <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Sport Year</h1>

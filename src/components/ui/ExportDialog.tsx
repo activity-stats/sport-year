@@ -246,7 +246,7 @@ export function ExportDialog({
           <button
             onClick={handleExport}
             disabled={!sections.some((s) => s.enabled) || isExporting}
-            className="px-6 py-2 rounded-lg font-medium bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+            className="px-6 py-2 rounded-lg font-medium bg-linear-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
           >
             {t('export.exportButton')}
           </button>

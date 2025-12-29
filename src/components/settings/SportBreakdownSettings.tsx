@@ -81,7 +81,7 @@ export function SportBreakdownSettings({ isOpen, onClose }: SportBreakdownSettin
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 dark:bg-black/90 backdrop-blur-sm">
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6">
+        <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white p-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-black">Sport Breakdown Settings</h2>

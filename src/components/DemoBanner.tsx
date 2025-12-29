@@ -9,7 +9,7 @@ export const DemoBanner = () => {
   const setupUrl = `${window.location.origin}/setup`;
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 shadow-md">
+    <div className="bg-linear-to-r from-blue-600 to-blue-700 text-white py-3 px-4 shadow-md">
       <div className="container mx-auto flex items-center justify-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-2xl">ℹ️</span>
