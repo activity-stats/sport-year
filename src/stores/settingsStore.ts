@@ -55,6 +55,7 @@ export type StatType =
   | 'avgSpeed'
   | 'longestActivity'
   | 'biggestClimb'
+  | 'mostActiveDay'
   | 'avgHeartRate'
   | 'maxSpeed'
   | 'calories'
@@ -304,6 +305,11 @@ export const AVAILABLE_STATS: Record<StatType, Omit<StatOption, 'enabled'>> = {
     id: 'biggestClimb',
     label: 'Biggest Climb',
     description: 'Elevation gain of your toughest climb',
+  },
+  mostActiveDay: {
+    id: 'mostActiveDay',
+    label: 'Most Active Day',
+    description: 'Day of the week with the most training time',
   },
   avgHeartRate: {
     id: 'avgHeartRate',

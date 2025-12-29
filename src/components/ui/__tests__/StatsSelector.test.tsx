@@ -39,6 +39,8 @@ describe('StatsSelector', () => {
     highestElevation: undefined,
     byType: {} as any,
     byMonth: [],
+    byDayOfWeek: [],
+    hourDayHeatmap: new Map(),
   };
 
   let mockOnConfirm: (selectedStats: any[]) => void;

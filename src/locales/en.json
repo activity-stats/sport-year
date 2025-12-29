@@ -80,6 +80,7 @@
     "avgSpeedKmh": "Avg Speed (km/h)",
     "longestKm": "Longest (km)",
     "biggestClimbM": "Biggest Climb (m)",
+    "mostActiveDay": "Most Active Day",
     "avgHeartRate": "Avg Heart Rate",
     "maxSpeedKmh": "Max Speed (km/h)",
     "caloriesBurned": "Calories Burned"
@@ -129,6 +130,29 @@
     "exportButton": "Export"
   },
   "months": {},
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "timeBlocks": {
+    "earlyMorning": "Early Morning",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "night": "Night"
+  },
   "statsOverview": {
     "title": "{{year}} Overview",
     "totalDistance": "Total Distance",
@@ -136,7 +160,9 @@
     "totalTime": "Total Time",
     "activities": "Activities",
     "longestActivity": "Longest Activity",
-    "mostElevation": "Most Elevation"
+    "mostElevation": "Most Elevation",
+    "mostActiveDay": "Most Active Day",
+    "preferredTime": "Preferred Training Time"
   },
   "statsSelector": {
     "title": "Select Stats",
@@ -178,6 +204,8 @@
   "charts": {
     "monthlyTrends": "Monthly Trends",
     "weeklyTrends": "Weekly Trends",
+    "weeklyPattern": "Weekly Training Pattern",
+    "trainingHeatmap": "Training Time Heatmap",
     "byActivityType": "By Activity Type",
     "activityTypes": "Activity Types",
     "noActivitiesYet": "No activities yet",

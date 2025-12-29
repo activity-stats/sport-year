@@ -5,6 +5,8 @@ import { useYearStats } from '../hooks/useYearStats.ts';
 import { StatsOverview } from '../components/ui/StatsOverview.tsx';
 import { MonthlyChart } from '../components/charts/MonthlyChart.tsx';
 import { ActivityTypeChart } from '../components/charts/ActivityTypeChart.tsx';
+import { DayOfWeekChart } from '../components/charts/DayOfWeekChart.tsx';
+import { TrainingHeatmap } from '../components/charts/TrainingHeatmap.tsx';
 import { HeatmapCalendar } from '../components/charts/HeatmapCalendar.tsx';
 import { AchievementTimeline } from '../components/charts/AchievementTimeline.tsx';
 import { ActivityList } from '../components/activities/ActivityList.tsx';
@@ -615,6 +617,12 @@ export const Dashboard = () => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <MonthlyChart data={stats.byMonth} activities={activities} />
                         <ActivityTypeChart data={stats.byType} />
+                      </div>
+
+                      {/* Weekly Pattern & Training Heatmap */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <DayOfWeekChart data={stats.byDayOfWeek} />
+                        <TrainingHeatmap data={stats.hourDayHeatmap} />
                       </div>
 
                       {/* Achievement Timeline */}

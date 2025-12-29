@@ -34,6 +34,28 @@ export const StatsOverview = ({ stats }: StatsOverviewProps) => {
       icon: '📊',
       color: 'bg-orange-500',
     },
+    ...(stats.mostActiveDay
+      ? [
+          {
+            label: t('statsOverview.mostActiveDay'),
+            value: t(`days.${stats.mostActiveDay.dayName}`),
+            icon: '🗓️',
+            color: 'bg-indigo-500',
+            subtitle: formatDuration(stats.mostActiveDay.timeHours * 3600),
+          },
+        ]
+      : []),
+    ...(stats.preferredTrainingTime
+      ? [
+          {
+            label: t('statsOverview.preferredTime'),
+            value: t(`timeBlocks.${stats.preferredTrainingTime.timeBlock}`),
+            icon: '🕐',
+            color: 'bg-pink-500',
+            subtitle: `${stats.preferredTrainingTime.activityCount} ${t('statsOverview.activities').toLowerCase()}`,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -42,7 +64,7 @@ export const StatsOverview = ({ stats }: StatsOverviewProps) => {
         {t('statsOverview.title', { year: stats.year })} 🏆
       </h2>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 px-3 sm:px-0">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-6 px-3 sm:px-0">
         {statCards.map((card) => (
           <div
             key={card.label}
@@ -53,9 +75,12 @@ export const StatsOverview = ({ stats }: StatsOverviewProps) => {
               <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <span className="text-2xl sm:text-4xl">{card.icon}</span>
               </div>
-              <div className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 break-words">
+              <div className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 wrap-break-word">
                 {card.value}
               </div>
+              {'subtitle' in card && card.subtitle && (
+                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{card.subtitle}</div>
+              )}
               <div className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
                 {card.label}
               </div>

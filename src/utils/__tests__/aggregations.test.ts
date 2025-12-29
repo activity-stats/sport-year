@@ -362,4 +362,154 @@ describe('aggregateYearStats', () => {
       expect(stats.totalTimeHours).toBeCloseTo(2.25, 2);
     });
   });
+
+  describe('Day of Week Statistics', () => {
+    it('should aggregate activities by day of week (Monday-first)', () => {
+      const activities = [
+        createActivity({ date: new Date('2024-01-08T10:00:00Z'), distanceKm: 10 }), // Monday
+        createActivity({ date: new Date('2024-01-09T10:00:00Z'), distanceKm: 15 }), // Tuesday
+        createActivity({ date: new Date('2024-01-08T14:00:00Z'), distanceKm: 5 }), // Monday
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.byDayOfWeek).toHaveLength(7);
+      expect(stats.byDayOfWeek[0].dayName).toBe('monday'); // Monday is index 0
+      expect(stats.byDayOfWeek[0].activityCount).toBe(2);
+      expect(stats.byDayOfWeek[0].distanceKm).toBe(15);
+      expect(stats.byDayOfWeek[1].dayName).toBe('tuesday');
+      expect(stats.byDayOfWeek[1].activityCount).toBe(1);
+    });
+
+    it('should include all 7 days even with no activities', () => {
+      const activities = [
+        createActivity({ date: new Date('2024-01-08T10:00:00Z') }), // Monday only
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.byDayOfWeek).toHaveLength(7);
+      stats.byDayOfWeek.forEach((day) => {
+        expect(day.dayName).toBeDefined();
+        expect(day.activityCount).toBeGreaterThanOrEqual(0);
+      });
+    });
+
+    it('should calculate averages correctly for days with activities', () => {
+      const activities = [
+        createActivity({
+          date: new Date('2024-01-08T10:00:00Z'),
+          distanceKm: 10,
+          durationMinutes: 60,
+        }), // Monday
+        createActivity({
+          date: new Date('2024-01-08T14:00:00Z'),
+          distanceKm: 20,
+          durationMinutes: 120,
+        }), // Monday
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+      const monday = stats.byDayOfWeek[0];
+
+      expect(monday.averageDistance).toBe(15); // (10+20)/2
+      expect(monday.averageTime).toBe(1.5); // (60+120)/60/2
+    });
+  });
+
+  describe('Hour-Day Heatmap', () => {
+    it('should create heatmap data for activities', () => {
+      // Use activities with explicit dates
+      const activities = [
+        createActivity({ date: new Date('2024-01-08T10:00:00'), distanceKm: 10 }), // Monday 10am local
+        createActivity({ date: new Date('2024-01-08T10:00:00'), distanceKm: 5 }), // Monday 10am local
+        createActivity({ date: new Date('2024-01-09T14:00:00'), distanceKm: 15 }), // Tuesday 2pm local
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.hourDayHeatmap).toBeInstanceOf(Map);
+      expect(stats.hourDayHeatmap.size).toBeGreaterThan(0);
+
+      // Should have entries for the activities
+      const hasEntries = stats.hourDayHeatmap.size > 0;
+      expect(hasEntries).toBe(true);
+    });
+
+    it('should handle empty heatmap', () => {
+      const stats = aggregateYearStats([], 2024);
+
+      expect(stats.hourDayHeatmap).toBeInstanceOf(Map);
+      expect(stats.hourDayHeatmap.size).toBe(0);
+    });
+  });
+
+  describe('Most Active Day', () => {
+    it('should find the most active day by time', () => {
+      const activities = [
+        createActivity({
+          date: new Date('2024-01-08T10:00:00Z'),
+          durationMinutes: 120,
+        }), // Monday
+        createActivity({
+          date: new Date('2024-01-09T10:00:00Z'),
+          durationMinutes: 60,
+        }), // Tuesday
+        createActivity({
+          date: new Date('2024-01-08T14:00:00Z'),
+          durationMinutes: 90,
+        }), // Monday
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.mostActiveDay).toBeDefined();
+      expect(stats.mostActiveDay?.dayName).toBe('monday');
+      expect(stats.mostActiveDay?.activityCount).toBe(2);
+      expect(stats.mostActiveDay?.timeHours).toBe(3.5); // 210 minutes / 60
+    });
+
+    it('should return undefined when no activities', () => {
+      const stats = aggregateYearStats([], 2024);
+
+      expect(stats.mostActiveDay).toBeUndefined();
+    });
+  });
+
+  describe('Preferred Training Time', () => {
+    it('should identify preferred training time block', () => {
+      const activities = [
+        createActivity({ date: new Date('2024-01-08T06:00:00Z') }), // Early morning
+        createActivity({ date: new Date('2024-01-09T07:00:00Z') }), // Early morning
+        createActivity({ date: new Date('2024-01-10T10:00:00Z') }), // Morning
+        createActivity({ date: new Date('2024-01-11T06:30:00Z') }), // Early morning
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.preferredTrainingTime).toBeDefined();
+      expect(stats.preferredTrainingTime?.timeBlock).toBe('earlyMorning');
+      expect(stats.preferredTrainingTime?.activityCount).toBe(3);
+    });
+
+    it('should handle night time block correctly (wraps around midnight)', () => {
+      const activities = [
+        createActivity({ date: new Date('2024-01-08T22:00:00Z') }), // Night
+        createActivity({ date: new Date('2024-01-09T23:00:00Z') }), // Night
+        createActivity({ date: new Date('2024-01-10T02:00:00Z') }), // Night (early AM)
+      ];
+
+      const stats = aggregateYearStats(activities, 2024);
+
+      expect(stats.preferredTrainingTime).toBeDefined();
+      expect(stats.preferredTrainingTime?.timeBlock).toBe('night');
+      expect(stats.preferredTrainingTime?.activityCount).toBe(3);
+    });
+
+    it('should return undefined when no activities', () => {
+      const stats = aggregateYearStats([], 2024);
+
+      expect(stats.preferredTrainingTime).toBeUndefined();
+    });
+  });
 });
