@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStore, AVAILABLE_STATS, type StatType } from '../../stores/settingsStore';
 import type { ActivityType } from '../../types';
-import { ImagePositionEditor } from './ImagePositionEditor';
+import { ImageCropEditor } from './ImageCropEditor';
+import type { CropArea } from '../../utils/imageCrop';
 import { ActivityManagement } from './ActivityManagement';
 import { AdvancedFilters } from './AdvancedFilters';
 import { showWarning, showError } from '../../utils/toast';
@@ -41,10 +42,20 @@ export function YearInReviewSettings({
   const {
     yearInReview,
     setBackgroundImage,
-    setBackgroundImagePosition,
+    setBackgroundImageCrop,
+    setBackgroundImageOpacity,
     toggleHighlightStat,
     resetYearInReview,
   } = useSettingsStore();
+
+  const handleCropChange = (crop: CropArea) => {
+    setBackgroundImageCrop(crop);
+  };
+
+  const handleOpacityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setBackgroundImageOpacity(value / 100); // Convert from 0-100 to 0-1
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -175,13 +186,46 @@ export function YearInReviewSettings({
                   <>
                     <div className="mb-4">
                       <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                        Position & Zoom
+                        Crop & Adjust
                       </h4>
-                      <ImagePositionEditor
+                      <ImageCropEditor
                         imageUrl={yearInReview.backgroundImageUrl}
-                        position={yearInReview.backgroundImagePosition}
-                        onPositionChange={setBackgroundImagePosition}
+                        initialCrop={yearInReview.backgroundImageCrop}
+                        onChange={handleCropChange}
+                        showPreviewOverlay={true}
                       />
+                    </div>
+
+                    {/* Transparency/Opacity Slider */}
+                    <div className="mb-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <label
+                          htmlFor="hero-opacity"
+                          className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          Background Transparency
+                        </label>
+                        <span className="text-sm text-gray-500">
+                          {Math.round((yearInReview.backgroundImageOpacity || 0.7) * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        id="hero-opacity"
+                        type="range"
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={(yearInReview.backgroundImageOpacity || 0.7) * 100}
+                        onChange={handleOpacityChange}
+                        className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+                        style={{
+                          background: `linear-gradient(to right, rgb(249 115 22) 0%, rgb(249 115 22) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) ${(yearInReview.backgroundImageOpacity || 0.7) * 100}%, rgb(229 231 235) 100%)`,
+                        }}
+                      />
+                      <p className="mt-2 text-xs text-gray-500">
+                        Adjust the transparency of the gradient overlay on the hero section
+                        background
+                      </p>
                     </div>
                   </>
                 )}

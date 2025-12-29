@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
@@ -20,6 +20,8 @@ import { calculateSportHighlights, type SportHighlights } from '../../utils/spor
 import { filterActivities } from '../../utils/activityFilters';
 import type { ActivityType } from '../../types';
 import type { TitlePattern, StatType, ActivityTypeFilter } from '../../stores/settingsStore';
+import type { CropArea } from '../../utils/imageCrop';
+import { getCroppedImage } from '../../utils/imageCrop';
 import { ActivitySelector } from './ActivitySelector';
 import { SocialCard } from './SocialCard';
 import { StatsSelector } from './StatsSelector';
@@ -31,7 +33,13 @@ import { showError } from '../../utils/toast';
 
 interface HighlightFilters {
   backgroundImageUrl: string | null;
-  backgroundImagePosition: { x: number; y: number; scale: number };
+  backgroundImageCrop: CropArea | null;
+  backgroundImageOpacity: number;
+  socialCardCrops: {
+    landscape?: CropArea;
+    opengraph?: CropArea;
+    square?: CropArea;
+  };
   excludedActivityTypes: ActivityType[];
   excludeVirtualPerSport: {
     cycling: { highlights: boolean; stats: boolean };
@@ -578,11 +586,49 @@ export function YearInReview({
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [croppedBackgroundUrl, setCroppedBackgroundUrl] = useState<string | null>(null);
   const {
     exportWithOptions,
     isExporting: isAdvancedExporting,
     progress: advancedProgress,
   } = useAdvancedExport();
+
+  // Generate cropped background image when crop settings change
+  useEffect(() => {
+    if (!backgroundImageUrl || !highlightFilters.backgroundImageCrop) {
+      // Defer setState to avoid cascading renders warning
+      Promise.resolve().then(() => setCroppedBackgroundUrl(null));
+      return;
+    }
+
+    let isCancelled = false;
+
+    // Use a larger dimension for better quality (hero section is typically wide)
+    const targetWidth = 1920;
+    const targetHeight = 1080;
+
+    getCroppedImage(
+      backgroundImageUrl,
+      highlightFilters.backgroundImageCrop,
+      targetWidth,
+      targetHeight
+    )
+      .then((result) => {
+        if (!isCancelled) {
+          setCroppedBackgroundUrl(result.url);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to crop background image:', error);
+        if (!isCancelled) {
+          setCroppedBackgroundUrl(null);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [backgroundImageUrl, highlightFilters.backgroundImageCrop]);
 
   const handleAdvancedExport = async (sections: ExportSection[], format: ExportFormat) => {
     try {
@@ -1043,18 +1089,20 @@ export function YearInReview({
           className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-black dark:to-gray-900 text-white"
         >
           {/* Background image or pattern */}
-          {backgroundImageUrl ? (
+          {croppedBackgroundUrl ? (
             <>
               <div
-                className="absolute inset-0 bg-cover"
+                className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(${backgroundImageUrl})`,
-                  backgroundPosition: `${highlightFilters.backgroundImagePosition.x}% ${highlightFilters.backgroundImagePosition.y}%`,
-                  transform: `scale(${highlightFilters.backgroundImagePosition.scale})`,
-                  transformOrigin: 'center',
+                  backgroundImage: `url(${croppedBackgroundUrl})`,
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70 dark:from-gray-900/80 dark:via-black/90 dark:to-gray-900/80" />
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-blue-600/70 via-indigo-700/80 to-purple-800/70 dark:from-gray-900/80 dark:via-black/90 dark:to-gray-900/80"
+                style={{
+                  opacity: highlightFilters.backgroundImageOpacity || 0.7,
+                }}
+              />
             </>
           ) : (
             <>

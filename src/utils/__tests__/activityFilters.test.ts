@@ -30,7 +30,9 @@ const createSettings = (overrides = {}): YearInReviewSettings => ({
   titleIgnorePatterns: [],
   activityFilters: [],
   backgroundImageUrl: null,
-  backgroundImagePosition: { x: 50, y: 50, scale: 1 },
+  backgroundImageCrop: null,
+  backgroundImageOpacity: 0.7,
+  socialCardCrops: {},
   highlightStats: [],
   activityTypeSettings: {
     order: [],

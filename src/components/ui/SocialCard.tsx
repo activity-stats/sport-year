@@ -6,6 +6,10 @@ import type { StravaAthlete } from '../../types/strava';
 import type { RaceHighlight } from '../../utils/raceDetection';
 import type { StatOption } from './statsOptions';
 import { formatDuration } from '../../utils/formatters';
+import { ImageCropEditor } from './ImageCropEditor';
+import type { CropArea } from '../../utils/imageCrop';
+import { getCroppedImage } from '../../utils/imageCrop';
+import { useSettingsStore } from '../../stores/settingsStore';
 
 interface SocialCardProps {
   year: number | 'last365';
@@ -35,25 +39,84 @@ export function SocialCard({
   const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const { yearInReview, setSocialCardCrop } = useSettingsStore();
 
   // Format options
   type ExportFormat = 'landscape' | 'opengraph' | 'square';
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('landscape');
   const [imageOpacity, setImageOpacity] = useState(0.6);
   const [textShadow, setTextShadow] = useState(2);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [croppedBackgroundUrl, setCroppedBackgroundUrl] = useState<string | null>(null);
 
   const formats = {
-    landscape: { width: 1920, height: 1080, label: 'Landscape', description: '16:9 format' },
+    landscape: {
+      width: 1920,
+      height: 1080,
+      label: 'Landscape',
+      description: '16:9 format',
+      aspectRatio: 16 / 9,
+    },
     opengraph: {
       width: 1200,
       height: 630,
       label: 'Open Graph',
       description: 'LinkedIn, Facebook, Twitter',
+      aspectRatio: 1200 / 630,
     },
-    square: { width: 1080, height: 1080, label: 'Square', description: 'Instagram, Strava' },
+    square: {
+      width: 1080,
+      height: 1080,
+      label: 'Square',
+      description: 'Instagram, Strava',
+      aspectRatio: 1,
+    },
   };
 
   const currentFormat = formats[selectedFormat];
+
+  // Generate cropped background image when crop settings or format changes
+  useEffect(() => {
+    if (!backgroundImageUrl) {
+      setCroppedBackgroundUrl(null);
+      return;
+    }
+
+    const currentCrop = yearInReview.socialCardCrops[selectedFormat];
+    if (!currentCrop) {
+      setCroppedBackgroundUrl(null);
+      return;
+    }
+
+    let isCancelled = false;
+
+    getCroppedImage(backgroundImageUrl, currentCrop, currentFormat.width, currentFormat.height)
+      .then((result) => {
+        if (!isCancelled) {
+          setCroppedBackgroundUrl(result.url);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to crop social card image:', error);
+        if (!isCancelled) {
+          setCroppedBackgroundUrl(null);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    backgroundImageUrl,
+    selectedFormat,
+    yearInReview.socialCardCrops,
+    currentFormat.width,
+    currentFormat.height,
+  ]);
+
+  const handleCropChange = (crop: CropArea) => {
+    setSocialCardCrop(selectedFormat, crop);
+  };
 
   // Close on ESC key
   useEffect(() => {
@@ -344,6 +407,14 @@ export function SocialCard({
             {/* Slider Controls */}
             {backgroundImageUrl && (
               <div className="flex-1 flex flex-col gap-3 min-w-[200px]">
+                {/* Crop Button */}
+                <button
+                  onClick={() => setShowCropModal(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg text-sm"
+                >
+                  ✂️ Crop Image
+                </button>
+
                 {/* Transparency Control */}
                 <div className="flex items-center gap-3">
                   <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap w-24">
@@ -416,19 +487,14 @@ export function SocialCard({
                 }}
               >
                 {/* Background Image */}
-                {backgroundImageUrl && (
+                {croppedBackgroundUrl && (
                   <>
                     <div
                       className="absolute inset-0"
                       style={{
-                        backgroundImage: `url(${backgroundImageUrl})`,
+                        backgroundImage: `url(${croppedBackgroundUrl})`,
                         backgroundSize: 'cover',
-                        backgroundPosition:
-                          selectedFormat === 'opengraph'
-                            ? 'center 40%'
-                            : selectedFormat === 'square'
-                              ? '70% center'
-                              : 'center center',
+                        backgroundPosition: 'center center',
                       }}
                     />
                     <div
@@ -761,6 +827,51 @@ export function SocialCard({
           </div>
         </div>
       </div>
+
+      {/* Crop Modal */}
+      {showCropModal && backgroundImageUrl && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white">
+                    Crop Image for {currentFormat.label}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Adjust the crop area to match your {currentFormat.width}×{currentFormat.height}
+                    px social card
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowCropModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <ImageCropEditor
+                imageUrl={backgroundImageUrl}
+                initialCrop={yearInReview.socialCardCrops[selectedFormat]}
+                aspectRatio={currentFormat.aspectRatio}
+                onChange={handleCropChange}
+              />
+            </div>
+
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+              <button
+                onClick={() => setShowCropModal(false)}
+                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -23,12 +23,30 @@ describe('settingsStore', () => {
       expect(useSettingsStore.getState().yearInReview.backgroundImageUrl).toBeNull();
     });
 
-    it('should set background image position', () => {
-      useSettingsStore.getState().setBackgroundImagePosition({ x: 30, y: 70, scale: 1.5 });
-      expect(useSettingsStore.getState().yearInReview.backgroundImagePosition).toEqual({
-        x: 30,
-        y: 70,
-        scale: 1.5,
+    it('should set background image crop', () => {
+      useSettingsStore.getState().setBackgroundImageCrop({ x: 10, y: 20, width: 80, height: 60 });
+      expect(useSettingsStore.getState().yearInReview.backgroundImageCrop).toEqual({
+        x: 10,
+        y: 20,
+        width: 80,
+        height: 60,
+      });
+    });
+
+    it('should set background image opacity', () => {
+      useSettingsStore.getState().setBackgroundImageOpacity(0.5);
+      expect(useSettingsStore.getState().yearInReview.backgroundImageOpacity).toBe(0.5);
+    });
+
+    it('should set social card crop for landscape format', () => {
+      useSettingsStore
+        .getState()
+        .setSocialCardCrop('landscape', { x: 5, y: 10, width: 90, height: 80 });
+      expect(useSettingsStore.getState().yearInReview.socialCardCrops.landscape).toEqual({
+        x: 5,
+        y: 10,
+        width: 90,
+        height: 80,
       });
     });
   });
