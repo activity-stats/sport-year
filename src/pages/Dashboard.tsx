@@ -24,9 +24,7 @@ import { useLoadingStore } from '../stores/loadingStore.ts';
 import { useThemeStore } from '../stores/themeStore.ts';
 import { useLanguageStore } from '../stores/languageStore.ts';
 import type { ActivityType } from '../types';
-import { detectRaceHighlights, detectRaceHighlightsWithExcluded } from '../utils/raceDetection';
-import { calculateSportHighlights } from '../utils/sportHighlights';
-import { filterActivities } from '../utils/activityFilters';
+import { ActivityService } from '../services/activityService';
 import { DemoBanner } from '../components/DemoBanner';
 
 const ONBOARDING_SEEN_KEY = 'sport-year-onboarding-seen';
@@ -143,53 +141,18 @@ export const Dashboard = () => {
     return result;
   }, [sportBreakdown]);
 
-  // Calculate highlights for Achievement Timeline
+  // Calculate highlights for Achievement Timeline using service layer
   const { highlights, sportHighlights } = useMemo(() => {
     if (!activities || activities.length === 0) {
       return { highlights: [], sportHighlights: {} };
     }
 
-    filterActivities(activities, yearInReview);
-
-    const raceHighlights = detectRaceHighlights(activities, {
-      titleIgnorePatterns: yearInReview.titleIgnorePatterns,
-      activityFilters: yearInReview.activityFilters,
-    });
-
-    const excludedResult = detectRaceHighlightsWithExcluded(activities, {
-      titleIgnorePatterns: yearInReview.titleIgnorePatterns,
-      activityFilters: yearInReview.activityFilters,
-    });
-
-    const activitiesForTotals = activities.filter((activity) => {
-      if (yearInReview.excludedActivityTypes.includes(activity.type)) {
-        return false;
-      }
-
-      // Also apply title ignore patterns for stats (not highlights)
-      for (const patternObj of yearInReview.titleIgnorePatterns) {
-        if (
-          patternObj.excludeFromStats &&
-          activity.name.toLowerCase().includes(patternObj.pattern.toLowerCase())
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    const sportStats = calculateSportHighlights(
-      activitiesForTotals,
-      yearInReview.activityFilters,
-      excludedResult.excludedActivityIds,
-      yearInReview.titleIgnorePatterns,
-      yearInReview.activityTypeSettings.includeInHighlights
-    );
+    // Use ActivityService to encapsulate all business logic
+    const enriched = ActivityService.getEnrichedActivities(activities, yearInReview);
 
     return {
-      highlights: raceHighlights,
-      sportHighlights: sportStats,
+      highlights: enriched.highlights,
+      sportHighlights: enriched.sportHighlights,
     };
   }, [activities, yearInReview]);
 

@@ -41,12 +41,13 @@ src/
 │   └── ui/              # Reusable UI components
 ├── hooks/               # Custom React hooks
 ├── pages/               # Page components (Login, Dashboard, Callback)
-├── services/            # Business logic (config providers)
+├── services/            # Business logic (config providers, activity service)
 ├── stores/              # Zustand stores
 ├── types/               # TypeScript type definitions
 └── utils/               # Utility functions
 
 Key files:
+- services/activityService.ts - Service layer for activity operations
 - services/stravaConfigProvider.ts - SOLID config loading
 - stores/stravaConfigStore.ts - Config state management
 - stores/authStore.ts - Authentication state
@@ -58,6 +59,48 @@ Key files:
 ### Core Principles
 
 The codebase follows several software engineering principles to maintain clean, maintainable, and professional code:
+
+#### Service Layer Architecture
+
+**NEW (December 2025):** Centralized service layer for activity data processing.
+
+**Purpose:**
+
+- Encapsulates all business logic for activity operations
+- Provides high-level operations for components
+- Eliminates code duplication across the app
+- Single source of truth for activity processing
+
+**`ActivityService` Methods:**
+
+- `getEnrichedActivities()` - Main method returning complete data (filters, highlights, stats)
+- `getTriathlons()` - Detect triathlon races
+- `getRaceHighlights()` - Get race highlights only
+- `filterActivities()` - Filter activities by settings
+- `calculateYearStats()` - Calculate year statistics
+
+**Benefits:**
+
+- **91% less code** in components (Dashboard, YearInReview)
+- **DRY:** Business logic in one place, used everywhere
+- **Testable:** 26 comprehensive tests for service methods
+- **Maintainable:** Changes to logic happen in one file
+- **Extensible:** Easy to add features (multi-sport, PRs, training load)
+
+**Usage Example:**
+
+```typescript
+// Before (40+ lines of scattered logic)
+const filtered = activities.filter(...);
+const highlights = detectRaceHighlights(...);
+const sportStats = calculateSportHighlights(...);
+
+// After (4 lines)
+const enriched = ActivityService.getEnrichedActivities(activities, settings);
+// Use: enriched.highlights, enriched.sportHighlights, enriched.activitiesForStats
+```
+
+See `.ai/service-layer-implementation.md` for complete documentation.
 
 #### Clean Code Principles
 
@@ -106,6 +149,7 @@ The codebase follows SOLID principles to maintain clean, maintainable code:
 
 - Each module has one reason to change
 - Example: `stravaConfigProvider.ts` handles config loading only
+- Example: `activityService.ts` handles activity processing only
 - Separate stores for auth, settings, config
 - Utility functions do one thing well
 
@@ -114,6 +158,7 @@ The codebase follows SOLID principles to maintain clean, maintainable code:
 - Open for extension, closed for modification
 - Example: `IConfigProvider` interface allows new providers without changing existing code
 - `CompositeConfigProvider` adds fallback behavior through composition
+- `ActivityService` can be extended with new methods without modifying existing ones
 
 #### Liskov Substitution Principle (LSP)
 
@@ -126,12 +171,14 @@ The codebase follows SOLID principles to maintain clean, maintainable code:
 - Focused interfaces: `IConfigProvider` has minimal methods
 - Stores expose only needed methods
 - Components receive only props they use
+- Service methods accept only required parameters
 
 #### Dependency Inversion Principle (DIP)
 
 - Depend on abstractions (interfaces), not concretions
 - `stravaConfigStore` depends on `IConfigProvider` interface
 - `ConfigProviderFactory` creates concrete implementations
+- Components depend on `ActivityService`, not individual utils
 - Easy to mock for testing
 
 **Config System Example:**
