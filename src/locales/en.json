@@ -39,6 +39,8 @@
     "export": "Export",
     "exportPDF": "Export",
     "exportFailed": "Failed to export PDF. Please try again.",
+    "customize": "Customize",
+    "fabTooltip": "Click here to customize, export, or share your Year in Review!",
     "heroSection": "Hero Section",
     "triathlonsSection": "Triathlons",
     "customHighlights": "Race Overview",

@@ -67,6 +67,7 @@ interface YearInReviewProps {
   backgroundImageUrl?: string | null;
   onDateClick?: (date: Date) => void;
   onActivityClick?: (activityIds: string | string[]) => void;
+  onCustomizeClick?: () => void;
 }
 
 function SportDetailSection({
@@ -609,6 +610,7 @@ export function YearInReview({
   backgroundImageUrl,
   onDateClick,
   onActivityClick,
+  onCustomizeClick,
 }: YearInReviewProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -619,12 +621,45 @@ export function YearInReview({
   const [selectedHighlights, setSelectedHighlights] = useState<RaceHighlight[]>([]);
   const [selectedStats, setSelectedStats] = useState<StatOption[]>([]);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [fabExpanded, setFabExpanded] = useState(false);
+  const [showFirstTimeTooltip, setShowFirstTimeTooltip] = useState(false);
   const [croppedBackgroundUrl, setCroppedBackgroundUrl] = useState<string | null>(null);
   const {
     exportWithOptions,
     isExporting: isAdvancedExporting,
     progress: advancedProgress,
   } = useAdvancedExport();
+
+  const dismissTooltip = () => {
+    setShowFirstTimeTooltip(false);
+    localStorage.setItem('yearInReview.hasSeenFabTooltip', 'true');
+  };
+
+  // First-time tooltip management
+  useEffect(() => {
+    const hasSeenTooltip = localStorage.getItem('yearInReview.hasSeenFabTooltip');
+    if (!hasSeenTooltip) {
+      const showTimer = setTimeout(() => {
+        setShowFirstTimeTooltip(true);
+      }, 1000); // Show after 1 second
+
+      const hideTimer = setTimeout(() => {
+        dismissTooltip();
+      }, 11000); // Auto-hide after 11 seconds (1s delay + 10s visible)
+
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, []);
+
+  const toggleFab = () => {
+    setFabExpanded(!fabExpanded);
+    if (showFirstTimeTooltip) {
+      dismissTooltip();
+    }
+  };
 
   // Generate cropped background image when crop settings change
   useEffect(() => {
@@ -1052,37 +1087,112 @@ export function YearInReview({
         id="year-in-review-content"
         className="relative min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-black"
       >
-        {/* Action Buttons - Fixed bottom right */}
-        <div className="fixed bottom-24 md:bottom-6 right-6 z-40 flex flex-col gap-3 print:hidden">
-          {/* Export PDF Button */}
-          <button
-            onClick={() => setShowExportDialog(true)}
-            disabled={isAdvancedExporting}
-            className="bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={t('yearInReview.exportPDF')}
-          >
-            {isAdvancedExporting ? (
-              <>
-                <span className="text-2xl animate-spin">⏳</span>
-                <span className="text-lg">{advancedProgress}%</span>
-              </>
-            ) : (
-              <>
-                <span className="text-2xl">📄</span>
-                <span className="text-lg">{t('yearInReview.export')}</span>
-              </>
-            )}
-          </button>
+        {/* Expandable FAB Menu - Fixed bottom right */}
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-40 print:hidden">
+          <div className="relative flex flex-col items-end gap-3">
+            {/* Action Buttons (slide up when expanded) */}
+            <div
+              className={`flex flex-col gap-3 transition-all duration-300 origin-bottom ${
+                fabExpanded
+                  ? 'opacity-100 scale-100 translate-y-0'
+                  : 'opacity-0 scale-95 translate-y-4 pointer-events-none'
+              }`}
+            >
+              {/* Customize Button */}
+              {onCustomizeClick && (
+                <button
+                  onClick={() => {
+                    onCustomizeClick();
+                    setFabExpanded(false);
+                  }}
+                  className="bg-linear-to-r from-emerald-500 to-teal-600 text-white font-bold py-4 px-6 rounded-full hover:from-emerald-600 hover:to-teal-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
+                  title={t('yearInReview.customize')}
+                  data-testid="customize-button"
+                >
+                  <span className="text-2xl">🎨</span>
+                  <span className="text-lg">{t('yearInReview.customize')}</span>
+                </button>
+              )}
 
-          {/* Social Card Button */}
-          <button
-            onClick={handleCreateSocialCard}
-            className="bg-linear-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
-            title="Create Social Card"
-          >
-            <span className="text-2xl">📱</span>
-            <span className="text-lg">{t('yearInReview.share')}</span>
-          </button>
+              {/* Export PDF Button */}
+              <button
+                onClick={() => {
+                  setShowExportDialog(true);
+                  setFabExpanded(false);
+                }}
+                disabled={isAdvancedExporting}
+                className="bg-linear-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-6 rounded-full hover:from-blue-600 hover:to-indigo-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={t('yearInReview.exportPDF')}
+              >
+                {isAdvancedExporting ? (
+                  <>
+                    <span className="text-2xl animate-spin">⏳</span>
+                    <span className="text-lg">{advancedProgress}%</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl">📄</span>
+                    <span className="text-lg">{t('yearInReview.export')}</span>
+                  </>
+                )}
+              </button>
+
+              {/* Social Card Button */}
+              <button
+                onClick={() => {
+                  handleCreateSocialCard();
+                  setFabExpanded(false);
+                }}
+                className="bg-linear-to-r from-purple-500 to-pink-600 text-white font-bold py-4 px-6 rounded-full hover:from-purple-600 hover:to-pink-700 transition-all shadow-2xl flex items-center gap-3 hover:scale-105"
+                title="Create Social Card"
+              >
+                <span className="text-2xl">📱</span>
+                <span className="text-lg">{t('yearInReview.share')}</span>
+              </button>
+            </div>
+
+            {/* First-time Tooltip */}
+            {showFirstTimeTooltip && (
+              <div className="absolute bottom-20 -right-4 w-64 animate-bounce">
+                <div className="bg-gray-900 text-white px-4 py-3 rounded-lg shadow-2xl relative">
+                  <button
+                    onClick={dismissTooltip}
+                    className="absolute -top-2 -right-2 bg-white text-gray-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold hover:bg-gray-100 transition-colors"
+                    aria-label="Dismiss"
+                  >
+                    ×
+                  </button>
+                  <p className="text-sm font-medium pr-4">
+                    {t('yearInReview.fabTooltip', {
+                      defaultValue:
+                        'Click here to customize, export, or share your Year in Review!',
+                    })}
+                  </p>
+                  <div className="absolute -bottom-2 right-8">
+                    <div className="border-8 border-transparent border-t-gray-900"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Main Toggle Button */}
+            <button
+              onClick={toggleFab}
+              className={`relative bg-linear-to-r from-orange-500 to-red-600 text-white font-bold p-5 rounded-full hover:from-orange-600 hover:to-red-700 transition-all shadow-2xl hover:scale-110 ${
+                fabExpanded ? 'rotate-45' : ''
+              }`}
+              title="Actions"
+              aria-label={fabExpanded ? 'Close actions menu' : 'Open actions menu'}
+              aria-expanded={fabExpanded}
+            >
+              <span className="text-3xl block">{fabExpanded ? '✕' : '⚡'}</span>
+              {!fabExpanded && (
+                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+                  {onCustomizeClick ? '3' : '2'}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Hero Section */}
