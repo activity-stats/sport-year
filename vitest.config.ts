@@ -7,6 +7,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.ts',
+    env: {
+      TZ: 'UTC',
+    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
