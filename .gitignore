@@ -50,6 +50,7 @@ coverage
 .playwright-mcp
 *.tsbuildinfo
 .eslintcache
+.ai
 
 # OS
 Thumbs.db

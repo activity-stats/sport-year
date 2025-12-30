@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import type { Activity, YearStats } from '../../types';
 import type { StravaAthlete } from '../../types/strava';
 import {
-  detectRaceHighlights,
-  detectRaceHighlightsWithExcluded,
   detectTriathlons,
   getTriathlonDisplayInfo,
   type RaceHighlight,
@@ -16,8 +14,7 @@ import {
   formatAthleteSlug,
   formatElevation,
 } from '../../utils/formatters';
-import { calculateSportHighlights, type SportHighlights } from '../../utils/sportHighlights';
-import { filterActivities } from '../../utils/activityFilters';
+import { type SportHighlights } from '../../utils/sportHighlights';
 import type { ActivityType } from '../../types';
 import type { TitlePattern, StatType, ActivityTypeFilter } from '../../stores/settingsStore';
 import type { CropArea } from '../../utils/imageCrop';
@@ -29,6 +26,7 @@ import type { StatOption } from './statsOptions';
 import { HeatmapCalendar } from '../charts/HeatmapCalendar';
 import { useAdvancedExport } from '../../hooks/useAdvancedExport';
 import { ExportDialog, type ExportSection, type ExportFormat } from './ExportDialog';
+import { ActivityService } from '../../services/activityService';
 import { showError } from '../../utils/toast';
 
 interface HighlightFilters {
@@ -698,70 +696,14 @@ export function YearInReview({
     { id: 'closing', name: t('yearInReview.closingSection') },
   ];
 
-  // Filter activities to exclude virtual rides if disabled and respect title patterns for highlight cards
-  useMemo(() => filterActivities(activities, highlightFilters), [activities, highlightFilters]);
-
-  // For sport highlights totals, use activities filtered only by type exclusions
-  // (not title patterns or virtual ride settings) to match the stats page totals
-  // Virtual ride exclusion only affects which highlight CARDS are shown, not the totals
-  const activitiesForTotals = useMemo(() => {
-    return activities.filter((activity) => {
-      // Filter by activity type exclusions only
-      if (highlightFilters.excludedActivityTypes.includes(activity.type)) {
-        return false;
-      }
-
-      // Also apply title ignore patterns for stats (not highlights)
-      for (const patternObj of highlightFilters.titleIgnorePatterns) {
-        if (
-          patternObj.excludeFromStats &&
-          activity.name.toLowerCase().includes(patternObj.pattern.toLowerCase())
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [activities, highlightFilters.excludedActivityTypes, highlightFilters.titleIgnorePatterns]);
-
-  const highlights = useMemo(
-    () =>
-      detectRaceHighlights(activities, {
-        // Use ALL activities, not filtered
-        titleIgnorePatterns: highlightFilters.titleIgnorePatterns,
-        activityFilters: highlightFilters.activityFilters,
-      }),
-    [activities, highlightFilters.titleIgnorePatterns, highlightFilters.activityFilters]
-  );
-
-  // Get excluded activity IDs from custom filters to prevent duplicates in sport highlights
-  const excludedActivityIds = useMemo(() => {
-    const result = detectRaceHighlightsWithExcluded(activities, {
-      titleIgnorePatterns: highlightFilters.titleIgnorePatterns,
-      activityFilters: highlightFilters.activityFilters,
-    });
-    return result.excludedActivityIds;
-  }, [activities, highlightFilters.titleIgnorePatterns, highlightFilters.activityFilters]);
-
-  // Use activitiesForTotals to calculate sport highlights so totals match stats page
-  const sportHighlights = useMemo(
-    () =>
-      calculateSportHighlights(
-        activitiesForTotals,
-        highlightFilters.activityFilters,
-        excludedActivityIds,
-        highlightFilters.titleIgnorePatterns,
-        highlightFilters.activityTypeSettings.includeInHighlights
-      ),
-    [
-      activitiesForTotals,
-      highlightFilters.activityFilters,
-      excludedActivityIds,
-      highlightFilters.titleIgnorePatterns,
-      highlightFilters.activityTypeSettings.includeInHighlights,
-    ]
-  );
+  // Use ActivityService to encapsulate all business logic
+  const { highlights, sportHighlights } = useMemo(() => {
+    const enriched = ActivityService.getEnrichedActivities(activities, highlightFilters);
+    return {
+      highlights: enriched.highlights,
+      sportHighlights: enriched.sportHighlights,
+    };
+  }, [activities, highlightFilters]);
 
   // Convert highlights to activities for selection, including triathlon activities
   const highlightActivities = useMemo(() => {
