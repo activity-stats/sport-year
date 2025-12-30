@@ -53,7 +53,14 @@ test.describe('Advanced Features', () => {
       await navigateToYearInReview(page);
       await page.waitForTimeout(2000);
 
-      // Open customize dialog
+      // First, expand the FAB menu by clicking the toggle button
+      const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+      if (await fabToggle.isVisible()) {
+        await fabToggle.click();
+        await page.waitForTimeout(500);
+      }
+
+      // Now click the customize button
       const customizeButton = page.getByTestId('customize-button');
 
       if (await customizeButton.isVisible()) {
@@ -94,6 +101,14 @@ test.describe('Advanced Features', () => {
       await navigateToYearInReview(page);
       await page.waitForTimeout(2000);
 
+      // First, expand the FAB menu by clicking the toggle button
+      const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+      if (await fabToggle.isVisible()) {
+        await fabToggle.click();
+        await page.waitForTimeout(500);
+      }
+
+      // Now click the customize button
       const customizeButton = page.getByTestId('customize-button');
 
       if (await customizeButton.isVisible()) {

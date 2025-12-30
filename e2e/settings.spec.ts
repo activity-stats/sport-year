@@ -12,6 +12,13 @@ test.describe('Settings', () => {
   test('should open settings dialog', async ({ page }) => {
     await page.waitForTimeout(2000);
 
+    // First, expand the FAB menu
+    const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+    if (await fabToggle.isVisible()) {
+      await fabToggle.click();
+      await page.waitForTimeout(500);
+    }
+
     // Look for customize button using test ID (available in presentation mode)
     const customizeButton = page.getByTestId('customize-button');
 
@@ -34,6 +41,13 @@ test.describe('Settings', () => {
 
   test('should exclude activity types', async ({ page }) => {
     await page.waitForTimeout(2000);
+
+    // First, expand the FAB menu
+    const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+    if (await fabToggle.isVisible()) {
+      await fabToggle.click();
+      await page.waitForTimeout(500);
+    }
 
     // Open customize settings using test ID
     const customizeButton = page.getByTestId('customize-button');
@@ -61,6 +75,13 @@ test.describe('Settings', () => {
   test('should configure distance filters', async ({ page }) => {
     await page.waitForTimeout(2000);
 
+    // First, expand the FAB menu
+    const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+    if (await fabToggle.isVisible()) {
+      await fabToggle.click();
+      await page.waitForTimeout(500);
+    }
+
     // Open customize settings using test ID
     const customizeButton = page.getByTestId('customize-button');
 
@@ -83,6 +104,13 @@ test.describe('Settings', () => {
 
   test('should save settings', async ({ page }) => {
     await page.waitForTimeout(2000);
+
+    // First, expand the FAB menu
+    const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+    if (await fabToggle.isVisible()) {
+      await fabToggle.click();
+      await page.waitForTimeout(500);
+    }
 
     // Open customize settings using test ID
     const customizeButton = page.getByTestId('customize-button');
@@ -111,6 +139,13 @@ test.describe('Settings', () => {
   test('should persist settings across page reload', async ({ page }) => {
     await page.waitForTimeout(2000);
 
+    // First, expand the FAB menu
+    const fabToggle = page.locator('button[aria-label*="Open actions menu"]');
+    if (await fabToggle.isVisible()) {
+      await fabToggle.click();
+      await page.waitForTimeout(500);
+    }
+
     // Make a setting change (exclude an activity type)
     const customizeButton = page.getByTestId('customize-button');
 
@@ -134,6 +169,13 @@ test.describe('Settings', () => {
         // Reload page
         await page.reload();
         await page.waitForTimeout(2000);
+
+        // Expand FAB menu again
+        const fabToggleAfter = page.locator('button[aria-label*="Open actions menu"]');
+        if (await fabToggleAfter.isVisible()) {
+          await fabToggleAfter.click();
+          await page.waitForTimeout(500);
+        }
 
         // Open customize settings again
         const customizeButtonAfter = page.getByTestId('customize-button');

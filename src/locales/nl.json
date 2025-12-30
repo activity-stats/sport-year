@@ -39,6 +39,8 @@
     "export": "Exporteren",
     "exportPDF": "Exporteren",
     "exportFailed": "PDF exporteren mislukt. Probeer opnieuw.",
+    "customize": "Aanpassen",
+    "fabTooltip": "Klik hier om je jaaroverzicht aan te passen, te exporteren of te delen!",
     "heroSection": "Hero Sectie",
     "triathlonsSection": "Triathlons",
     "customHighlights": "Race overzicht",
