@@ -18,7 +18,7 @@ export const aggregateYearStats = (activities: Activity[], year: number): YearSt
   const byType = aggregateByType(yearActivities);
   const byDayOfWeek = aggregateByDayOfWeek(yearActivities);
   const hourDayHeatmap = aggregateByHourAndDay(yearActivities);
-  const mostActiveDay = getMostActiveDay(byDayOfWeek);
+  const mostActiveDay = getMostActiveDay(byDayOfWeek, year);
   const preferredTrainingTime = getPreferredTrainingTime(yearActivities);
 
   const totalDistanceKm = yearActivities.reduce((sum, a) => sum + a.distanceKm, 0);
@@ -210,21 +210,40 @@ export const aggregateByHourAndDay = (activities: Activity[]): Map<string, HourD
 };
 
 // Get most active day
-export const getMostActiveDay = (dayOfWeekStats: DayOfWeekStats[]): MostActiveDay | undefined => {
+export const getMostActiveDay = (
+  dayOfWeekStats: DayOfWeekStats[],
+  year: number
+): MostActiveDay | undefined => {
   if (dayOfWeekStats.length === 0) return undefined;
 
-  // Find day with highest total time (best indicator of training volume)
-  const mostActive = dayOfWeekStats.reduce((max, current) =>
-    current.timeHours > max.timeHours ? current : max
-  );
+  // Calculate number of occurrences of each day in the year
+  const startDate = new Date(year, 0, 1);
+  const endDate = new Date(year, 11, 31);
+  const dayOccurrences: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+
+  for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+    const jsDayOfWeek = date.getDay();
+    const dayOfWeek = jsDayOfWeek === 0 ? 6 : jsDayOfWeek - 1; // Monday=0, Sunday=6
+    dayOccurrences[dayOfWeek]++;
+  }
+
+  // Find day with highest average time per occurrence
+  const mostActive = dayOfWeekStats.reduce((max, current) => {
+    const currentAvg = current.timeHours / dayOccurrences[current.dayOfWeek];
+    const maxAvg = max.timeHours / dayOccurrences[max.dayOfWeek];
+    return currentAvg > maxAvg ? current : max;
+  });
 
   if (mostActive.activityCount === 0) return undefined;
+
+  // Calculate average time per day occurrence for the most active day
+  const avgTimePerOccurrence = mostActive.timeHours / dayOccurrences[mostActive.dayOfWeek];
 
   return {
     dayName: mostActive.dayName,
     activityCount: mostActive.activityCount,
     distanceKm: mostActive.distanceKm,
-    timeHours: mostActive.timeHours,
+    timeHours: avgTimePerOccurrence,
   };
 };
 

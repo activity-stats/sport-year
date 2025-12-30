@@ -445,7 +445,7 @@ describe('aggregateYearStats', () => {
   });
 
   describe('Most Active Day', () => {
-    it('should find the most active day by time', () => {
+    it('should find day with highest average time per occurrence', () => {
       const activities = [
         createActivity({
           date: new Date('2024-01-08T10:00:00Z'),
@@ -466,7 +466,8 @@ describe('aggregateYearStats', () => {
       expect(stats.mostActiveDay).toBeDefined();
       expect(stats.mostActiveDay?.dayName).toBe('monday');
       expect(stats.mostActiveDay?.activityCount).toBe(2);
-      expect(stats.mostActiveDay?.timeHours).toBe(3.5); // 210 minutes / 60
+      // Total: 210 minutes = 3.5 hours, divided by 52 Mondays in 2024 = ~0.067 hours average
+      expect(stats.mostActiveDay?.timeHours).toBeCloseTo(0.067, 2);
     });
 
     it('should return undefined when no activities', () => {
