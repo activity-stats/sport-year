@@ -3,15 +3,11 @@ import type { Activity } from '../types/activity.ts';
 
 // DRY: Transform Strava API responses to domain model
 export const transformActivity = (stravaActivity: StravaActivity): Activity => {
-  // Parse start_date_local WITHOUT timezone conversion
-  // Remove 'Z' suffix if present to treat it as local time, not UTC
-  const localDateStr = stravaActivity.start_date_local.replace(/Z$/, '');
-
   return {
     id: stravaActivity.id.toString(),
     name: stravaActivity.name,
     type: stravaActivity.type,
-    date: new Date(localDateStr),
+    date: new Date(stravaActivity.start_date),
     distanceKm: stravaActivity.distance / 1000,
     durationMinutes: stravaActivity.elapsed_time / 60,
     movingTimeMinutes: stravaActivity.moving_time / 60,
