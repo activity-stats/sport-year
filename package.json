@@ -48,7 +48,7 @@
     "date-fns": "^4.1.0",
     "html2canvas": "^1.4.1",
     "i18next": "^25.7.3",
-    "jspdf": "^3.0.4",
+    "jspdf": "^4.0.0",
     "leaflet": "^1.9.4",
     "modern-screenshot": "^4.6.7",
     "polyline-encoded": "^0.0.9",
